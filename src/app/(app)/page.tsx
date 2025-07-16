@@ -4,7 +4,14 @@ import { useState, useEffect } from "react";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
 import { Package, ShoppingCart, Truck, Wrench } from "lucide-react"
-import { ChartTooltipContent } from "@/components/ui/chart";
+import { ChartContainer, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
+
+const chartConfig = {
+  total: {
+    label: "Total",
+    color: "hsl(var(--primary))",
+  },
+} satisfies ChartConfig
 
 export default function Dashboard() {
   const [chartData, setChartData] = useState<any[]>([]);
@@ -71,30 +78,32 @@ export default function Dashboard() {
           <p className="text-sm text-muted-foreground">Movimiento de insumos en los últimos 6 meses.</p>
         </CardHeader>
         <CardContent className="pl-2">
-          <ResponsiveContainer width="100%" height={350}>
-            <BarChart data={chartData}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} />
-              <XAxis
-                dataKey="month"
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-              />
-              <YAxis
-                stroke="hsl(var(--muted-foreground))"
-                fontSize={12}
-                tickLine={false}
-                axisLine={false}
-                tickFormatter={(value) => `$${value}`}
-              />
-              <Tooltip
-                cursor={{ fill: 'hsl(var(--primary) / 0.1)' }}
-                content={<ChartTooltipContent />}
-              />
-              <Bar dataKey="total" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
+          <ChartContainer config={chartConfig} className="min-h-[350px] w-full">
+            <ResponsiveContainer width="100%" height={350}>
+              <BarChart data={chartData} accessibilityLayer>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis
+                  dataKey="month"
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                />
+                <YAxis
+                  stroke="hsl(var(--muted-foreground))"
+                  fontSize={12}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(value) => `$${value}`}
+                />
+                <Tooltip
+                  cursor={{ fill: 'hsl(var(--primary) / 0.1)' }}
+                  content={<ChartTooltipContent />}
+                />
+                <Bar dataKey="total" fill="hsl(var(--primary))" radius={[4, 4, 0, 0]} />
+              </BarChart>
+            </ResponsiveContainer>
+          </ChartContainer>
         </CardContent>
       </Card>
     </div>
