@@ -71,7 +71,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       <Sidebar collapsible="icon">
         <SidebarHeader>
           <div className="flex items-center gap-2">
-            <Button variant="ghost" size="icon" className="shrink-0 md:hidden">
+            <Button asChild variant="ghost" size="icon" className="shrink-0 md:hidden">
               <SidebarTrigger />
             </Button>
             <Link href="/" className="flex items-center gap-2 font-semibold text-lg text-sidebar-foreground">
