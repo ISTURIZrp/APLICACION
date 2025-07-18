@@ -1,5 +1,5 @@
 import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { collection, query, orderBy, getDocs, doc, addDoc, updateDoc, deleteDoc, runTransaction, writeBatch, where, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { collection, query, orderBy, getDocs, doc, addDoc, updateDoc, deleteDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 import { auth, db } from './firebase-config.js';
 import { loadSidebar } from './main.js';
 
@@ -8,26 +8,31 @@ const productTableBody = document.getElementById('productTableBody');
 const btnAddProduct = document.getElementById('btnAddProduct');
 const productModal = document.getElementById('productModal');
 const productForm = document.getElementById('productForm');
-const saveBtn = document.getElementById('saveBtn');
 const closeModalBtns = document.querySelectorAll('.close-modal-btn');
 const searchInput = document.getElementById('searchInput');
 
-// --- LÓGICA PRINCIPAL ---
+// --- FUNCIONES AUXILIARES ---
+function showNotification(message, type = 'success') {
+    // Puedes implementar un sistema de notificaciones más avanzado si quieres.
+    // Por ahora, una simple alerta servirá.
+    alert(message);
+}
 
+// --- LÓGICA PRINCIPAL ---
 async function fetchAndRenderInsumos() {
-    productTableBody.innerHTML = `<tr><td colspan="6" class="loading-message">Cargando insumos...</td></tr>`;
+    productTableBody.innerHTML = `<tr><td colspan="5" class="loading-message">Cargando insumos...</td></tr>`;
     try {
         const insumosQuery = query(collection(db, "insumos"), orderBy("nombre"));
         const insumosSnapshot = await getDocs(insumosQuery);
         
         if (insumosSnapshot.empty) {
-            productTableBody.innerHTML = `<tr><td colspan="6" class="empty-message">No hay insumos registrados</td></tr>`;
+            productTableBody.innerHTML = `<tr><td colspan="5" class="empty-message">No hay insumos registrados</td></tr>`;
             return;
         }
 
         let tableHtml = '';
-        for (const insumoDoc of insumosSnapshot.docs) {
-            const insumo = { id: insumoDoc.id, ...insumoDoc.data() };
+        insumosSnapshot.forEach(doc => {
+            const insumo = { id: doc.id, ...doc.data() };
             
             let estadoHtml = '';
             if ((insumo.existencia_total || 0) <= 0) { estadoHtml = '<span class="status-critical">Agotado</span>'; } 
@@ -41,16 +46,16 @@ async function fetchAndRenderInsumos() {
                     <td>${insumo.stock_minimo}</td>
                     <td>${estadoHtml}</td>
                     <td class="action-buttons">
-                        <button class="btn btn-edit" data-action="edit-insumo" data-id="${insumo.id}"><i class="mdi mdi-pencil"></i></button>
-                        <button class="btn btn-delete" data-action="delete-insumo" data-id="${insumo.id}"><i class="mdi mdi-delete"></i></button>
+                        <button class="btn-edit" data-action="edit-insumo" data-id="${insumo.id}" title="Editar"><i class="mdi mdi-pencil"></i></button>
+                        <button class="btn-delete" data-action="delete-insumo" data-id="${insumo.id}" title="Eliminar"><i class="mdi mdi-delete"></i></button>
                     </td>
                 </tr>
             `;
-        }
+        });
         productTableBody.innerHTML = tableHtml;
     } catch (error) {
         console.error("Error cargando insumos:", error);
-        productTableBody.innerHTML = `<tr><td colspan="6" class="empty-message">Error al cargar datos</td></tr>`;
+        productTableBody.innerHTML = `<tr><td colspan="5" class="empty-message">Error al cargar datos</td></tr>`;
     }
 }
 
@@ -74,22 +79,37 @@ async function handleFormSubmit(e) {
     const stock_minimo = Number(document.getElementById('stockMinimo').value);
 
     if (!nombre || stock_minimo < 0) {
-        // Simple validación
+        showNotification('Por favor, completa los campos correctamente.', 'error');
         return;
     }
 
     try {
         if (insumoId) {
-            // Actualizar
             await updateDoc(doc(db, "insumos", insumoId), { nombre, stock_minimo });
+            showNotification('Insumo actualizado con éxito.');
         } else {
-            // Crear nuevo
             await addDoc(collection(db, "insumos"), { nombre, stock_minimo, existencia_total: 0 });
+            showNotification('Insumo agregado con éxito.');
         }
         closeModal();
         fetchAndRenderInsumos();
     } catch (error) {
         console.error("Error guardando insumo:", error);
+        showNotification('Error al guardar el insumo.', 'error');
+    }
+}
+
+async function handleDelete(insumoId) {
+    if (!confirm('¿Estás seguro de que quieres eliminar este insumo? Esta acción no se puede deshacer.')) {
+        return;
+    }
+    try {
+        await deleteDoc(doc(db, "insumos", insumoId));
+        showNotification('Insumo eliminado con éxito.');
+        fetchAndRenderInsumos();
+    } catch (error) {
+        console.error("Error eliminando insumo:", error);
+        showNotification('Error al eliminar el insumo.', 'error');
     }
 }
 
@@ -105,6 +125,26 @@ searchInput.addEventListener('input', () => {
         row.style.display = nombre.includes(searchTerm) ? '' : 'table-row';
     });
 });
+
+// Listener para los botones de acción en la tabla
+productTableBody.addEventListener('click', async (e) => {
+    const target = e.target.closest('button');
+    if (!target) return;
+
+    const action = target.dataset.action;
+    const insumoId = target.dataset.id;
+
+    if (action === 'edit-insumo') {
+        const docRef = doc(db, "insumos", insumoId);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+            openModal({ id: docSnap.id, ...docSnap.data() });
+        }
+    } else if (action === 'delete-insumo') {
+        handleDelete(insumoId);
+    }
+});
+
 
 // --- PUNTO DE ENTRADA ---
 onAuthStateChanged(auth, async (user) => {
