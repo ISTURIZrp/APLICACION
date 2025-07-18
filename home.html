@@ -2,44 +2,64 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
-    <title>LabFlow Manager - Inicio</title>
-    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LabFlow Manager - Panel de Control</title>
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body class="app-body">
-    <div id="app-content" style="display: none;">
-        <header class="top-bar">
-            <div class="app-brand">
-                <i class="mdi mdi-beaker-outline logo-icon"></i>
-                <h1>LabFlow</h1>
+<body>
+
+    <header class="top-bar">
+        <div class="app-brand">
+            <i class="mdi mdi-beaker-outline logo-icon"></i>
+            <h1>LabFlow Manager</h1>
+        </div>
+        <div class="user-info-box" id="user-info-box">
+            <div class="user-details">
+                <div id="user-name-display">Cargando...</div>
+                <small id="user-role-display">...</small>
             </div>
-            <div id="userInfoBox" class="user-info-box">
-                <div class="user-details">
-                    <div id="user-name-display">Cargando...</div>
-                </div>
-                <i class="mdi mdi-account-circle-outline"></i>
-                <div id="userDropdown" class="user-dropdown">
-                    <a href="#" id="btnLogout"><i class="mdi mdi-logout"></i> Cerrar Sesión</a>
-                </div>
+            <i class="mdi mdi-account-circle-outline"></i>
+            <div class="user-dropdown" id="user-dropdown">
+                <a href="perfil.html"><i class="mdi mdi-account-outline"></i><span>Mi perfil</span></a>
+                <a href="#" id="logout-btn"><i class="mdi mdi-logout-variant"></i><span>Cerrar sesión</span></a>
             </div>
-        </header>
-        <div class="page-wrapper">
-            <div class="page-container">
-                <header class="header-dashboard">
-                    <h1>Panel de Control</h1>
-                </header>
-                <div class="modules-container">
-                    <div class="module">
-                        <div class="module-header"><i class="mdi mdi-beaker-check-outline"></i><h2>Insumos</h2></div>
-                        <div class="module-content">
-                            <a href="insumos.html" class="module-item"><h3>Insumos y Lotes</h3></a>
-                            <a href="movimientos.html" class="module-item"><h3>Movimientos</h3></a>
-                        </div>
+        </div>
+    </header>
+
+    <main class="page-wrapper" id="page-container" style="display: none;">
+        <div class="page-container">
+            <div class="header-dashboard">
+                <h1>Panel de Control</h1>
+                <p>Gestiona tus operaciones de laboratorio con eficiencia.</p>
+            </div>
+
+            <div class="modules-container">
+                <div class="module active">
+                    <div class="module-header"><i class="mdi mdi-clipboard-list-outline"></i><h2>Insumos</h2></div>
+                    <div class="module-content">
+                        <a href="insumos.html" class="module-item"><h3>Insumos y Lotes</h3><p>Gestiona tu inventario</p></a>
+                        <a href="movimientos.html" class="module-item"><h3>Movimientos</h3><p>Registra entradas y salidas</p></a>
+                    </div>
+                </div>
+                <div class="module">
+                    <div class="module-header"><i class="mdi mdi-cube-outline"></i><h2>Productos</h2></div>
+                    <div class="module-content">
+                         <a href="productos.html" class="module-item"><h3>Productos</h3><p>Administra productos terminados</p></a>
                     </div>
                 </div>
             </div>
         </div>
+    </main>
+
+    <div class="login-container" id="login-section">
+        <h2>Inicia Sesión para Continuar</h2>
+        <p>Serás redirigido a la página de login.</p>
     </div>
+
     <script type="module" src="js/home.js"></script>
 </body>
 </html>
