@@ -1,921 +1,106 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LabFlow Manager - Gestión de Insumos</title>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LabFlow Manager - Insumos</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="css/style.css">
+
     <style>
-        :root {
-            --primary-color: #4361ee;
-            --primary-hover: #3a56d4;
-            --secondary-color: #6c757d;
-            --success-color: #06d6a0;
-            --danger-color: #ef476f;
-            --warning-color: #ffd166;
-            --light-color: #f8f9fa;
-            --dark-color: #212529;
-            --border-color: #dee2e6;
-            --sidebar-width: 260px;
-            --sidebar-collapsed: 70px;
-            --header-height: 70px;
-            --transition: all 0.3s ease;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --radius: 8px;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Roboto', sans-serif;
-            background-color: #f5f7fb;
-            color: #333;
-            line-height: 1.6;
-            display: flex;
-            min-height: 100vh;
-            transition: var(--transition);
-        }
-
-        /* Barra lateral - Fija y funcional */
-        #sidebar-container {
-            width: var(--sidebar-width);
-            background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%);
-            color: white;
-            height: 100vh;
-            position: fixed;
-            left: 0;
-            top: 0;
-            z-index: 1000;
-            overflow-y: auto;
-            transition: var(--transition);
-            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
-        }
-
-        .sidebar-header {
-            padding: 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            height: 70px;
-        }
-
-        .sidebar-header h2 {
-            font-size: 1.2rem;
-            font-weight: 600;
-            transition: var(--transition);
-        }
-
-        .sidebar-menu {
-            padding: 15px 0;
-        }
-
-        .menu-item {
-            padding: 12px 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            cursor: pointer;
-            transition: var(--transition);
-            white-space: nowrap;
-        }
-
-        .menu-item:hover, .menu-item.active {
-            background-color: rgba(255, 255, 255, 0.1);
-            border-left: 4px solid var(--primary-color);
-        }
-
-        .menu-item span {
-            transition: var(--transition);
-        }
-
-        /* Botón para colapsar/expandir el menú */
-        .collapse-btn {
-            position: absolute;
-            right: -15px;
-            top: 20px;
-            background: white;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-            z-index: 1001;
-            border: none;
-            transition: var(--transition);
-        }
-
-        .collapse-btn:hover {
-            background: #f0f0f0;
-        }
-
-        /* Contenido principal */
-        #content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            padding: 20px;
-            transition: var(--transition);
-        }
-
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .page-header h1 {
-            font-size: 1.8rem;
-            font-weight: 600;
-            color: var(--dark-color);
-        }
-
-        .content-wrapper {
-            background-color: white;
-            border-radius: var(--radius);
-            box-shadow: var(--shadow);
-            overflow: hidden;
-        }
-
-        /* Controles de tabla */
-        .table-controls {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px 20px;
-            background-color: #f8f9fa;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .search-container {
-            position: relative;
-            width: 300px;
-        }
-
-        #searchInput {
-            width: 100%;
-            padding: 10px 15px 10px 40px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            font-size: 14px;
-            transition: var(--transition);
-        }
-
-        #searchInput:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--secondary-color);
-        }
-
-        /* Tabla */
-        .table-container {
-            overflow-x: auto;
-        }
-
-        .table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 800px;
-        }
-
-        .table th {
-            background-color: #f1f5f9;
-            text-align: left;
-            padding: 16px 15px;
-            font-weight: 600;
-            color: var(--dark-color);
-            border-bottom: 2px solid var(--border-color);
-        }
-
-        .table td {
-            padding: 14px 15px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .table tbody tr {
-            transition: var(--transition);
-        }
-
-        .table tbody tr:hover {
-            background-color: #f8fafc;
-        }
-
-        /* Botones y controles */
-        .btn {
-            padding: 10px 18px;
-            border-radius: var(--radius);
-            font-weight: 500;
-            font-size: 14px;
-            cursor: pointer;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            border: none;
-        }
-
-        .btn-primary {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .btn-secondary {
-            background-color: var(--secondary-color);
-            color: white;
-        }
-
-        .btn-secondary:hover {
-            background-color: #5a6268;
-        }
-
-        .btn-danger {
-            background-color: var(--danger-color);
-            color: white;
-        }
-
-        .btn-danger:hover {
-            background-color: #e5395c;
-        }
-
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid var(--border-color);
-            color: var(--dark-color);
-        }
-
-        .btn-outline:hover {
-            background-color: #f8f9fa;
-        }
-
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 13px;
-        }
-
-        .btn-icon {
-            padding: 8px;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-        }
-
-        /* Estado */
-        .status {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 500;
-        }
-
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-        }
-
-        .status-active {
-            background-color: rgba(6, 214, 160, 0.1);
-            color: #06b48a;
-        }
-
-        .status-active .status-dot {
-            background-color: #06d6a0;
-        }
-
-        .status-low {
-            background-color: rgba(255, 209, 102, 0.15);
-            color: #d4a007;
-        }
-
-        .status-low .status-dot {
-            background-color: #ffd166;
-        }
-
-        .status-inactive {
-            background-color: rgba(239, 71, 111, 0.1);
-            color: #d8456a;
-        }
-
-        .status-inactive .status-dot {
-            background-color: #ef476f;
-        }
-
-        /* Modal */
-        .modal-backdrop {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            opacity: 0;
-            visibility: hidden;
-            transition: var(--transition);
-        }
-
-        .modal-backdrop.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .modal-content {
-            background-color: white;
-            border-radius: var(--radius);
-            width: 90%;
-            max-width: 600px;
-            max-height: 90vh;
-            overflow-y: auto;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            transform: translateY(20px);
-            transition: var(--transition);
-        }
-
-        .modal-backdrop.active .modal-content {
-            transform: translateY(0);
-        }
-
-        .modal-header {
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .modal-header h2 {
-            font-size: 1.5rem;
-            font-weight: 600;
-        }
-
-        .close-modal-btn {
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--secondary-color);
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 50%;
-        }
-
-        .close-modal-btn:hover {
-            background-color: #f8f9fa;
-            color: var(--dark-color);
-        }
-
-        .modal-body {
-            padding: 20px;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: var(--dark-color);
-        }
-
-        .form-group input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 1px solid var(--border-color);
-            border-radius: var(--radius);
-            font-size: 15px;
-            transition: var(--transition);
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--primary-color);
-            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
-        }
-
-        .form-section {
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        .form-section-title {
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: var(--dark-color);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .modal-buttons {
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-            padding: 20px;
-            background-color: #f8f9fa;
-            border-top: 1px solid var(--border-color);
-        }
-
-        /* Modal de confirmación */
-        #customConfirmModal .modal-content {
-            max-width: 450px;
-        }
-
-        #customConfirmModal .modal-body {
-            padding: 30px 20px;
-            text-align: center;
-        }
-
-        #modalTitleConfirm {
-            font-size: 1.3rem;
-            margin-bottom: 15px;
-        }
-
-        #modalMessageConfirm {
-            color: var(--secondary-color);
-            margin-bottom: 25px;
-        }
-
-        /* Botón de menú para móviles */
-        .mobile-menu-btn {
-            display: none;
-            position: fixed;
-            top: 15px;
-            left: 15px;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: var(--radius);
-            width: 40px;
-            height: 40px;
-            z-index: 1500;
-            cursor: pointer;
-            align-items: center;
-            justify-content: center;
-        }
-
-        /* Responsive */
-        @media (max-width: 992px) {
-            :root {
-                --sidebar-width: 70px;
-            }
-            
-            .sidebar-header h2, .menu-item span {
-                display: none;
-            }
-
-            .sidebar-header {
-                justify-content: center;
-            }
-
-            .menu-item {
-                justify-content: center;
-                padding: 12px 0;
-            }
-            
-            .collapse-btn {
-                display: none;
-            }
-        }
-
-        @media (max-width: 768px) {
-            .mobile-menu-btn {
-                display: flex;
-            }
-            
-            #sidebar-container {
-                transform: translateX(-100%);
-                width: 260px;
-                z-index: 1400;
-            }
-            
-            #sidebar-container.active {
-                transform: translateX(0);
-            }
-            
-            #content {
-                margin-left: 0;
-            }
-            
-            .page-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .table-controls {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-
-            .search-container {
-                width: 100%;
-            }
-
-            .modal-buttons {
-                flex-direction: column;
-            }
-
-            .modal-buttons .btn {
-                width: 100%;
-            }
-        }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .page-header h1 { font-size: 2.2rem; font-weight: 800; background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .content-wrapper { background: var(--background-container); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 30px; }
+        .table-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; }
+        thead { background: var(--background-medium); }
+        html[data-theme="dark"] thead { background: rgba(0,0,0,0.2); }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .status-ok { color: #10b981; }
+        .status-low { color: #f59e0b; }
+        .status-critical { color: #ef4444; }
+        .action-buttons button { background: none; border: 1px solid transparent; cursor: pointer; color: var(--text-secondary); font-size: 0.9rem; padding: 5px 10px; border-radius: 8px; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 5px; }
+        .action-buttons .btn-edit:hover { background-color: rgba(14, 165, 233, 0.1); color: var(--accent-primary); border-color: var(--accent-primary);}
+        .action-buttons .btn-delete:hover { background-color: rgba(239, 68, 68, 0.1); color: var(--action-error); border-color: var(--action-error); }
+        .action-buttons .mdi { font-size: 1.2rem; }
+        .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; border: none; cursor: pointer; }
+        .modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1100; backdrop-filter: blur(5px); }
+        .modal-backdrop.active { display: flex; }
+        .modal-content { background: var(--background-container); padding: 30px; border-radius: var(--border-radius-lg); width: 90%; max-width: 500px; box-shadow: var(--glass-shadow); }
+        .close-modal-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
     </style>
 </head>
 <body class="app-body">
-    <!-- Botón para móviles -->
-    <button class="mobile-menu-btn" id="mobileMenuBtn">
-        <i class="mdi mdi-menu"></i>
-    </button>
-    
-    <!-- Menú lateral corregido -->
-    <div id="sidebar-container">
-        <button class="collapse-btn" id="collapseBtn">
-            <i class="mdi mdi-chevron-left"></i>
-        </button>
-        
-        <div class="sidebar-header">
-            <span class="material-symbols-outlined">science</span>
-            <h2>LabFlow</h2>
-        </div>
-        <div class="sidebar-menu">
-            <div class="menu-item active">
-                <span class="material-symbols-outlined">inventory_2</span>
-                <span>Insumos</span>
-            </div>
-            <div class="menu-item">
-                <span class="material-symbols-outlined">lab_profile</span>
-                <span>Experimentos</span>
-            </div>
-            <div class="menu-item">
-                <span class="material-symbols-outlined">calendar_month</span>
-                <span>Calendario</span>
-            </div>
-            <div class="menu-item">
-                <span class="material-symbols-outlined">group</span>
-                <span>Usuarios</span>
-            </div>
-            <div class="menu-item">
-                <span class="material-symbols-outlined">settings</span>
-                <span>Configuración</span>
-            </div>
-        </div>
-    </div>
+    <div id="sidebar-container"></div>
 
     <main id="content">
         <div class="page-header">
+            <h1>Gestión de Insumos</h1>
+            <button class="btn btn-primary" id="btnAddProduct"><i class="mdi mdi-plus"></i> Agregar Insumo</button>
             <h1>Gestión de Insumos y Lotes</h1>
-            <button class="btn btn-primary" id="btnAddProduct">
-                <i class="mdi mdi-plus"></i> Agregar Nuevo Insumo
-            </button>
+            <button class="btn btn-primary" id="btnAddProduct"><i class="mdi mdi-plus"></i> Agregar</button>
         </div>
-        
+
         <div class="content-wrapper">
             <div class="table-controls">
-                <div class="search-container">
-                    <span class="material-symbols-outlined search-icon">search</span>
-                    <input type="search" id="searchInput" placeholder="Buscar insumo por nombre, lote o estado...">
-                </div>
-                <div class="actions">
-                    <button class="btn btn-outline">
-                        <i class="mdi mdi-filter-variant"></i> Filtros
-                    </button>
-                    <button class="btn btn-outline">
-                        <i class="mdi mdi-export-variant"></i> Exportar
-                    </button>
-                </div>
+                <input type="search" id="searchInput" placeholder="Buscar insumo...">
             </div>
-            <div class="table-container">
-                <table class="table" id="tableProducts">
-                    <thead>
-                        <tr>
-                            <th style="width: 50px;"><input type="checkbox" id="selectAllCheckbox"></th>
-                            <th>Nombre Insumo</th>
-                            <th>Existencia Total</th>
-                            <th>Stock Mínimo</th>
-                            <th>Estado</th>
-                            <th style="width: 150px;">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="productTableBody">
-                        <tr>
-                            <td><input type="checkbox"></td>
-                            <td>Ácido Clorhídrico</td>
-                            <td>1,250 mL</td>
-                            <td>500 mL</td>
-                            <td>
-                                <div class="status status-active">
-                                    <span class="status-dot"></span>
-                                    <span>Disponible</span>
-                                </div>
-                            </td>
-                            <td>
-                                <button class="btn btn-icon btn-outline" title="Editar">
-                                    <i class="mdi mdi-pencil"></i>
-                                </button>
-                                <button class="btn btn-icon btn-outline" title="Ver detalles">
-                                    <i class="mdi mdi-eye"></i>
-                                </button>
-                                <button class="btn btn-icon btn-outline" title="Eliminar">
-                                    <i class="mdi mdi-delete"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><input type="checkbox"></td>
-                            <td>Hidróxido de Sodio</td>
-                            <td>850 g</td>
-                            <td>1,000 g</td>
-                            <td>
-                                <div class="status status-low">
-                                    <span class="status-dot"></span>
-                                    <span>Stock Bajo</span>
-                                </div>
-                            </td>
-                            <td>
-                                <button class="btn btn-icon btn-outline" title="Editar">
-                                    <i class="mdi mdi-pencil"></i>
-                                </button>
-                                <button class="btn btn-icon btn-outline" title="Ver detalles">
-                                    <i class="mdi mdi-eye"></i>
-                                </button>
-                                <button class="btn btn-icon btn-outline" title="Eliminar">
-                                    <i class="mdi mdi-delete"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><input type="checkbox"></td>
-                            <td>Cloruro de Sodio</td>
-                            <td>2,500 g</td>
-                            <td>1,000 g</td>
-                            <td>
-                                <div class="status status-active">
-                                    <span class="status-dot"></span>
-                                    <span>Disponible</span>
-                                </div>
-                            </td>
-                            <td>
-                                <button class="btn btn-icon btn-outline" title="Editar">
-                                    <i class="mdi mdi-pencil"></i>
-                                </button>
-                                <button class="btn btn-icon btn-outline" title="Ver detalles">
-                                    <i class="mdi mdi-eye"></i>
-                                </button>
-                                <button class="btn btn-icon btn-outline" title="Eliminar">
-                                    <i class="mdi mdi-delete"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td><input type="checkbox"></td>
-                            <td>Etanol 70%</td>
-                            <td>0 mL</td>
-                            <td>1,500 mL</td>
-                            <td>
-                                <div class="status status-inactive">
-                                    <span class="status-dot"></span>
-                                    <span>Agotado</span>
-                                </div>
-                            </td>
-                            <td>
-                                <button class="btn btn-icon btn-outline" title="Editar">
-                                    <i class="mdi mdi-pencil"></i>
-                                </button>
-                                <button class="btn btn-icon btn-outline" title="Ver detalles">
-                                    <i class="mdi mdi-eye"></i>
-                                </button>
-                                <button class="btn btn-icon btn-outline" title="Eliminar">
-                                    <i class="mdi mdi-delete"></i>
-                                </button>
-                            </td>
-                        </tr>
+            <table>
+            <table class="table" id="tableProducts">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="selectAllCheckbox"></th>
+                        <th>Nombre Insumo</th>
+                        <th>Existencia Total</th>
+                        <th>Stock Mínimo</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody">
                     </tbody>
-                </table>
-            </div>
+                <tbody id="productTableBody"></tbody>
+            </table>
         </div>
     </main>
 
-    <!-- Modal para agregar/editar insumo -->
     <div class="modal-backdrop" id="productModal">
         <div class="modal-content">
-            <div class="modal-header">
-                <h2 id="modalTitle">Agregar Nuevo Insumo</h2>
-                <button class="close-modal-btn">
-                    <i class="mdi mdi-close"></i>
-                </button>
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h2 id="modalTitle">Agregar Insumo</h2>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2 id="modalTitle">Agregar Insumo / Lote</h2>
+                <button class="close-modal-btn"><i class="mdi mdi-close"></i></button>
             </div>
-            <form id="productForm">
-                <div class="modal-body">
-                    <input type="hidden" id="insumoIdField">
-                    <input type="hidden" id="loteIdField">
-                    
-                    <div class="form-section">
-                        <h3 class="form-section-title">
-                            <i class="mdi mdi-flask-outline"></i>
-                            Información del Insumo
-                        </h3>
-                        <div class="form-group">
-                            <label for="nombre">Nombre del Insumo *</label>
-                            <input type="text" id="nombre" required placeholder="Ej: Ácido Clorhídrico">
-                        </div>
-                        <div class="form-group">
-                            <label for="stockMinimo">Stock Mínimo *</label>
-                            <input type="number" id="stockMinimo" min="0" required placeholder="Cantidad mínima requerida">
-                        </div>
-                    </div>
-                    
-                    <div class="form-section">
-                        <h3 class="form-section-title">
-                            <i class="mdi mdi-package-variant"></i>
-                            Información del Lote
-                        </h3>
-                        <div class="form-group">
-                            <label for="lote">Número de Lote</label>
-                            <input type="text" id="lote" placeholder="Ej: LOTE-2024-001">
-                        </div>
-                        <div class="form-group">
-                            <label for="fechaCaducidad">Fecha de Caducidad</label>
-                            <input type="date" id="fechaCaducidad">
-                        </div>
-                        <div class="form-group">
-                            <label for="existencia">Existencia del Lote</label>
-                            <input type="number" id="existencia" min="0" placeholder="Cantidad disponible">
-                        </div>
-                    </div>
+            <form id="productForm" style="margin-top: 20px;">
+                <input type="hidden" id="insumoIdField">
+                <input type="hidden" id="loteIdField">
+                <div class="form-group">
+                    <label for="nombre">Nombre del Insumo</label>
+                    <input type="text" id="nombre" required>
+@@ -79,9 +54,22 @@ <h2 id="modalTitle">Agregar Insumo</h2>
+                    <label for="stockMinimo">Stock Mínimo</label>
+                    <input type="number" id="stockMinimo" min="0" required>
                 </div>
-                <div class="modal-buttons">
+                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <hr style="margin: 20px 0; border-color: var(--border-color);">
+                <div class="form-group">
+                    <label for="lote">Número de Lote</label>
+                    <input type="text" id="lote">
+                </div>
+                <div class="form-group">
+                    <label for="fechaCaducidad">Fecha de Caducidad</label>
+                    <input type="date" id="fechaCaducidad">
+                </div>
+                <div class="form-group">
+                    <label for="existencia">Existencia del Lote</label>
+                    <input type="number" id="existencia" min="0">
+                </div>
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
                     <button type="button" class="btn btn-secondary close-modal-btn">Cancelar</button>
-                    <button type="submit" class="btn btn-primary">Guardar Insumo</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn">Guardar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
                 </div>
             </form>
         </div>
-    </div>
-    
-    <!-- Modal de confirmación -->
-    <div id="customConfirmModal" class="modal-overlay">
-        <div class="modal-backdrop">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h3 id="modalTitleConfirm">Confirmar Acción</h3>
-                    <button class="close-modal-btn">
-                        <i class="mdi mdi-close"></i>
-                    </button>
-                </div>
-                <div class="modal-body">
-                    <p id="modalMessageConfirm">¿Está seguro que desea eliminar este insumo? Esta acción no puede deshacerse.</p>
-                </div>
-                <div class="modal-buttons">
-                    <button id="modalCancelBtn" class="btn btn-secondary">Cancelar</button>
-                    <button id="modalConfirmBtn" class="btn btn-danger">Confirmar Eliminación</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Botón para colapsar/expandir el menú lateral
-            const collapseBtn = document.getElementById('collapseBtn');
-            const sidebar = document.getElementById('sidebar-container');
-            const content = document.getElementById('content');
-            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-            
-            // Función para colapsar/expandir el menú
-            function toggleSidebar() {
-                sidebar.classList.toggle('collapsed');
-                content.classList.toggle('expanded');
-                
-                if (sidebar.classList.contains('collapsed')) {
-                    collapseBtn.innerHTML = '<i class="mdi mdi-chevron-right"></i>';
-                    sidebar.style.width = 'var(--sidebar-collapsed)';
-                    content.style.marginLeft = 'var(--sidebar-collapsed)';
-                } else {
-                    collapseBtn.innerHTML = '<i class="mdi mdi-chevron-left"></i>';
-                    sidebar.style.width = 'var(--sidebar-width)';
-                    content.style.marginLeft = 'var(--sidebar-width)';
-                }
-            }
-            
-            // Función para mostrar/ocultar menú en móviles
-            function toggleMobileMenu() {
-                sidebar.classList.toggle('active');
-            }
-            
-            // Event listeners
-            if (collapseBtn) {
-                collapseBtn.addEventListener('click', toggleSidebar);
-            }
-            
-            if (mobileMenuBtn) {
-                mobileMenuBtn.addEventListener('click', toggleMobileMenu);
-            }
-            
-            // Cerrar menú móvil al hacer clic en un ítem
-            const menuItems = document.querySelectorAll('.menu-item');
-            menuItems.forEach(item => {
-                item.addEventListener('click', function() {
-                    if (window.innerWidth < 768) {
-                        sidebar.classList.remove('active');
-                    }
-                });
-            });
-            
-            // Botón para agregar nuevo insumo
-            const btnAddProduct = document.getElementById('btnAddProduct');
-            const productModal = document.getElementById('productModal');
-            const closeModalBtns = document.querySelectorAll('.close-modal-btn');
-            
-            // Mostrar modal al hacer clic en agregar
-            if(btnAddProduct) {
-                btnAddProduct.addEventListener('click', () => {
-                    productModal.classList.add('active');
-                    document.body.style.overflow = 'hidden';
-                });
-            }
-            
-            // Ocultar modal al hacer clic en cerrar
-            closeModalBtns.forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.modal-backdrop').forEach(modal => {
-                        modal.classList.remove('active');
-                    });
-                    document.body.style.overflow = '';
-                });
-            });
-            
-            // Cerrar modal al hacer clic fuera del contenido
-            window.addEventListener('click', (e) => {
-                if(e.target.classList.contains('modal-backdrop')) {
-                    document.querySelectorAll('.modal-backdrop').forEach(modal => {
-                        modal.classList.remove('active');
-                    });
-                    document.body.style.overflow = '';
-                }
-            });
-            
-            // Ejemplo de manejo de estado de checkbox
-            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
-            if(selectAllCheckbox) {
-                selectAllCheckbox.addEventListener('change', function() {
-                    const checkboxes = document.querySelectorAll('#productTableBody input[type="checkbox"]');
-                    checkboxes.forEach(checkbox => {
-                        checkbox.checked = this.checked;
-                    });
-                });
-            }
-            
-            // Simulación de búsqueda
-            const searchInput = document.getElementById('searchInput');
-            if(searchInput) {
-                searchInput.addEventListener('input', function() {
-                    const searchTerm = this.value.toLowerCase();
-                    const rows = document.querySelectorAll('#productTableBody tr');
-                    
-                    rows.forEach(row => {
-                        const text = row.textContent.toLowerCase();
-                        row.style.display = text.includes(searchTerm) ? '' : 'none';
-                    });
-                });
-            }
-        });
-    </script>
-</body>
-</html>
