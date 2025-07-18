@@ -11,14 +11,8 @@ const productForm = document.getElementById('productForm');
 const closeModalBtns = document.querySelectorAll('.close-modal-btn');
 const searchInput = document.getElementById('searchInput');
 
-// --- FUNCIONES AUXILIARES ---
-function showNotification(message, type = 'success') {
-    // Puedes implementar un sistema de notificaciones más avanzado si quieres.
-    // Por ahora, una simple alerta servirá.
-    alert(message);
-}
-
 // --- LÓGICA PRINCIPAL ---
+
 async function fetchAndRenderInsumos() {
     productTableBody.innerHTML = `<tr><td colspan="5" class="loading-message">Cargando insumos...</td></tr>`;
     try {
@@ -46,8 +40,8 @@ async function fetchAndRenderInsumos() {
                     <td>${insumo.stock_minimo}</td>
                     <td>${estadoHtml}</td>
                     <td class="action-buttons">
-                        <button class="btn-edit" data-action="edit-insumo" data-id="${insumo.id}" title="Editar"><i class="mdi mdi-pencil"></i></button>
-                        <button class="btn-delete" data-action="delete-insumo" data-id="${insumo.id}" title="Eliminar"><i class="mdi mdi-delete"></i></button>
+                        <button class="btn-edit" data-action="edit-insumo" data-id="${insumo.id}" title="Editar"><i class="mdi mdi-pencil"></i> Editar</button>
+                        <button class="btn-delete" data-action="delete-insumo" data-id="${insumo.id}" title="Eliminar"><i class="mdi mdi-delete"></i> Eliminar</button>
                     </td>
                 </tr>
             `;
@@ -65,11 +59,11 @@ function openModal(insumo = null) {
     document.getElementById('insumoIdField').value = insumo ? insumo.id : '';
     document.getElementById('nombre').value = insumo ? insumo.nombre : '';
     document.getElementById('stockMinimo').value = insumo ? insumo.stock_minimo : '';
-    productModal.style.display = 'flex';
+    productModal.classList.add('active');
 }
 
 function closeModal() {
-    productModal.style.display = 'none';
+    productModal.classList.remove('active');
 }
 
 async function handleFormSubmit(e) {
@@ -79,37 +73,37 @@ async function handleFormSubmit(e) {
     const stock_minimo = Number(document.getElementById('stockMinimo').value);
 
     if (!nombre || stock_minimo < 0) {
-        showNotification('Por favor, completa los campos correctamente.', 'error');
+        alert('Por favor, completa los campos correctamente.');
         return;
     }
 
     try {
         if (insumoId) {
             await updateDoc(doc(db, "insumos", insumoId), { nombre, stock_minimo });
-            showNotification('Insumo actualizado con éxito.');
+            alert('Insumo actualizado con éxito.');
         } else {
             await addDoc(collection(db, "insumos"), { nombre, stock_minimo, existencia_total: 0 });
-            showNotification('Insumo agregado con éxito.');
+            alert('Insumo agregado con éxito.');
         }
         closeModal();
         fetchAndRenderInsumos();
     } catch (error) {
         console.error("Error guardando insumo:", error);
-        showNotification('Error al guardar el insumo.', 'error');
+        alert('Error al guardar el insumo.');
     }
 }
 
 async function handleDelete(insumoId) {
-    if (!confirm('¿Estás seguro de que quieres eliminar este insumo? Esta acción no se puede deshacer.')) {
+    if (!confirm('¿Estás seguro de que quieres eliminar este insumo?')) {
         return;
     }
     try {
         await deleteDoc(doc(db, "insumos", insumoId));
-        showNotification('Insumo eliminado con éxito.');
+        alert('Insumo eliminado con éxito.');
         fetchAndRenderInsumos();
     } catch (error) {
         console.error("Error eliminando insumo:", error);
-        showNotification('Error al eliminar el insumo.', 'error');
+        alert('Error al eliminar el insumo.');
     }
 }
 
@@ -126,17 +120,15 @@ searchInput.addEventListener('input', () => {
     });
 });
 
-// Listener para los botones de acción en la tabla
 productTableBody.addEventListener('click', async (e) => {
-    const target = e.target.closest('button');
-    if (!target) return;
+    const button = e.target.closest('button');
+    if (!button) return;
 
-    const action = target.dataset.action;
-    const insumoId = target.dataset.id;
+    const action = button.dataset.action;
+    const insumoId = button.dataset.id;
 
     if (action === 'edit-insumo') {
-        const docRef = doc(db, "insumos", insumoId);
-        const docSnap = await getDoc(docRef);
+        const docSnap = await getDoc(doc(db, "insumos", insumoId));
         if (docSnap.exists()) {
             openModal({ id: docSnap.id, ...docSnap.data() });
         }
@@ -144,7 +136,6 @@ productTableBody.addEventListener('click', async (e) => {
         handleDelete(insumoId);
     }
 });
-
 
 // --- PUNTO DE ENTRADA ---
 onAuthStateChanged(auth, async (user) => {
