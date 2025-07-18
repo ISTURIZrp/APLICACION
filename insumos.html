@@ -4,52 +4,27 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>LabFlow Manager - Insumos</title>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
-    
     <link rel="stylesheet" href="css/style.css">
-
-    <style>
-        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-        .page-header h1 { font-size: 2.2rem; font-weight: 800; background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .content-wrapper { background: var(--background-container); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 30px; }
-        .table-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
-        table { width: 100%; border-collapse: separate; border-spacing: 0; }
-        thead { background: var(--background-medium); }
-        html[data-theme="dark"] thead { background: rgba(0,0,0,0.2); }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
-        .status-ok { color: #10b981; }
-        .status-low { color: #f59e0b; }
-        .status-critical { color: #ef4444; }
-        .action-buttons button { background: none; border: 1px solid transparent; cursor: pointer; color: var(--text-secondary); font-size: 0.9rem; padding: 5px 10px; border-radius: 8px; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 5px; }
-        .action-buttons .btn-edit:hover { background-color: rgba(14, 165, 233, 0.1); color: var(--accent-primary); border-color: var(--accent-primary);}
-        .action-buttons .btn-delete:hover { background-color: rgba(239, 68, 68, 0.1); color: var(--action-error); border-color: var(--action-error); }
-        .action-buttons .mdi { font-size: 1.2rem; }
-        .btn { padding: 10px 20px; border-radius: 8px; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; border: none; cursor: pointer; }
-        .modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1100; backdrop-filter: blur(5px); }
-        .modal-backdrop.active { display: flex; }
-        .modal-content { background: var(--background-container); padding: 30px; border-radius: var(--border-radius-lg); width: 90%; max-width: 500px; box-shadow: var(--glass-shadow); }
-        .close-modal-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
-    </style>
 </head>
 <body class="app-body">
     <div id="sidebar-container"></div>
 
     <main id="content">
         <div class="page-header">
-            <h1>Gestión de Insumos</h1>
-            <button class="btn btn-primary" id="btnAddProduct"><i class="mdi mdi-plus"></i> Agregar Insumo</button>
+            <h1>Gestión de Insumos y Lotes</h1>
+            <button class="btn btn-primary" id="btnAddProduct"><i class="mdi mdi-plus"></i> Agregar</button>
         </div>
         
         <div class="content-wrapper">
             <div class="table-controls">
                 <input type="search" id="searchInput" placeholder="Buscar insumo...">
             </div>
-            <table>
+            <table class="table" id="tableProducts">
                 <thead>
                     <tr>
+                        <th><input type="checkbox" id="selectAllCheckbox"></th>
                         <th>Nombre Insumo</th>
                         <th>Existencia Total</th>
                         <th>Stock Mínimo</th>
@@ -57,20 +32,20 @@
                         <th>Acciones</th>
                     </tr>
                 </thead>
-                <tbody id="productTableBody">
-                    </tbody>
+                <tbody id="productTableBody"></tbody>
             </table>
         </div>
     </main>
 
     <div class="modal-backdrop" id="productModal">
         <div class="modal-content">
-            <div style="display: flex; justify-content: space-between; align-items: center;">
-                <h2 id="modalTitle">Agregar Insumo</h2>
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h2 id="modalTitle">Agregar Insumo / Lote</h2>
                 <button class="close-modal-btn"><i class="mdi mdi-close"></i></button>
             </div>
             <form id="productForm" style="margin-top: 20px;">
                 <input type="hidden" id="insumoIdField">
+                <input type="hidden" id="loteIdField">
                 <div class="form-group">
                     <label for="nombre">Nombre del Insumo</label>
                     <input type="text" id="nombre" required>
@@ -79,9 +54,22 @@
                     <label for="stockMinimo">Stock Mínimo</label>
                     <input type="number" id="stockMinimo" min="0" required>
                 </div>
-                <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                <hr style="margin: 20px 0; border-color: var(--border-color);">
+                <div class="form-group">
+                    <label for="lote">Número de Lote</label>
+                    <input type="text" id="lote">
+                </div>
+                <div class="form-group">
+                    <label for="fechaCaducidad">Fecha de Caducidad</label>
+                    <input type="date" id="fechaCaducidad">
+                </div>
+                <div class="form-group">
+                    <label for="existencia">Existencia del Lote</label>
+                    <input type="number" id="existencia" min="0">
+                </div>
+                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
                     <button type="button" class="btn btn-secondary close-modal-btn">Cancelar</button>
-                    <button type="submit" class="btn btn-primary" id="saveBtn">Guardar</button>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
                 </div>
             </form>
         </div>
