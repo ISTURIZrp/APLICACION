@@ -2,7 +2,6 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>LabFlow Manager - Insumos</title>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
@@ -39,39 +38,34 @@
 
     <div class="modal-backdrop" id="productModal">
         <div class="modal-content">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h2 id="modalTitle">Agregar Insumo / Lote</h2>
-                <button class="close-modal-btn"><i class="mdi mdi-close"></i></button>
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <button class="close-modal-btn mdi mdi-close"></button>
             </div>
-            <form id="productForm" style="margin-top: 20px;">
+            <form id="productForm">
                 <input type="hidden" id="insumoIdField">
                 <input type="hidden" id="loteIdField">
-                <div class="form-group">
-                    <label for="nombre">Nombre del Insumo</label>
-                    <input type="text" id="nombre" required>
-                </div>
-                <div class="form-group">
-                    <label for="stockMinimo">Stock Mínimo</label>
-                    <input type="number" id="stockMinimo" min="0" required>
-                </div>
-                <hr style="margin: 20px 0; border-color: var(--border-color);">
-                <div class="form-group">
-                    <label for="lote">Número de Lote</label>
-                    <input type="text" id="lote">
-                </div>
-                <div class="form-group">
-                    <label for="fechaCaducidad">Fecha de Caducidad</label>
-                    <input type="date" id="fechaCaducidad">
-                </div>
-                <div class="form-group">
-                    <label for="existencia">Existencia del Lote</label>
-                    <input type="number" id="existencia" min="0">
-                </div>
-                <div style="display:flex; justify-content:flex-end; gap:10px; margin-top:20px;">
+                <div class="form-group"><label for="nombre">Nombre del Insumo</label><input type="text" id="nombre" required></div>
+                <div class="form-group"><label for="stockMinimo">Stock Mínimo</label><input type="number" id="stockMinimo" min="0" required></div>
+                <hr style="border-color: var(--border-color); margin: 20px 0;">
+                <div class="form-group"><label for="lote">Número de Lote</label><input type="text" id="lote"></div>
+                <div class="form-group"><label for="fechaCaducidad">Fecha de Caducidad</label><input type="date" id="fechaCaducidad"></div>
+                <div class="form-group"><label for="existencia">Existencia del Lote</label><input type="number" id="existencia" min="0"></div>
+                <div class="modal-buttons" style="margin-top:20px;">
                     <button type="button" class="btn btn-secondary close-modal-btn">Cancelar</button>
                     <button type="submit" class="btn btn-primary">Guardar</button>
                 </div>
             </form>
+        </div>
+    </div>
+    
+    <div id="customConfirmModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modalTitleConfirm"></h3><p id="modalMessageConfirm"></p>
+            <div class="modal-buttons">
+                <button id="modalCancelBtn" class="btn btn-secondary">Cancelar</button>
+                <button id="modalConfirmBtn" class="btn btn-primary">Confirmar</button>
+            </div>
         </div>
     </div>
 
