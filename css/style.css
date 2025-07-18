@@ -121,3 +121,28 @@ nav#sidebar:hover ul li a span.text { display: inline; opacity: 1; }
 #theme-toggle-btn:hover { color: var(--accent-primary); transform: rotate(20deg); }
 main#content { flex-grow: 1; margin-left: var(--sidebar-width-collapsed); padding: 2rem 3rem; transition: margin-left 0.3s ease; }
 nav#sidebar:hover + main#content { margin-left: var(--sidebar-width-expanded); }
+/* css/style.css */
+
+/* Estilos para la página de Insumos */
+.page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+.page-header h1 { font-size: 2.2rem; font-weight: 800; background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.content-wrapper { background: var(--background-container); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 30px; }
+.table-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem; }
+.table { width: 100%; border-collapse: separate; border-spacing: 0; }
+.table thead { background: var(--background-medium); }
+html[data-theme="dark"] .table thead { background: rgba(0,0,0,0.2); }
+.table th, .table td { padding: 15px; text-align: left; border-bottom: 1px solid var(--border-color); }
+.insumo-row { cursor: pointer; }
+.insumo-row:hover { background-color: rgba(14, 165, 233, 0.05); }
+html[data-theme="dark"] .insumo-row:hover { background-color: rgba(0, 196, 230, 0.05); }
+.lote-row td { background-color: rgba(0,0,0,0.02); }
+html[data-theme="dark"] .lote-row td { background-color: rgba(0,0,0,0.1); }
+.status-ok { color: #10b981; font-weight: bold; }
+.status-low { color: #f59e0b; font-weight: bold; }
+.status-critical { color: #ef4444; font-weight: bold; }
+.action-buttons { display: flex; gap: 8px; }
+.action-buttons .btn { padding: 5px 10px; font-size: 0.9rem; }
+.modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); display: none; justify-content: center; align-items: center; z-index: 1100; backdrop-filter: blur(5px); }
+.modal-backdrop.active { display: flex; }
+.modal-content { background: var(--background-container); padding: 30px; border-radius: var(--border-radius-lg); width: 90%; max-width: 500px; }
+.close-modal-btn { background: none; border: none; font-size: 1.5rem; cursor: pointer; }
