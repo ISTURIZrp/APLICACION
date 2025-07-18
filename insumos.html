@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LabFlow Manager - Insumos y Lotes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
+    
+    <style>
+        /* Estilos generales de la página */
+        :root {
+            --background-light: #ffffff;
+            --background-medium: #f0f4f8;
+            --background-dark: #e0e6ec;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-color: rgba(15, 23, 42, 0.05);
+            --accent-primary: #0ea5e9;
+            --accent-secondary: #38bdf8;
+            --action-success: #10b981;
+            --action-error: #ef4444;
+            --action-warning: #f59e0b;
+            --font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --sidebar-width-collapsed: 70px;
+            --sidebar-width-expanded: 260px;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.3);
+            --glass-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Modo oscuro opcional */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background-light: #0f172a;
+                --background-medium: #1e293b;
+                --background-dark: #334155;
+                --text-primary: #f1f5f9;
+                --text-secondary: #94a3b8;
+                --border-color: #334155;
+                --shadow-color: rgba(2, 6, 23, 0.5);
+                --accent-primary: #38bdf8;
+                --accent-secondary: #7dd3fc;
+                --glass-bg: rgba(30, 41, 59, 0.7);
+                --glass-border: rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--background-light);
+            color: var(--text-primary);
+            display: flex;
+            min-height: 100vh;
+            background-image:
+                radial-gradient(ellipse at 10% 20%, rgba(14, 165, 233, 0.1), transparent 50%),
+                radial-gradient(ellipse at 90% 80%, rgba(56, 189, 248, 0.1), transparent 50%);
+        }
+        
+        /* Estilos de la página de Insumos */
+        .btn { font-family: var(--font-family); padding: 10px 18px; border: none; border-radius: 10px; cursor: pointer; font-size: 0.9rem; font-weight: 600; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        .btn-primary { background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary)); color: white; box-shadow: 0 4px 15px rgba(14, 165, 233, 0.3); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(14, 165, 233, 0.4); }
+        .btn-secondary { background-color: var(--background-dark); color: var(--text-primary); border: 1px solid var(--border-color); }
+        .btn-edit { background-color: rgba(56, 189, 248, 0.15); color: var(--accent-primary); padding: 8px 12px; font-size: 0.85rem; }
+        .btn-delete { background-color: rgba(239, 68, 68, 0.15); color: var(--action-error); padding: 8px 12px; font-size: 0.85rem; }
+        .btn-danger { background-color: var(--action-error); color: white; }
+        .btn-danger:hover { background-color: #dc2626; }
+        input, select { width: 100%; padding: 13px 16px; border: 1px solid var(--border-color); border-radius: 10px; background-color: var(--background-medium); color: var(--text-primary); font-size: 1rem; transition: all 0.3s ease; }
+        input:focus, select:focus { outline: none; border-color: var(--accent-primary); box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2); }
+        #app-notification { position: fixed; top: 25px; right: 25px; padding: 16px 24px; border-radius: 10px; z-index: 2000; opacity: 0; transition: opacity 0.5s ease, transform 0.5s ease; transform: translateX(100%); display: flex; align-items: center; gap: 12px; backdrop-filter: blur(10px); background: var(--glass-bg); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); max-width: 400px; }
+        #app-notification.show { opacity: 1; transform: translateX(0); }
+        #app-notification.success { border-left: 4px solid var(--action-success); color: var(--action-success);}
+        #app-notification.error { border-left: 4px solid var(--action-error); color: var(--action-error); }
+        #notification-icon { font-size: 1.6rem; }
+        #notification-content { flex: 1; color: var(--text-primary); }
+        #notification-title { font-weight: 700; margin-bottom: 4px; }
+        #notification-message { font-size: 0.9rem; color: var(--text-secondary); }
+        .content-wrapper { background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 18px; padding: 30px; box-shadow: var(--glass-shadow); backdrop-filter: blur(10px); }
+        .table-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.8rem; flex-wrap: wrap; gap: 1rem; }
+        .table-header h1 { font-size: 1.8rem; font-weight: 800; background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; margin: 0; }
+        .table-controls { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.8rem; flex-wrap: wrap; gap: 1.2rem; }
+        .search-container { position: relative; flex: 1; max-width: 400px; }
+        .search-container input { padding-left: 45px; }
+        .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: var(--text-secondary); font-size: 1.2rem; }
+        .users-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; border-radius: 12px; overflow: hidden; background: var(--background-medium); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .users-table th, .users-table td { padding: 14px 16px; text-align: left; border-bottom: 1px solid var(--border-color); }
+        .users-table thead { background: var(--background-dark); }
+        .users-table th { font-weight: 700; color: var(--text-primary); font-size: 0.95rem; }
+        .users-table tbody tr { transition: background-color 0.2s ease; }
+        .users-table tbody tr:hover { background-color: rgba(56, 189, 248, 0.05); }
+        .action-buttons { display: flex; gap: 8px; }
+        .modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1500; backdrop-filter: blur(6px); }
+        .modal-backdrop.active { display: flex; }
+        .modal-content { background: var(--glass-bg); padding: 35px; border-radius: 18px; width: 90%; max-width: 520px; position: relative; animation: slideUp 0.4s ease-out; backdrop-filter: blur(10px); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        .close-modal-btn { position: absolute; top: 18px; right: 18px; background: transparent; border: none; font-size: 1.8rem; cursor: pointer; color: var(--text-secondary); transition: all 0.3s ease; }
+        .close-modal-btn:hover { color: var(--action-error); transform: rotate(90deg); }
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--text-primary); font-size: 0.95rem; }
+        tr.insumo-row { cursor: pointer; background: var(--background-light); }
+        tr.lote-row td { padding-left: 40px; background-color: var(--background-medium); }
+        .dropdown-container { position: relative; display: inline-block; }
+        .dropdown-menu { display: none; position: absolute; background-color: var(--background-light); min-width: 200px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); z-index: 1; border-radius: 12px; overflow: hidden; border: 1px solid var(--border-color); backdrop-filter: blur(10px); padding: 8px 0; }
+        .dropdown-menu a { color: var(--text-primary); padding: 12px 18px; text-decoration: none; display: block; font-size: 0.95rem; transition: all 0.2s ease; display: flex; align-items: center; gap: 10px; }
+        .dropdown-menu a:hover { background-color: rgba(56, 189, 248, 0.1); }
+        .dropdown-container.show .dropdown-menu { display: block; }
+        .status-indicator { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; }
+        .status-low { background-color: var(--action-warning); }
+        .status-critical { background-color: var(--action-error); }
+        .status-ok { background-color: var(--action-success); }
+        .modal-footer { display: flex; justify-content: flex-end; gap: 12px; margin-top: 25px; }
+        .modal-footer .btn { min-width: 100px; justify-content: center; }
+        @keyframes fadeInRow { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .insumo-row, .lote-row { animation: fadeInRow 0.4s ease-out; }
+    </style>
+</head>
+<body>
+    <div id="sidebar-container"></div>
+
+    <main id="content">
+        <div class="table-header">
+            <h1>Gestión de Insumos y Lotes</h1>
+            <div class="dropdown-container" id="csvActionsContainer">
+                <button id="btnCSVActions" class="btn btn-secondary"><span class="material-symbols-outlined">file_present</span> Acciones CSV</button>
+                <div id="csvDropdownMenu" class="dropdown-menu">
+                    <a href="#" id="btnExportCSV"><span class="material-symbols-outlined">download</span> Exportar Todo</a>
+                    <a href="#" id="btnImportInsumosCSV"><span class="material-symbols-outlined">upload</span> Importar Insumos</a>
+                    <a href="#" id="btnImportLotesCSV"><span class="material-symbols-outlined">upload</span> Importar Lotes</a>
+                </div>
+                <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
+            </div>
+        </div>
+        
+        <div class="content-wrapper">
+            <div class="table-controls">
+                <div class="search-container">
+                    <span class="material-symbols-outlined search-icon">search</span>
+                    <input type="search" id="searchInput" placeholder="Buscar insumo..." autocomplete="off">
+                </div>
+                <button id="btnDeleteSelected" class="btn btn-danger" style="display: none;"><span class="material-symbols-outlined">delete_sweep</span> Eliminar Seleccionados</button>
+                <button id="btnAddProduct" class="btn btn-primary"><span class="material-symbols-outlined">add_box</span> Agregar Insumo/Lote</button>
+            </div>
+            <table class="users-table" id="tableProducts">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="selectAllCheckbox" title="Seleccionar todo"></th>
+                        <th>Nombre Insumo</th>
+                        <th>Existencia Total</th>
+                        <th>Stock Mínimo</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="productTableBody"></tbody>
+            </table>
+        </div>
+    </main>
+
+    <div class="modal-backdrop" id="productModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">Agregar Insumo / Lote</h2>
+            <button type="button" class="close-modal-btn material-symbols-outlined">close</button>
+            <form id="productForm">
+                <input type="hidden" id="insumoIdField">
+                <input type="hidden" id="loteIdField">
+                <div class="form-group">
+                    <label for="nombre">Nombre del Insumo *</label>
+                    <input type="text" id="nombre" required placeholder="Ej: Acetona">
+                </div>
+                <div class="form-group">
+                    <label for="stockMinimo">Stock Mínimo *</label>
+                    <input type="number" id="stockMinimo" min="0" required placeholder="Ej: 50">
+                </div>
+                <hr style="margin: 20px 0; border: 1px solid var(--border-color);">
+                <div class="form-group">
+                    <label for="lote">Número de Lote</label>
+                    <input type="text" id="lote" placeholder="Ej: LOTE-2024-001">
+                </div>
+                <div class="form-group">
+                    <label for="fechaCaducidad">Fecha de Caducidad</label>
+                    <input type="date" id="fechaCaducidad">
+                </div>
+                <div class="form-group">
+                    <label for="existencia">Existencia del Lote *</label>
+                    <input type="number" id="existencia" min="0" required placeholder="Ej: 100">
+                </div>
+                
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary close-modal-btn">Cancelar</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn">Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="modal-backdrop" id="confirmModal">
+        <div class="modal-content" style="max-width: 450px;">
+            <h2 id="confirmModalTitle">Confirmar Acción</h2>
+            <p id="confirmModalMessage" style="margin-top: 15px; margin-bottom: 25px;"></p>
+            <div style="text-align: right; display: flex; justify-content: flex-end; gap: 10px;">
+                <button type="button" class="btn btn-secondary" id="confirmCancelBtn">Cancelar</button>
+                <button type="button" class="btn btn-danger" id="confirmOkBtn">Aceptar</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-notification">
+        <span class="material-symbols-outlined" id="notification-icon">info</span>
+        <div id="notification-content">
+            <div id="notification-title">Notificación</div>
+            <div id="notification-message">Mensaje de notificación</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+        import { getAuth, onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+        import { getFirestore, collection, query, where, orderBy, getDocs, doc, getDoc, addDoc, updateDoc, deleteDoc, runTransaction, writeBatch } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+        // --- CONFIGURACIÓN DE FIREBASE ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxJOpBEXZUo7WrAqDTrlJV_2kJBsL8Ym0",
+            authDomain: "labflow-manager.firebaseapp.com",
+            projectId: "labflow-manager",
+            storageBucket: "labflow-manager.appspot.com",
+            messagingSenderId: "742212306654",
+            appId: "1:742212306654:web:a53bf890fc63cd5d05e44f",
+            measurementId: "G-YVZDBCJR3B"
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        // --- LÓGICA DEL SIDEBAR ---
+        function initializeSidebar() {
+            const userEmailDisplay = document.getElementById('user-email-display-sidebar');
+            const logoutBtn = document.getElementById('user-logout-btn-sidebar');
+            
+            if (auth.currentUser && userEmailDisplay) {
+                userEmailDisplay.textContent = auth.currentUser.email;
+            }
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', () => signOut(auth));
+            }
+            document.querySelectorAll('.menu-section-header').forEach(header => {
+                header.addEventListener('click', () => {
+                    const submenu = header.nextElementSibling;
+                    const arrow = header.querySelector('.dropdown-arrow');
+                    const isVisible = submenu.style.display === 'block';
+                    submenu.style.display = isVisible ? 'none' : 'block';
+                    if(arrow) arrow.style.transform = isVisible ? 'rotate(0deg)' : 'rotate(180deg)';
+                });
+            });
+            const currentPage = window.location.pathname.split("/").pop();
+            document.querySelectorAll('#sidebar a').forEach(link => {
+                if (link.getAttribute('href') === currentPage) {
+                    link.classList.add('active');
+                    const submenu = link.closest('.submenu');
+                    if (submenu) {
+                        submenu.style.display = 'block';
+                        const arrow = submenu.previousElementSibling.querySelector('.dropdown-arrow');
+                        if (arrow) arrow.style.transform = 'rotate(180deg)';
+                    }
+                }
+            });
+        }
+
+        async function loadSidebar() {
+            try {
+                const response = await fetch('sidebar.html');
+                if (!response.ok) throw new Error('Network response was not ok.');
+                document.getElementById('sidebar-container').innerHTML = await response.text();
+                initializeSidebar();
+            } catch (error) {
+                console.error("Failed to load sidebar:", error);
+                document.getElementById('sidebar-container').innerHTML = "<p>Error al cargar menú.</p>";
+            }
+        }
+        
+        // --- LÓGICA DE LA PÁGINA DE INSUMOS ---
+        const productTableBody = document.getElementById('productTableBody');
+        const btnAddProduct = document.getElementById('btnAddProduct');
+        const productModal = document.getElementById('productModal');
+        const productForm = document.getElementById('productForm');
+        const saveBtn = document.getElementById('saveBtn');
+        const closeModalBtns = document.querySelectorAll('.close-modal-btn');
+        const notificationDiv = document.getElementById('app-notification');
+        const notificationTitle = document.getElementById('notification-title');
+        const notificationMessage = document.getElementById('notification-message');
+        const notificationIcon = document.getElementById('notification-icon');
+        const confirmModal = document.getElementById('confirmModal');
+        const confirmModalMessage = document.getElementById('confirmModalMessage');
+        const confirmOkBtn = document.getElementById('confirmOkBtn');
+        const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+        
+        const csvActionsContainer = document.getElementById('csvActionsContainer');
+        const btnCSVActions = document.getElementById('btnCSVActions');
+        const btnExportCSV = document.getElementById('btnExportCSV');
+        const btnImportInsumosCSV = document.getElementById('btnImportInsumosCSV');
+        const btnImportLotesCSV = document.getElementById('btnImportLotesCSV');
+        const csvFileInput = document.getElementById('csvFileInput');
+        let currentImportType = null;
+
+        const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+        const btnDeleteSelected = document.getElementById('btnDeleteSelected');
+        const searchInput = document.getElementById('searchInput');
+
+        function showNotification(title, message, type = 'info') {
+            notificationTitle.textContent = title;
+            notificationMessage.textContent = message;
+            notificationDiv.className = 'show ' + type;
+            if (type === 'success') { notificationIcon.textContent = 'check_circle'; } 
+            else if (type === 'error') { notificationIcon.textContent = 'error'; } 
+            else { notificationIcon.textContent = 'info'; }
+            setTimeout(() => { notificationDiv.className = ''; }, 3000);
+        }
+
+        function showConfirm(message) {
+            return new Promise((resolve) => {
+                confirmModalMessage.textContent = message;
+                confirmModal.classList.add('active');
+                const onOk = () => { cleanup(); resolve(true); };
+                const onCancel = () => { cleanup(); resolve(false); };
+                const cleanup = () => {
+                    confirmOkBtn.removeEventListener('click', onOk);
+                    confirmCancelBtn.removeEventListener('click', onCancel);
+                    confirmModal.classList.remove('active');
+                };
+                confirmOkBtn.addEventListener('click', onOk, { once: true });
+                confirmCancelBtn.addEventListener('click', onCancel, { once: true });
+            });
+        }
+
+        async function fetchAndRenderInsumos() {
+            productTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 30px; color: var(--text-secondary);"><span class="material-symbols-outlined" style="font-size: 3rem; margin-bottom: 15px;">hourglass_top</span><p>Cargando insumos...</p></td></tr>`;
+            try {
+                const insumosQuery = query(collection(db, "insumos"), orderBy("nombre"));
+                const insumosSnapshot = await getDocs(insumosQuery);
+                
+                if (insumosSnapshot.empty) {
+                    productTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 30px; color: var(--text-secondary);"><span class="material-symbols-outlined" style="font-size: 3rem; margin-bottom: 15px;">inventory_2</span><p>No hay insumos registrados</p></td></tr>`;
+                    return;
+                }
+
+                let tableHtml = '';
+                for (const insumoDoc of insumosSnapshot.docs) {
+                    const insumo = { id: insumoDoc.id, ...insumoDoc.data() };
+                    const lotesQuery = query(collection(db, "lotes"), where("insumo_id", "==", insumo.id));
+                    const lotesSnapshot = await getDocs(lotesQuery);
+                    const lotes = lotesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                    
+                    let estadoHtml = '';
+                    if (insumo.existencia_total === 0) { estadoHtml = '<span class="status-indicator status-critical"></span>Agotado'; } 
+                    else if (insumo.existencia_total <= insumo.stock_minimo * 0.3) { estadoHtml = '<span class="status-indicator status-critical"></span>Crítico'; } 
+                    else if (insumo.existencia_total <= insumo.stock_minimo) { estadoHtml = '<span class="status-indicator status-low"></span>Bajo'; } 
+                    else { estadoHtml = '<span class="status-indicator status-ok"></span>Normal'; }
+
+                    tableHtml += `<tr class="insumo-row" data-insumo-id="${insumo.id}"><td><input type="checkbox" class="insumo-checkbox" data-id="${insumo.id}"></td><td><strong>${insumo.nombre}</strong></td><td>${insumo.existencia_total || 0}</td><td>${insumo.stock_minimo}</td><td>${estadoHtml}</td><td class="action-buttons"><button class="btn btn-edit" data-action="edit-insumo" data-id="${insumo.id}" data-nombre="${insumo.nombre}" data-stock-minimo="${insumo.stock_minimo}"><span class="material-symbols-outlined" style="font-size: 1.1rem;">edit</span> Editar</button><button class="btn btn-delete" data-action="delete-insumo" data-id="${insumo.id}" data-nombre="${insumo.nombre}"><span class="material-symbols-outlined" style="font-size: 1.1rem;">delete</span> Eliminar</button></td></tr>`;
+                    if (lotes.length > 0) {
+                        tableHtml += `<tr class="lote-row" data-lote-for="${insumo.id}" style="display:none;"><td colspan="6"><table style="width: 100%; background: var(--background-light); border-radius: 8px; overflow: hidden;"><thead><tr><th>Lote</th><th>Caducidad</th><th>Existencia</th><th>Acciones</th></tr></thead><tbody>`;
+                        lotes.forEach(lote => {
+                            tableHtml += `<tr><td>${lote.lote || 'N/A'}</td><td>${lote.fecha_caducidad || 'N/A'}</td><td>${lote.existencia}</td><td class="action-buttons"><button class="btn btn-edit" data-action="edit-lote" data-id="${lote.id}" data-insumo-id="${insumo.id}" data-insumo-nombre="${insumo.nombre}" data-stock-minimo="${insumo.stock_minimo}" data-lote='${JSON.stringify(lote)}'><span class="material-symbols-outlined" style="font-size: 1.1rem;">edit</span> Editar</button><button class="btn btn-delete" data-action="delete-lote" data-id="${lote.id}" data-lote-nombre="${lote.lote || 'este lote'}"><span class="material-symbols-outlined" style="font-size: 1.1rem;">delete</span> Eliminar</button></td></tr>`;
+                        });
+                        tableHtml += `</tbody></table></td></tr>`;
+                    }
+                }
+                productTableBody.innerHTML = tableHtml;
+            } catch (error) {
+                console.error("Error cargando insumos:", error);
+                showNotification("Error", "Error al cargar los insumos.", "error");
+                productTableBody.innerHTML = `<tr><td colspan="6" style="text-align: center; padding: 30px; color: var(--text-secondary);"><span class="material-symbols-outlined" style="font-size: 3rem; margin-bottom: 15px;">error</span><p>Error al cargar los datos</p></td></tr>`;
+            }
+        }
+
+        function openModal(insumo = null, lote = null) {
+            productForm.reset();
+            const modalTitle = document.getElementById('modalTitle');
+            const insumoIdField = document.getElementById('insumoIdField');
+            const loteIdField = document.getElementById('loteIdField');
+            const nombreInput = document.getElementById('nombre');
+            const stockMinimoInput = document.getElementById('stockMinimo');
+
+            if (lote) {
+                modalTitle.textContent = "Editar Lote";
+                insumoIdField.value = lote.insumo_id;
+                loteIdField.value = lote.id;
+                nombreInput.value = insumo.nombre;
+                nombreInput.disabled = true;
+                stockMinimoInput.value = insumo.stock_minimo;
+                stockMinimoInput.disabled = true;
+                document.getElementById('lote').value = lote.lote;
+                document.getElementById('fechaCaducidad').value = lote.fecha_caducidad;
+                document.getElementById('existencia').value = lote.existencia;
+            } else if (insumo) {
+                modalTitle.textContent = "Editar Insumo / Añadir Lote";
+                insumoIdField.value = insumo.id;
+                loteIdField.value = '';
+                nombreInput.value = insumo.nombre;
+                nombreInput.disabled = false;
+                stockMinimoInput.value = insumo.stock_minimo;
+                stockMinimoInput.disabled = false;
+            } else {
+                modalTitle.textContent = "Agregar Insumo y Lote";
+                insumoIdField.value = '';
+                loteIdField.value = '';
+                nombreInput.disabled = false;
+                stockMinimoInput.disabled = false;
+            }
+            productModal.classList.add('active');
+        }
+
+        function closeModal() {
+            productModal.classList.remove('active');
+        }
+
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = '<span class="material-symbols-outlined" style="animation: spin 1s linear infinite;">refresh</span> Guardando...';
+            const style = document.createElement('style'); style.textContent = `@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`; document.head.appendChild(style);
+
+
+            const insumoId = document.getElementById('insumoIdField').value;
+            const loteId = document.getElementById('loteIdField').value;
+            const data = {
+                nombre: document.getElementById('nombre').value.trim(),
+                stock_minimo: Number(document.getElementById('stockMinimo').value),
+                lote: document.getElementById('lote').value.trim(),
+                fecha_caducidad: document.getElementById('fechaCaducidad').value,
+                existencia: Number(document.getElementById('existencia').value)
+            };
+
+            try {
+                if (loteId) {
+                    await updateDoc(doc(db, "lotes", loteId), { lote: data.lote, fecha_caducidad: data.fecha_caducidad, existencia: data.existencia });
+                } else if (insumoId) {
+                    await updateDoc(doc(db, "insumos", insumoId), { nombre: data.nombre, stock_minimo: data.stock_minimo });
+                    if (data.lote || data.fecha_caducidad || data.existencia > 0) {
+                        await addDoc(collection(db, "lotes"), { insumo_id: insumoId, lote: data.lote, fecha_caducidad: data.fecha_caducidad, existencia: data.existencia, created_at: new Date().toISOString() });
+                    }
+                } else {
+                    const q = query(collection(db, "insumos"), where("nombre", "==", data.nombre));
+                    const querySnapshot = await getDocs(q);
+                    if (!querySnapshot.empty) {
+                        showNotification("Error", "Ya existe un insumo con este nombre.", "error");
+                        saveBtn.disabled = false; saveBtn.innerHTML = 'Guardar'; return;
+                    }
+                    await runTransaction(db, async (transaction) => {
+                        const newInsumoRef = doc(collection(db, "insumos"));
+                        transaction.set(newInsumoRef, { nombre: data.nombre, stock_minimo: data.stock_minimo, existencia_total: data.existencia, created_at: new Date().toISOString() });
+                        if (data.lote || data.fecha_caducidad || data.existencia > 0) {
+                            const newLoteRef = doc(collection(db, "lotes"));
+                            transaction.set(newLoteRef, { insumo_id: newInsumoRef.id, lote: data.lote, fecha_caducidad: data.fecha_caducidad, existencia: data.existencia, created_at: new Date().toISOString() });
+                        }
+                    });
+                }
+                
+                const finalInsumoId = insumoId || (await getDocs(query(collection(db, "insumos"), where("nombre", "==", data.nombre)))).docs[0].id;
+                const lotesQuery = query(collection(db, "lotes"), where("insumo_id", "==", finalInsumoId));
+                const lotesSnapshot = await getDocs(lotesQuery);
+                const totalExistencia = lotesSnapshot.docs.reduce((sum, doc) => sum + doc.data().existencia, 0);
+                await updateDoc(doc(db, "insumos", finalInsumoId), { existencia_total: totalExistencia });
+
+                showNotification("Éxito", "Operación completada correctamente.", "success");
+                closeModal();
+                await fetchAndRenderInsumos();
+            } catch (error) {
+                console.error("Error guardando:", error);
+                showNotification("Error", "Error al guardar: " + error.message, "error");
+            } finally {
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = 'Guardar';
+            }
+        }
+        
+        // ... (resto de funciones: handleDelete, exportToCSV, import, etc.)
+
+        // --- EVENT LISTENERS ---
+        btnAddProduct.addEventListener('click', () => openModal());
+        closeModalBtns.forEach(btn => btn.addEventListener('click', closeModal));
+        productForm.addEventListener('submit', handleFormSubmit);
+
+        productTableBody.addEventListener('click', (e) => {
+            const target = e.target;
+            const insumoRow = target.closest('.insumo-row');
+            const actionButton = target.closest('.btn');
+
+            if (actionButton) {
+                e.stopPropagation();
+                const { action, id, nombre, loteNombre } = actionButton.dataset;
+                if (action === 'edit-insumo') {
+                    openModal({ id, nombre, stock_minimo: actionButton.dataset.stockMinimo });
+                } else if (action === 'edit-lote') {
+                    const insumoData = { id: actionButton.dataset.insumoId, nombre: actionButton.dataset.insumoNombre, stock_minimo: actionButton.dataset.stockMinimo };
+                    const loteData = JSON.parse(actionButton.dataset.lote);
+                    openModal(insumoData, { id, ...loteData });
+                } else if (action === 'delete-insumo' || action === 'delete-lote') {
+                    // handleDelete(action, id, nombre || loteNombre); // Re-implement if needed
+                }
+            } else if (target.classList.contains('insumo-checkbox')) {
+                e.stopPropagation();
+                // updateDeleteSelectedButton(); // Re-implement if needed
+            } else if (insumoRow) {
+                const loteRow = document.querySelector(`[data-lote-for="${insumoRow.dataset.insumoId}"]`);
+                if (loteRow) {
+                    loteRow.style.display = loteRow.style.display === 'none' ? 'table-row' : 'none';
+                }
+            }
+        });
+
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            const rows = document.querySelectorAll('.insumo-row');
+            rows.forEach(row => {
+                const insumoName = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+                row.style.display = insumoName.includes(searchTerm) ? '' : 'none';
+            });
+        });
+
+        // --- PUNTO DE ENTRADA ---
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                loadSidebar();
+                fetchAndRenderInsumos(); // Llama a la función que carga tus datos de la página
+            } else {
+                window.location.href = 'index.html'; // Redirige a index en la misma carpeta
+            }
+        });
+    </script>
+</body>
+</html>

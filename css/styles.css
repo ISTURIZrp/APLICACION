@@ -1,0 +1,76 @@
+/* css/style.css */
+
+/* ... (tus otros estilos como :root, body, etc.) ... */
+
+/* Estilos para el Login */
+.login-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 100vh;
+    padding: 20px;
+    background-image:
+        radial-gradient(ellipse at 5% 95%, var(--accent-glow-start), transparent 40%),
+        radial-gradient(ellipse at 95% 5%, var(--accent-glow-end), transparent 40%);
+}
+
+.login-box {
+    background: var(--glass-bg);
+    backdrop-filter: blur(10px);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--border-radius-lg);
+    padding: 40px;
+    width: 100%;
+    max-width: 450px;
+    box-shadow: var(--glass-shadow);
+    text-align: center;
+    animation: popIn 0.6s ease-out forwards;
+}
+
+.login-box h2 {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.btn-login {
+    display: inline-block;
+    padding: 12px 30px;
+    background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
+    color: white;
+    border: none;
+    border-radius: var(--border-radius-md);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.btn-login:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(14, 165, 233, 0.3);
+}
+
+.login-error-message {
+    color: var(--action-error);
+    margin-top: 15px;
+    font-weight: 500;
+    height: 20px; /* Para evitar que el layout salte */
+}
