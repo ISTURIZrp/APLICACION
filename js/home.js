@@ -1,50 +1,53 @@
 import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { auth } from './firebase-config.js';
+import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { auth, db } from './firebase-config.js';
 
-// --- Elementos del DOM ---
-const loginContainer = document.getElementById('login-container'); // Suponiendo que aún lo necesitas como referencia
-const appContent = document.getElementById('app-content');
-const btnLogout = document.getElementById('btnLogout');
-const userInfoBox = document.getElementById('userInfoBox');
-const userDropdown = document.getElementById('userDropdown');
+const pageContainer = document.getElementById('page-container');
+const loginSection = document.getElementById('login-section');
+const userInfoBox = document.getElementById('user-info-box');
+const userDropdown = document.getElementById('user-dropdown');
 const userNameDisplay = document.getElementById('user-name-display');
 const userRoleDisplay = document.getElementById('user-role-display');
+const logoutBtn = document.getElementById('logout-btn');
 
-// --- Lógica Principal ---
-
-// Se ejecuta cuando el estado de autenticación cambia
-onAuthStateChanged(auth, (user) => {
+onAuthStateChanged(auth, async (user) => {
     if (user) {
-        // Usuario autenticado: muestra el contenido principal
-        appContent.style.display = 'block';
-        userNameDisplay.textContent = user.displayName || user.email;
-        userRoleDisplay.textContent = "Administrador"; // Puedes cambiar esto si gestionas roles
+        // Usuario autenticado
+        pageContainer.style.display = 'block';
+        loginSection.style.display = 'none';
+
+        try {
+            const userDoc = await getDoc(doc(db, 'users', user.uid));
+            if (userDoc.exists()) {
+                const userData = userDoc.data();
+                userNameDisplay.textContent = userData.displayName || user.email;
+                userRoleDisplay.textContent = userData.role || 'Usuario';
+            } else {
+                userNameDisplay.textContent = user.email;
+                userRoleDisplay.textContent = 'Usuario';
+            }
+        } catch (error) {
+            console.error("Error al obtener datos del usuario:", error);
+            userNameDisplay.textContent = user.email;
+        }
     } else {
-        // Usuario no autenticado: redirige a la página de login
-        window.location.href = 'index.html';
+        // No autenticado
+        pageContainer.style.display = 'none';
+        loginSection.style.display = 'block';
     }
 });
 
-// --- Event Listeners ---
+logoutBtn.addEventListener('click', () => signOut(auth));
 
-// Botón para cerrar sesión
-btnLogout.addEventListener('click', () => {
-    signOut(auth);
-});
-
-// Menú desplegable del usuario
-userInfoBox.addEventListener('click', () => {
+userInfoBox.addEventListener('click', (e) => {
+    e.stopPropagation();
     userDropdown.classList.toggle('show');
 });
 
-// Cierra el menú si se hace clic fuera
-document.addEventListener('click', (e) => {
-    if (!userInfoBox.contains(e.target)) {
-        userDropdown.classList.remove('show');
-    }
+document.addEventListener('click', () => {
+    userDropdown.classList.remove('show');
 });
 
-// Lógica para expandir/colapsar los módulos
 document.querySelectorAll('.module-header').forEach(header => {
     header.addEventListener('click', () => {
         header.closest('.module').classList.toggle('active');
