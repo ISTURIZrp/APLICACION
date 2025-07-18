@@ -1,88 +1,808 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <title>LabFlow Manager - Movimientos</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LabFlow Manager - Gestión de Insumos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
     <style>
-        .page-header { margin-bottom: 1.5rem; }
-        .page-header h1 { font-size: 2.2rem; background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        .content-wrapper { background: var(--background-container); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 30px; }
-        .section-title { font-size: 1.4rem; margin-bottom: 25px; padding-bottom: 10px; border-bottom: 1px solid var(--border-color); }
-        .btn-remove { background: none; border: none; color: var(--action-error); cursor: pointer; text-decoration: underline; }
-        #app-notification { position: fixed; bottom: 20px; right: 20px; padding: 15px; border-radius: 8px; color: white; z-index: 2000; opacity: 0; transition: all 0.5s ease; transform: translateY(100%); }
-        #app-notification.show { opacity: 1; transform: translateY(0); }
-        #app-notification.info { background-color: #03a9f4; }
-        #app-notification.success { background-color: #4caf50; }
-        #app-notification.error { background-color: #f44336; }
+        /* Variables para colores y dimensiones */
+        :root {
+            --primary-color: #4361ee;
+            --primary-hover: #3a56d4;
+            --secondary-color: #6c757d;
+            --success-color: #06d6a0;
+            --danger-color: #ef476f;
+            --warning-color: #ffd166;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --border-color: #dee2e6;
+            --sidebar-width: 260px;
+            --header-height: 70px;
+            --transition: all 0.3s ease;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --radius: 8px;
+        }
+
+        /* Reset y estilos base */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #f5f7fb;
+            color: #333;
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Barra lateral */
+        #sidebar-container {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, #2d3748 0%, #1a202c 100%);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            z-index: 100;
+            overflow-y: auto;
+            transition: var(--transition);
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        .sidebar-menu {
+            padding: 15px 0;
+        }
+
+        .menu-item {
+            padding: 12px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-left: 4px solid var(--primary-color);
+        }
+
+        /* Contenido principal */
+        #content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            transition: var(--transition);
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .page-header h1 {
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .content-wrapper {
+            background-color: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+        }
+
+        /* Controles de tabla */
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background-color: #f8f9fa;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .search-container {
+            position: relative;
+            width: 300px;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--secondary-color);
+        }
+
+        /* Tabla */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        .table th {
+            background-color: #f1f5f9;
+            text-align: left;
+            padding: 16px 15px;
+            font-weight: 600;
+            color: var(--dark-color);
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .table td {
+            padding: 14px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .table tbody tr {
+            transition: var(--transition);
+        }
+
+        .table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        /* Botones y controles */
+        .btn {
+            padding: 10px 18px;
+            border-radius: var(--radius);
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary-color);
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #e5395c;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--dark-color);
+        }
+
+        .btn-outline:hover {
+            background-color: #f8f9fa;
+        }
+
+        .btn-sm {
+            padding: 6px 12px;
+            font-size: 13px;
+        }
+
+        .btn-icon {
+            padding: 8px;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+        }
+
+        /* Estado */
+        .status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-active {
+            background-color: rgba(6, 214, 160, 0.1);
+            color: #06b48a;
+        }
+
+        .status-active .status-dot {
+            background-color: #06d6a0;
+        }
+
+        .status-low {
+            background-color: rgba(255, 209, 102, 0.15);
+            color: #d4a007;
+        }
+
+        .status-low .status-dot {
+            background-color: #ffd166;
+        }
+
+        .status-inactive {
+            background-color: rgba(239, 71, 111, 0.1);
+            color: #d8456a;
+        }
+
+        .status-inactive .status-dot {
+            background-color: #ef476f;
+        }
+
+        /* Modal */
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal-backdrop.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: var(--transition);
+        }
+
+        .modal-backdrop.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-header h2 {
+            font-size: 1.5rem;
+            font-weight: 600;
+        }
+
+        .close-modal-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--secondary-color);
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .close-modal-btn:hover {
+            background-color: #f8f9fa;
+            color: var(--dark-color);
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark-color);
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius);
+            font-size: 15px;
+            transition: var(--transition);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .form-section {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .form-section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--dark-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-top: 1px solid var(--border-color);
+        }
+
+        /* Modal de confirmación */
+        #customConfirmModal .modal-content {
+            max-width: 450px;
+        }
+
+        #customConfirmModal .modal-body {
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        #modalTitleConfirm {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+        }
+
+        #modalMessageConfirm {
+            color: var(--secondary-color);
+            margin-bottom: 25px;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            :root {
+                --sidebar-width: 70px;
+            }
+
+            .sidebar-header h2, .menu-item span {
+                display: none;
+            }
+
+            .sidebar-header {
+                justify-content: center;
+            }
+
+            .menu-item {
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .table-controls {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .search-container {
+                width: 100%;
+            }
+
+            .modal-buttons {
+                flex-direction: column;
+            }
+
+            .modal-buttons .btn {
+                width: 100%;
+            }
+        }
+
+        /* Animación de carga */
+        .skeleton {
+            background-color: #e2e8f0;
+            border-radius: 4px;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
     </style>
 </head>
 <body class="app-body">
-    <div id="sidebar-container"></div>
-
-    <main id="content">
-        <header class="page-header"><h1>Gestión de Movimientos</h1></header>
-        
-        <div class="content-wrapper">
-            <h2 class="section-title">Registrar Movimiento</h2>
-            <form id="singleTransactionForm" novalidate>
-                 <div class="form-group">
-                    <label for="insumoSelect">Insumo</label>
-                    <select id="insumoSelect" required disabled><option value="">Cargando...</option></select>
-                </div>
-                 <div class="form-group">
-                    <label>Tipo de Movimiento</label>
-                    <div class="radio-group" style="display: flex; gap: 15px;">
-                        <label><input type="radio" name="tipoTransaccion" value="entrada" required> Entrada</label>
-                        <label><input type="radio" name="tipoTransaccion" value="salida"> Salida</label>
-                        <label><input type="radio" name="tipoTransaccion" value="ajuste"> Ajuste</label>
-                    </div>
-                </div>
-                <div class="form-group" id="loteSelectGroup" style="display:none;">
-                    <label for="loteSelect">Lote (existente)</label>
-                    <select id="loteSelect"></select>
-                </div>
-                <div class="form-group" id="nuevoLoteGroup" style="display:none;">
-                    <label for="nuevoLoteInput">Nuevo Lote</label>
-                    <input type="text" id="nuevoLoteInput" placeholder="Ej: LOTE-2025-A">
-                </div>
-                 <div class="form-group" id="fechaCaducidadNuevoLoteGroup" style="display:none;">
-                    <label for="fechaCaducidadNuevoLote">Fecha de Caducidad</label>
-                    <input type="date" id="fechaCaducidadNuevoLote">
-                </div>
-                <div class="form-group">
-                    <label for="cantidad">Cantidad</label>
-                    <input type="number" id="cantidad" min="1" required>
-                </div>
-                <button type="submit" class="btn-primary" id="addToListBtn">Añadir a la Lista</button>
-            </form>
-
-            <h2 class="section-title" style="margin-top:40px;">Pendientes de Confirmar</h2>
-            <table id="pendingTransactionsTable">
-                <thead><tr><th>Insumo</th><th>Lote</th><th>Tipo</th><th>Cantidad</th><th>Acciones</th></tr></thead>
-                <tbody id="pendingTransactionsTableBody"></tbody>
-            </table>
-            <button class="btn-primary" id="confirmAllTransactionsBtn" style="margin-top:20px;" disabled>Confirmar Todo</button>
-
-            <h2 class="section-title" style="margin-top:40px;">Historial</h2>
-            <table id="transactionsHistoryTable">
-                <thead><tr><th>Fecha</th><th>Insumo</th><th>Lote</th><th>Tipo</th><th>Cantidad</th><th>Responsable</th></tr></thead>
-                <tbody id="transactionsHistoryTableBody"></tbody>
-            </table>
+    <div id="sidebar-container">
+        <div class="sidebar-header">
+            <span class="material-symbols-outlined">science</span>
+            <h2>LabFlow</h2>
         </div>
-    </main>
-
-    <div id="customConfirmModal" class="modal-overlay">
-        <div class="modal-content">
-            <h3 id="modalTitle">Confirmar</h3><p id="modalMessage">¿Seguro?</p>
-            <div class="modal-buttons">
-                <button id="modalCancelBtn" class="btn-secondary">Cancelar</button>
-                <button id="modalConfirmBtn" class="btn-primary">Confirmar</button>
+        <div class="sidebar-menu">
+            <div class="menu-item active">
+                <span class="material-symbols-outlined">inventory_2</span>
+                <span>Insumos</span>
+            </div>
+            <div class="menu-item">
+                <span class="material-symbols-outlined">lab_profile</span>
+                <span>Experimentos</span>
+            </div>
+            <div class="menu-item">
+                <span class="material-symbols-outlined">calendar_month</span>
+                <span>Calendario</span>
+            </div>
+            <div class="menu-item">
+                <span class="material-symbols-outlined">group</span>
+                <span>Usuarios</span>
+            </div>
+            <div class="menu-item">
+                <span class="material-symbols-outlined">settings</span>
+                <span>Configuración</span>
             </div>
         </div>
     </div>
-    <div id="app-notification"></div>
 
-    <script type="module" src="js/movimientos.js"></script>
+    <main id="content">
+        <div class="page-header">
+            <h1>Gestión de Insumos y Lotes</h1>
+            <button class="btn btn-primary" id="btnAddProduct">
+                <i class="mdi mdi-plus"></i> Agregar Nuevo Insumo
+            </button>
+        </div>
+        
+        <div class="content-wrapper">
+            <div class="table-controls">
+                <div class="search-container">
+                    <span class="material-symbols-outlined search-icon">search</span>
+                    <input type="search" id="searchInput" placeholder="Buscar insumo por nombre, lote o estado...">
+                </div>
+                <div class="actions">
+                    <button class="btn btn-outline">
+                        <i class="mdi mdi-filter-variant"></i> Filtros
+                    </button>
+                    <button class="btn btn-outline">
+                        <i class="mdi mdi-export-variant"></i> Exportar
+                    </button>
+                </div>
+            </div>
+            <div class="table-container">
+                <table class="table" id="tableProducts">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;"><input type="checkbox" id="selectAllCheckbox"></th>
+                            <th>Nombre Insumo</th>
+                            <th>Existencia Total</th>
+                            <th>Stock Mínimo</th>
+                            <th>Estado</th>
+                            <th style="width: 150px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="productTableBody">
+                        <!-- Ejemplo de fila de datos -->
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>Ácido Clorhídrico</td>
+                            <td>1,250 mL</td>
+                            <td>500 mL</td>
+                            <td>
+                                <div class="status status-active">
+                                    <span class="status-dot"></span>
+                                    <span>Disponible</span>
+                                </div>
+                            </td>
+                            <td>
+                                <button class="btn btn-icon btn-outline" title="Editar">
+                                    <i class="mdi mdi-pencil"></i>
+                                </button>
+                                <button class="btn btn-icon btn-outline" title="Ver detalles">
+                                    <i class="mdi mdi-eye"></i>
+                                </button>
+                                <button class="btn btn-icon btn-outline" title="Eliminar">
+                                    <i class="mdi mdi-delete"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>Hidróxido de Sodio</td>
+                            <td>850 g</td>
+                            <td>1,000 g</td>
+                            <td>
+                                <div class="status status-low">
+                                    <span class="status-dot"></span>
+                                    <span>Stock Bajo</span>
+                                </div>
+                            </td>
+                            <td>
+                                <button class="btn btn-icon btn-outline" title="Editar">
+                                    <i class="mdi mdi-pencil"></i>
+                                </button>
+                                <button class="btn btn-icon btn-outline" title="Ver detalles">
+                                    <i class="mdi mdi-eye"></i>
+                                </button>
+                                <button class="btn btn-icon btn-outline" title="Eliminar">
+                                    <i class="mdi mdi-delete"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>Cloruro de Sodio</td>
+                            <td>2,500 g</td>
+                            <td>1,000 g</td>
+                            <td>
+                                <div class="status status-active">
+                                    <span class="status-dot"></span>
+                                    <span>Disponible</span>
+                                </div>
+                            </td>
+                            <td>
+                                <button class="btn btn-icon btn-outline" title="Editar">
+                                    <i class="mdi mdi-pencil"></i>
+                                </button>
+                                <button class="btn btn-icon btn-outline" title="Ver detalles">
+                                    <i class="mdi mdi-eye"></i>
+                                </button>
+                                <button class="btn btn-icon btn-outline" title="Eliminar">
+                                    <i class="mdi mdi-delete"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><input type="checkbox"></td>
+                            <td>Etanol 70%</td>
+                            <td>0 mL</td>
+                            <td>1,500 mL</td>
+                            <td>
+                                <div class="status status-inactive">
+                                    <span class="status-dot"></span>
+                                    <span>Agotado</span>
+                                </div>
+                            </td>
+                            <td>
+                                <button class="btn btn-icon btn-outline" title="Editar">
+                                    <i class="mdi mdi-pencil"></i>
+                                </button>
+                                <button class="btn btn-icon btn-outline" title="Ver detalles">
+                                    <i class="mdi mdi-eye"></i>
+                                </button>
+                                <button class="btn btn-icon btn-outline" title="Eliminar">
+                                    <i class="mdi mdi-delete"></i>
+                                </button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Modal para agregar/editar insumo -->
+    <div class="modal-backdrop" id="productModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Agregar Nuevo Insumo</h2>
+                <button class="close-modal-btn">
+                    <i class="mdi mdi-close"></i>
+                </button>
+            </div>
+            <form id="productForm">
+                <div class="modal-body">
+                    <input type="hidden" id="insumoIdField">
+                    <input type="hidden" id="loteIdField">
+                    
+                    <div class="form-section">
+                        <h3 class="form-section-title">
+                            <i class="mdi mdi-flask-outline"></i>
+                            Información del Insumo
+                        </h3>
+                        <div class="form-group">
+                            <label for="nombre">Nombre del Insumo *</label>
+                            <input type="text" id="nombre" required placeholder="Ej: Ácido Clorhídrico">
+                        </div>
+                        <div class="form-group">
+                            <label for="stockMinimo">Stock Mínimo *</label>
+                            <input type="number" id="stockMinimo" min="0" required placeholder="Cantidad mínima requerida">
+                        </div>
+                    </div>
+                    
+                    <div class="form-section">
+                        <h3 class="form-section-title">
+                            <i class="mdi mdi-package-variant"></i>
+                            Información del Lote
+                        </h3>
+                        <div class="form-group">
+                            <label for="lote">Número de Lote</label>
+                            <input type="text" id="lote" placeholder="Ej: LOTE-2024-001">
+                        </div>
+                        <div class="form-group">
+                            <label for="fechaCaducidad">Fecha de Caducidad</label>
+                            <input type="date" id="fechaCaducidad">
+                        </div>
+                        <div class="form-group">
+                            <label for="existencia">Existencia del Lote</label>
+                            <input type="number" id="existencia" min="0" placeholder="Cantidad disponible">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-buttons">
+                    <button type="button" class="btn btn-secondary close-modal-btn">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">Guardar Insumo</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Modal de confirmación -->
+    <div id="customConfirmModal" class="modal-overlay">
+        <div class="modal-backdrop">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 id="modalTitleConfirm">Confirmar Acción</h3>
+                    <button class="close-modal-btn">
+                        <i class="mdi mdi-close"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p id="modalMessageConfirm">¿Está seguro que desea eliminar este insumo? Esta acción no puede deshacerse.</p>
+                </div>
+                <div class="modal-buttons">
+                    <button id="modalCancelBtn" class="btn btn-secondary">Cancelar</button>
+                    <button id="modalConfirmBtn" class="btn btn-danger">Confirmar Eliminación</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Script básico para mostrar/ocultar modales
+        document.addEventListener('DOMContentLoaded', function() {
+            // Botón para agregar nuevo insumo
+            const btnAddProduct = document.getElementById('btnAddProduct');
+            const productModal = document.getElementById('productModal');
+            const closeModalBtns = document.querySelectorAll('.close-modal-btn');
+            
+            // Mostrar modal al hacer clic en agregar
+            if(btnAddProduct) {
+                btnAddProduct.addEventListener('click', () => {
+                    productModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                });
+            }
+            
+            // Ocultar modal al hacer clic en cerrar
+            closeModalBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.modal-backdrop').forEach(modal => {
+                        modal.classList.remove('active');
+                    });
+                    document.body.style.overflow = '';
+                });
+            });
+            
+            // Cerrar modal al hacer clic fuera del contenido
+            window.addEventListener('click', (e) => {
+                if(e.target.classList.contains('modal-backdrop')) {
+                    document.querySelectorAll('.modal-backdrop').forEach(modal => {
+                        modal.classList.remove('active');
+                    });
+                    document.body.style.overflow = '';
+                }
+            });
+            
+            // Ejemplo de manejo de estado de checkbox
+            const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+            if(selectAllCheckbox) {
+                selectAllCheckbox.addEventListener('change', function() {
+                    const checkboxes = document.querySelectorAll('#productTableBody input[type="checkbox"]');
+                    checkboxes.forEach(checkbox => {
+                        checkbox.checked = this.checked;
+                    });
+                });
+            }
+            
+            // Simulación de búsqueda
+            const searchInput = document.getElementById('searchInput');
+            if(searchInput) {
+                searchInput.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase();
+                    const rows = document.querySelectorAll('#productTableBody tr');
+                    
+                    rows.forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        row.style.display = text.includes(searchTerm) ? '' : 'none';
+                    });
+                });
+            }
+        });
+    </script>
 </body>
 </html>
