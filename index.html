@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>LabFlow Manager - Iniciar Sesión</title>
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
@@ -14,6 +15,7 @@
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body class="login-page-body">
+
     <div class="particles">
         <div class="particle" style="top:10%;left:10%;width:5px;height:5px;animation-delay:0s;"></div>
         <div class="particle" style="top:80%;left:90%;width:6px;height:6px;animation-delay:1s;"></div>
@@ -26,7 +28,7 @@
             <i class="mdi mdi-beaker-outline logo-icon"></i>
             <h1>LabFlow Manager</h1>
         </div>
-        <form id="loginForm">
+        <form id="loginForm" novalidate>
             <div class="form-group">
                 <label for="email-username-field">Email o Nombre de Usuario</label>
                 <div class="input-container">
@@ -42,72 +44,14 @@
                 </div>
                 <div class="error-message" id="error-message"></div>
             </div>
-            <button type="submit" class="btn btn-primary" id="login-btn">
+            <button type="submit" class="btn-primary" id="login-btn">
                 <span class="material-symbols-outlined">login</span>
                 <span>Iniciar Sesión</span>
             </button>
         </form>
     </div>
 
-    <script type="module">
-        import { signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-        import { collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-        import { auth, db } from './js/firebase-config.js';
-
-        const loginForm = document.getElementById('loginForm');
-        const emailOrUsernameField = document.getElementById('email-username-field');
-        const passwordField = document.getElementById('password-field');
-        const errorMessageDiv = document.getElementById('error-message');
-        const loginBtn = document.getElementById('login-btn');
-
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                window.location.href = 'home.html';
-            }
-        });
-
-        loginForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            loginBtn.disabled = true;
-            errorMessageDiv.textContent = '';
-            let emailToSignIn = emailOrUsernameField.value.trim();
-            const password = passwordField.value;
-
-            if (!emailToSignIn || !password) {
-                errorMessageDiv.textContent = 'Ambos campos son obligatorios.';
-                loginBtn.disabled = false;
-                return;
-            }
-
-            // Si no es un email, búscalo como nombre de usuario en Firestore
-            if (!emailToSignIn.includes('@')) {
-                try {
-                    const q = query(collection(db, 'users'), where('username', '==', emailToSignIn));
-                    const querySnapshot = await getDocs(q);
-                    if (!querySnapshot.empty) {
-                        emailToSignIn = querySnapshot.docs[0].data().email;
-                    } else {
-                        errorMessageDiv.textContent = 'Usuario o contraseña incorrectos.';
-                        loginBtn.disabled = false;
-                        return;
-                    }
-                } catch (error) {
-                    errorMessageDiv.textContent = 'Error al verificar usuario.';
-                    loginBtn.disabled = false;
-                    return;
-                }
-            }
-            
-            // Intenta iniciar sesión con el email
-            try {
-                await signInWithEmailAndPassword(auth, emailToSignIn, password);
-                // La redirección la maneja onAuthStateChanged
-            } catch (error) {
-                errorMessageDiv.textContent = 'Usuario o contraseña incorrectos.';
-            } finally {
-                loginBtn.disabled = false;
-            }
-        });
-    </script>
+    <script type="module" src="js/login.js"></script>
+    
 </body>
 </html>
