@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>LabFlow Manager - [Nombre de la Página]</title> 
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        /* Variables CSS para el tema claro (si no están ya en style.css) */
+        :root {
+            --primary-color: #007bff; /* Azul vibrante */
+            --secondary-color: #6c757d; /* Gris oscuro */
+            --accent-primary: #0e8edc; /* Azul más claro para acentos */
+            --accent-secondary: #007bff; /* Otro azul para degradados */
+            --background-body: #f8f9fa; /* Fondo claro general */
+            --background-container: #ffffff; /* Fondo de contenedores/tarjetas */
+            --background-medium: #e9ecef; /* Fondo de tablas/secciones */
+            --border-color: #dee2e6; /* Borde general */
+            --text-primary: #343a40; /* Color de texto principal */
+            --text-secondary: #6c757d; /* Color de texto secundario */
+            --action-error: #dc3545; /* Rojo para errores/acciones de eliminar */
+            --border-radius-lg: 8px; /* Radio de borde grande para elementos */
+            --glass-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Sombra suave para elevación */
+        }
+
+        /* Tema oscuro (para el switch de tema en main.js/home.js) */
+        html[data-theme="dark"] {
+            --primary-color: #6bb0ff;
+            --secondary-color: #adb5bd;
+            --accent-primary: #0056b3;
+            --accent-secondary: #0a4f90;
+            --background-body: #212529;
+            --background-container: #2b3035;
+            --background-medium: #343a40;
+            --border-color: #495057;
+            --text-primary: #e9ecef;
+            --text-secondary: #adb5bd;
+            --action-error: #ef4444;
+            --glass-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Añade aquí cualquier estilo CSS que sea específico de una página 
+           y que NO deba ir en 'style.css'.
+           Por ejemplo, si 'insumos.html' tiene estilos únicos para su tabla
+           que no se usarán en otras páginas, irían aquí.
+        */
+    </style>
+</head>
+<body>
+    ```
+
+---
+### Cómo usar esta plantilla:
+
+1.  **Copia todo el contenido** de este bloque (desde `<!DOCTYPE html>` hasta justo antes de ``).
+2.  **Pégalo al inicio de cada uno de tus archivos HTML** (`index.html`, `home.html`, `insumos.html`, `experimentos.html`, `perfil.html`, etc.), reemplazando su sección `<head>` existente.
+3.  **¡IMPORTANTE! Cambia el `<title>`** en cada archivo HTML para que refleje el contenido de esa página específica (por ejemplo, "LabFlow Manager - Gestión de Insumos").
+4.  **Mueve los estilos compartidos a `css/style.css`:** Si tienes estilos que se repiten en diferentes páginas (como los que me compartiste para tablas, modales, botones, etc.), lo mejor es que los cortes de la sección `<style>` de tus HTML y los pegues en tu archivo `css/style.css`. Esto hará que tu CSS sea más mantenible y tu HTML más limpio.
+
+Esto te dará una base consistente y centralizada para la sección `head` de todas tus páginas, manteniendo la flexibilidad para ajustes específicos de cada una.
