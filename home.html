@@ -2,88 +2,44 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>LabFlow Manager - Inicio</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
-    
     <link rel="stylesheet" href="css/style.css">
 </head>
-<body>
-
+<body class="app-body">
     <div id="app-content" style="display: none;">
         <header class="top-bar">
             <div class="app-brand">
-                <i class="mdi mdi-flask-outline logo-icon"></i>
+                <i class="mdi mdi-beaker-outline logo-icon"></i>
                 <h1>LabFlow</h1>
             </div>
             <div id="userInfoBox" class="user-info-box">
                 <div class="user-details">
                     <div id="user-name-display">Cargando...</div>
-                    <div id="user-role-display"></div>
                 </div>
                 <i class="mdi mdi-account-circle-outline"></i>
                 <div id="userDropdown" class="user-dropdown">
-                    <a href="perfil.html"><i class="mdi mdi-account-cog-outline"></i> Mi Perfil</a>
                     <a href="#" id="btnLogout"><i class="mdi mdi-logout"></i> Cerrar Sesión</a>
                 </div>
             </div>
         </header>
-
         <div class="page-wrapper">
             <div class="page-container">
                 <header class="header-dashboard">
                     <h1>Panel de Control</h1>
-                    <p>Gestiona todos los aspectos de tu laboratorio desde un solo lugar.</p>
                 </header>
-    
                 <div class="modules-container">
                     <div class="module">
-                        <div class="module-header">
-                            <i class="mdi mdi-beaker-check-outline"></i>
-                            <h2>Gestión de Insumos</h2>
-                        </div>
+                        <div class="module-header"><i class="mdi mdi-beaker-check-outline"></i><h2>Insumos</h2></div>
                         <div class="module-content">
-                            <a href="insumos.html" class="module-item">
-                                <i class="mdi mdi-format-list-bulleted-square"></i>
-                                <div><h3>Insumos y Lotes</h3><p>Ver y gestionar inventario.</p></div>
-                            </a>
-                            <a href="movimientos.html" class="module-item">
-                                <i class="mdi mdi-swap-horizontal-bold"></i>
-                                <div><h3>Movimientos</h3><p>Registrar entradas y salidas.</p></div>
-                            </a>
-                        </div>
-                    </div>
-    
-                    <div class="module">
-                        <div class="module-header">
-                            <i class="mdi mdi-package-variant-closed"></i>
-                            <h2>Gestión de Productos</h2>
-                        </div>
-                        <div class="module-content">
-                             <a href="productos.html" class="module-item">
-                                <i class="mdi mdi-cube-outline"></i>
-                                <div><h3>Productos</h3><p>Administrar productos finales.</p></div>
-                            </a>
-                             <a href="envios.html" class="module-item">
-                                <i class="mdi mdi-truck-delivery-outline"></i>
-                                <div><h3>Envíos</h3><p>Controlar envíos a clientes.</p></div>
-                            </a>
+                            <a href="insumos.html" class="module-item"><h3>Insumos y Lotes</h3></a>
+                            <a href="movimientos.html" class="module-item"><h3>Movimientos</h3></a>
                         </div>
                     </div>
                 </div>
-    
-                <footer class="dashboard-footer">
-                    <p>&copy; 2025 LabFlow Manager. Todos los derechos reservados.</p>
-                </footer>
             </div>
         </div>
     </div>
-
     <script type="module" src="js/home.js"></script>
-
 </body>
 </html>
