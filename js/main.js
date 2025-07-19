@@ -65,8 +65,20 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 auth.onAuthStateChanged((user) => {
     if (user) {
         console.log("Usuario autenticado:", user);
-        // Aquí puedes cargar información adicional del usuario si lo deseas
     } else {
         console.log("No hay usuario autenticado");
     }
+});
+
+// Manejar el comportamiento del sidebar
+const sidebar = document.getElementById('sidebar');
+
+// Mostrar el sidebar al pasar el mouse
+sidebar.addEventListener('mouseenter', () => {
+    sidebar.classList.add('visible');
+});
+
+// Ocultar el sidebar al salir del mouse
+sidebar.addEventListener('mouseleave', () => {
+    sidebar.classList.remove('visible');
 });
