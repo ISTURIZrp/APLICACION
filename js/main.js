@@ -75,17 +75,7 @@ auth.onAuthStateChanged((user) => {
 const sidebar = document.getElementById('sidebar');
 const menuToggle = document.getElementById('menu-toggle');
 
-// Mostrar el sidebar al pasar el mouse en desktop
-sidebar.addEventListener('mouseenter', () => {
-    sidebar.classList.add('visible');
-});
-
-// Ocultar el sidebar al salir del mouse en desktop
-sidebar.addEventListener('mouseleave', () => {
-    sidebar.classList.remove('visible');
-});
-
-// Alternar el sidebar al hacer clic en el botón de menú en móviles
+// Alternar el sidebar al hacer clic en el botón de menú
 menuToggle.addEventListener('click', () => {
     sidebar.classList.toggle('visible');
 });
