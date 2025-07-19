@@ -1,3 +1,46 @@
+Para usar una plantilla de sidebar almacenada en una carpeta de plantillas, podemos cargar el contenido dinámicamente en tu página principal. Esto te permitirá mantener el código modular y fácil de mantener.
+
+### Paso a Paso para Integrar la Plantilla de Sidebar
+
+#### 1. Estructura de Archivos
+
+Supongamos que tienes la siguiente estructura de archivos:
+
+```
+/project-root
+    /plantillas
+        sidebar.html
+    /js
+        main.js
+    /css
+        style.css
+    index.html
+```
+
+#### 2. Contenido de `sidebar.html`
+
+Asegúrate de que tu `sidebar.html` tenga la estructura del menú que deseas incluir. Aquí hay un ejemplo simple:
+
+**plantillas/sidebar.html**:
+
+```html
+<ul>
+    <li>
+        <a href="#" onclick="loadModule('insumos')">
+            <i class="mdi mdi-flask-empty-outline"></i> <span class="menu-text">Insumos</span>
+        </a>
+    </li>
+    <!-- Agrega más elementos del menú según sea necesario -->
+</ul>
+```
+
+#### 3. Cargar la Plantilla Dinámicamente
+
+En tu archivo `index.html`, asegúrate de que tienes un contenedor para el sidebar donde se cargará el contenido:
+
+**index.html**:
+
+```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -21,14 +64,7 @@
 
     <div class="container">
         <nav class="sidebar collapsed" id="sidebar">
-            <ul>
-                <li>
-                    <a href="#" onclick="loadModule('insumos')">
-                        <i class="mdi mdi-flask-empty-outline"></i> <span class="menu-text">Insumos</span>
-                    </a>
-                </li>
-                <!-- Más elementos del menú aquí -->
-            </ul>
+            <!-- El contenido se cargará aquí dinámicamente -->
         </nav>
 
         <main class="page-container" id="page-container">
@@ -51,3 +87,78 @@
     <script src="js/main.js"></script>
 </body>
 </html>
+```
+
+#### 4. Lógica de JavaScript para Cargar la Plantilla
+
+Utiliza JavaScript para cargar el contenido de `sidebar.html` en el contenedor del sidebar:
+
+**main.js**:
+
+```javascript
+// Inicialización de Firebase
+const firebaseConfig = {
+    apiKey: "Tu-API-Key",
+    authDomain: "tu-proyecto.firebaseapp.com",
+    projectId: "tu-proyecto",
+    storageBucket: "tu-proyecto.appspot.com",
+    messagingSenderId: "tu-messagingSenderId",
+    appId: "tu-appId"
+};
+
+// Inicializa Firebase
+if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+}
+const db = firebase.firestore();
+
+// Función para cargar la plantilla del sidebar
+function loadSidebar() {
+    fetch('plantillas/sidebar.html')
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById('sidebar').innerHTML = data;
+        })
+        .catch(error => console.error("Error al cargar la plantilla del sidebar:", error));
+}
+
+// Llamar a la función para cargar el sidebar
+document.addEventListener('DOMContentLoaded', loadSidebar);
+
+// Alternar entre modo oscuro y claro
+const themeToggle = document.getElementById('theme-toggle');
+themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    document.body.classList.toggle('light-mode');
+});
+
+// Función para cargar módulos dinámicamente (ejemplo de insumos)
+function loadModule(module) {
+    const moduleContent = document.getElementById('module-content');
+    
+    switch (module) {
+        case 'insumos':
+            fetch('modules/insumos.html')
+                .then(response => response.text())
+                .then(data => {
+                    moduleContent.innerHTML = data;
+                    loadInsumos(); // Llamar a la función para cargar los insumos
+                })
+                .catch(error => console.error("Error al cargar el módulo de insumos:", error));
+            break;
+        // Más casos para otros módulos
+        default:
+            moduleContent.innerHTML = '<h2>Selecciona un módulo</h2>';
+    }
+}
+```
+
+### Resumen
+
+1. **Plantilla de Sidebar**: Guarda la estructura del sidebar en un archivo separado (`sidebar.html`) dentro de la carpeta de plantillas.
+
+2. **Carga Dinámica**: Usa JavaScript para cargar el contenido del sidebar en la página principal cuando se cargue el documento.
+
+3. **Modularidad**: Mantener el código modular facilita el mantenimiento y la actualización de la interfaz.
+
+Siguiendo estos pasos, deberías poder cargar el sidebar desde una plantilla externa. Si tienes alguna pregunta adicional o necesitas más ayuda, ¡estaré encantado de asistirte!
