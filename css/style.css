@@ -1,42 +1,56 @@
 /* Estilos globales */
 * {
     box-sizing: border-box;
-}
-body {
-    font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f5f5f7;
+    color: #1d1d1f;
 }
 
 .container {
     display: flex;
     height: 100vh;
-    transition: margin-left 0.3s; /* Suaviza la transición */
 }
 
 .top-bar {
-    background-color: #007BFF;
-    color: white;
-    padding: 10px;
+    background-color: #fff;
+    color: #1d1d1f;
+    padding: 10px 20px;
     text-align: center;
     position: relative;
     z-index: 1000;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.menu-toggle {
+    background: none;
+    border: none;
+    color: #1d1d1f;
+    font-size: 24px;
+    cursor: pointer;
+    display: none; /* Oculta el botón en pantallas grandes */
 }
 
 .sidebar {
     width: 220px;
-    background-color: #343a40;
-    color: white;
+    background-color: #ffffff;
+    color: #1d1d1f;
     padding: 20px;
     height: 100%;
-    position: sticky;
-    top: 0;
-    transition: transform 0.3s ease; /* Suaviza la transición de ocultar/mostrar */
-    transform: translateX(-100%); /* Oculta el menú lateral inicialmente */
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    transform: translateX(-100%);
 }
 
 .sidebar.visible {
-    transform: translateX(0); /* Muestra el menú lateral */
+    transform: translateX(0);
 }
 
 .sidebar ul {
@@ -49,24 +63,25 @@ body {
 }
 
 .sidebar ul li a {
-    color: white;
+    color: #1d1d1f;
     text-decoration: none;
-    font-weight: bold;
+    font-weight: 500;
     display: flex;
     align-items: center;
     padding: 10px;
-    border-radius: 5px;
-    transition: background 0.3s;
+    border-radius: 8px;
+    transition: background 0.3s, color 0.3s;
 }
 
 .sidebar ul li a:hover {
-    background-color: #495057;
+    background-color: #e5e5ea;
+    color: #007aff;
 }
 
 .submenu {
     display: none;
     list-style-type: none;
-    padding: 0 0 0 20px; /* Indentación para el submenú */
+    padding: 0 0 0 20px;
 }
 
 .submenu li {
@@ -74,22 +89,22 @@ body {
 }
 
 .submenu li a {
-    font-weight: normal; /* Normalizar el peso de la fuente del submenú */
+    font-weight: normal;
 }
 
 .submenu-toggle:hover + .submenu {
-    display: block; /* Mostrar submenú al pasar el mouse */
+    display: block;
 }
 
 .submenu-arrow {
-    margin-left: auto; /* Mover la flecha del menú a la derecha */
+    margin-left: auto;
 }
 
 .page-container {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
-    transition: margin-left 0.3s; /* Suaviza la transición */
+    transition: margin-left 0.3s;
 }
 
 .header-dashboard {
@@ -97,16 +112,19 @@ body {
 }
 
 .header-dashboard h1 {
-    color: #007BFF;
+    color: #007aff;
+    font-size: 2em;
+    margin-bottom: 10px;
 }
 
 .dashboard-footer {
-    background-color: #f1f1f1;
+    background-color: #f5f5f7;
     padding: 10px;
     text-align: center;
     position: relative;
     bottom: 0;
     width: 100%;
+    border-top: 1px solid #e5e5ea;
 }
 
 /* Estilos para botones */
@@ -114,13 +132,38 @@ body {
     display: inline-block;
     width: 100%;
     padding: 10px;
-    background-color: #007BFF;
+    background-color: #007aff;
     color: white;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
 }
 
 .btn:hover {
-    background-color: #0056b3;
+    background-color: #005bb5;
+}
+
+/* Estilos para Pantallas Pequeñas */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 200px;
+    }
+
+    .menu-toggle {
+        display: block;
+    }
+
+    .sidebar.visible {
+        transform: translateX(0);
+    }
+
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .container {
+        margin-left: 0;
+    }
 }
