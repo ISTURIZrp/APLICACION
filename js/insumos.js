@@ -1,62 +1,48 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LabFlow Manager - Insumos</title>
-    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
-</head>
-<body class="light-mode">
+// insumos.js
 
-    <header class="top-bar">
-        <div class="app-brand">
-            <i class="mdi mdi-beaker-outline logo-icon"></i>
-            <h1>LabFlow Manager</h1>
-        </div>
-        <button id="theme-toggle" class="theme-toggle">
-            <i class="mdi mdi-theme-light-dark"></i>
-        </button>
-    </header>
+// Inicialización de Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyCxJOpBEXZUo7WrAqDTrlJV_2kJBsL8Ym0",
+    authDomain: "labflow-manager.firebaseapp.com",
+    projectId: "labflow-manager",
+    storageBucket: "labflow-manager.appspot.com",
+    messagingSenderId: "742212306654",
+    appId: "1:742212306654:web:a53bf890fc63cd5d05e44f"
+};
 
-    <div class="container">
-        <nav class="sidebar collapsed" id="sidebar">
-            <!-- Sidebar content -->
-        </nav>
+// Inicializa Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
 
-        <main class="page-container">
-            <div class="header-dashboard">
-                <h1>Insumos</h1>
-                <p>Gestión de insumos del laboratorio</p>
-            </div>
+// Función para cargar los insumos desde Firestore
+function loadInsumos() {
+    const insumosList = document.getElementById('insumos-list');
+    db.collection('insumos').get().then(snapshot => {
+        snapshot.forEach(doc => {
+            const insumo = doc.data();
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${doc.id}</td>
+                <td>${insumo.nombre}</td>
+                <td>${insumo.categoria}</td>
+                <td>${insumo.cantidad}</td>
+                <td>
+                    <button class="btn-edit">Editar</button>
+                    <button class="btn-delete">Eliminar</button>
+                </td>
+            `;
+            insumosList.appendChild(row);
+        });
+    }).catch(error => {
+        console.error("Error al cargar insumos:", error);
+    });
+}
 
-            <div class="insumos-container">
-                <button class="btn" id="add-insumo">Agregar Insumo</button>
-                <table class="insumos-table">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Categoría</th>
-                            <th>Cantidad</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="insumos-list">
-                        <!-- Lista de insumos -->
-                    </tbody>
-                </table>
-            </div>
+// Evento para agregar un nuevo insumo
+document.getElementById('add-insumo').addEventListener('click', () => {
+    // Lógica para abrir un formulario y agregar un nuevo insumo
+    alert('Funcionalidad para agregar insumo no implementada.');
+});
 
-            <footer class="dashboard-footer">
-                &copy; 2023 LabFlow Manager | <a href="#">Términos de uso</a> | <a href="#">Política de privacidad</a>
-            </footer>
-        </main>
-    </div>
-
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-    <script src="js/insumos.js"></script>
-</body>
-</html>
+// Cargar los insumos al cargar la página
+document.addEventListener('DOMContentLoaded', loadInsumos);
