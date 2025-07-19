@@ -1,1 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LabFlow Manager - Iniciar Sesión</title>
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="login-container" id="login-section">
+        <h2>Iniciar Sesión</h2>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="login-email">Correo electrónico</label>
+                <input type="email" id="login-email" required>
+            </div>
+            <div class="form-group">
+                <label for="login-password">Contraseña</label>
+                <input type="password" id="login-password" required>
+            </div>
+            <button type="submit" class="btn">Ingresar</button>
+        </form>
+    </div>
+    
+    <div id="app-notification">
+        <i class="mdi mdi-information-outline"></i>
+        <div id="notification-content">
+            <div id="notification-title">Sistema</div>
+            <div id="notification-message">Por favor inicie sesión</div>
+        </div>
+    </div>
 
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
