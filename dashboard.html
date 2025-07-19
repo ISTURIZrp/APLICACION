@@ -19,12 +19,41 @@
     <div class="container">
         <nav class="sidebar">
             <ul>
-                <li><a href="#" onclick="loadModule('insumos')">Insumos</a></li>
-                <li><a href="#" onclick="loadModule('movimientos')">Movimientos</a></li>
-                <li><a href="#" onclick="loadModule('pedidos')">Pedidos</a></li>
-                <li><a href="#" onclick="loadModule('equipos')">Equipos</a></li>
-                <li><a href="#" onclick="loadModule('productos')">Productos</a></li>
-                <li><a href="#" onclick="loadModule('usuarios')">Usuarios</a></li>
+                <li>
+                    <a href="#" onclick="loadModule('insumos')">
+                        <i class="mdi mdi-flask-empty-outline"></i> Insumos
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="loadModule('movimientos')">
+                        <i class="mdi mdi-swap-horizontal"></i> Movimientos
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="loadModule('pedidos')">
+                        <i class="mdi mdi-cart-outline"></i> Pedidos
+                    </a>
+                </li>
+                <li>
+                    <a href="#submenu-equipos" class="submenu-toggle">
+                        <i class="mdi mdi-cogs"></i> Equipos
+                        <i class="mdi mdi-chevron-down submenu-arrow"></i>
+                    </a>
+                    <ul class="submenu" id="submenu-equipos">
+                        <li><a href="#" onclick="loadModule('equipos')">Gestionar Equipos</a></li>
+                        <li><a href="#" onclick="loadModule('historical-equipos')">Historial de Equipos</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" onclick="loadModule('productos')">
+                        <i class="mdi mdi-package-variant-closed"></i> Productos
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="loadModule('usuarios')">
+                        <i class="mdi mdi-account-cog-outline"></i> Usuarios
+                    </a>
+                </li>
             </ul>
         </nav>
 
