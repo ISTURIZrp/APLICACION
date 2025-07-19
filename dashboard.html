@@ -5,14 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>LabFlow Manager - Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="css/style.css"> <!-- Enlace al CSS -->
+    <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-    <header class="top-bar">...</header>
+    <header class="top-bar">
+        <div class="app-brand">
+            <i class="mdi mdi-beaker-outline logo-icon"></i>
+            <h1>LabFlow Manager</h1>
+        </div>
+    </header>
     
     <main class="page-container" id="page-container">
-        <div class="header-dashboard">...</div>
+        <div class="header-dashboard">
+            <h1>Panel de Control</h1>
+            <p>Gestiona tus operaciones de laboratorio con eficiencia desde un solo lugar</p>
+        </div>
 
         <nav>
             <ul>
@@ -26,13 +34,15 @@
         </nav>
 
         <div id="module-content"></div> <!-- Contenido dinámico -->
+        
+        <footer class="dashboard-footer">
+            &copy; 2023 LabFlow Manager | <a href="#">Términos de uso</a> | <a href="#">Política de privacidad</a>
+        </footer>
     </main>
-
-    <footer class="dashboard-footer">...</footer>
 
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-    <script src="js/main.js"></script> <!-- Script principal -->
+    <script src="js/main.js"></script>
 </body>
 </html>
