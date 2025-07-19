@@ -23,7 +23,7 @@ body {
 }
 
 .sidebar {
-    width: 200px;
+    width: 220px;
     background-color: #343a40;
     color: white;
     padding: 20px;
@@ -39,13 +39,15 @@ body {
 
 .sidebar ul li {
     margin-bottom: 15px;
+    position: relative;
 }
 
 .sidebar ul li a {
     color: white;
     text-decoration: none;
     font-weight: bold;
-    display: block;
+    display: flex;
+    align-items: center;
     padding: 10px;
     border-radius: 5px;
     transition: background 0.3s;
@@ -53,6 +55,28 @@ body {
 
 .sidebar ul li a:hover {
     background-color: #495057;
+}
+
+.submenu {
+    display: none;
+    list-style-type: none;
+    padding: 0 0 0 20px; /* Indentación para el submenú */
+}
+
+.submenu li {
+    margin-bottom: 5px;
+}
+
+.submenu li a {
+    font-weight: normal; /* Normalizar el peso de la fuente del submenú */
+}
+
+.submenu-toggle:hover + .submenu {
+    display: block; /* Mostrar submenú al pasar el mouse */
+}
+
+.submenu-arrow {
+    margin-left: auto; /* Mover la flecha del menú a la derecha */
 }
 
 .page-container {
