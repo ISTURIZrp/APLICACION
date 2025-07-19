@@ -42,14 +42,27 @@ function loadModule(module) {
     }
 }
 
-// Código adicional para autenticación y otras funcionalidades
-// Manejar estado de autenticación
-auth.onAuthStateChanged(async (user) => {
-    if (user) {
-        // Lógica para usuario autenticado
-    } else {
-        // Lógica para usuario no autenticado
+// Manejar el inicio de sesión
+document.getElementById('login-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-password').value;
+
+    try {
+        await auth.signInWithEmailAndPassword(email, password);
+        // Redirigir a dashboard después de iniciar sesión
+        window.location.href = 'dashboard.html';
+    } catch (error) {
+        console.error("Error al iniciar sesión:", error.message);
+        alert("Error al iniciar sesión: " + error.message);
     }
 });
 
-// Aquí puedes incluir más lógica para manejar eventos, autenticación, etc.
+// Manejar estado de autenticación
+auth.onAuthStateChanged((user) => {
+    if (user) {
+        console.log("Usuario autenticado:", user);
+    } else {
+        console.log("No hay usuario autenticado");
+    }
+});
