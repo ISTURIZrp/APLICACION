@@ -29,7 +29,10 @@ function loadModule(module) {
             moduleContent.innerHTML = '<h2>Pedidos</h2>'; // Aquí puedes cargar el contenido de pedidos
             break;
         case 'equipos':
-            moduleContent.innerHTML = '<h2>Equipos</h2>'; // Aquí puedes cargar el contenido de equipos
+            moduleContent.innerHTML = '<h2>Gestionar Equipos</h2>'; // Aquí puedes cargar el contenido de gestionar equipos
+            break;
+        case 'historical-equipos':
+            moduleContent.innerHTML = '<h2>Historial de Equipos</h2>'; // Aquí puedes cargar el contenido del historial
             break;
         case 'productos':
             moduleContent.innerHTML = '<h2>Productos</h2>'; // Aquí puedes cargar el contenido de productos
@@ -62,6 +65,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 auth.onAuthStateChanged((user) => {
     if (user) {
         console.log("Usuario autenticado:", user);
+        // Aquí puedes cargar información adicional del usuario si lo deseas
     } else {
         console.log("No hay usuario autenticado");
     }
