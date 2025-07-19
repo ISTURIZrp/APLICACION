@@ -18,7 +18,7 @@ const db = firebase.firestore();
 // Función para cargar módulos dinámicamente
 function loadModule(module) {
     const moduleContent = document.getElementById('module-content');
-    switch(module) {
+    switch (module) {
         case 'insumos':
             moduleContent.innerHTML = '<h2>Insumos</h2>'; // Aquí puedes cargar el contenido de insumos
             break;
@@ -65,6 +65,7 @@ document.getElementById('login-form').addEventListener('submit', async (e) => {
 auth.onAuthStateChanged((user) => {
     if (user) {
         console.log("Usuario autenticado:", user);
+        // Aquí puedes cargar información adicional del usuario si lo deseas
     } else {
         console.log("No hay usuario autenticado");
     }
@@ -72,13 +73,26 @@ auth.onAuthStateChanged((user) => {
 
 // Manejar el comportamiento del sidebar
 const sidebar = document.getElementById('sidebar');
+const menuToggle = document.getElementById('menu-toggle');
 
-// Mostrar el sidebar al pasar el mouse
+// Mostrar el sidebar al pasar el mouse en desktop
 sidebar.addEventListener('mouseenter', () => {
     sidebar.classList.add('visible');
 });
 
-// Ocultar el sidebar al salir del mouse
+// Ocultar el sidebar al salir del mouse en desktop
 sidebar.addEventListener('mouseleave', () => {
     sidebar.classList.remove('visible');
+});
+
+// Alternar el sidebar al hacer clic en el botón de menú en móviles
+menuToggle.addEventListener('click', () => {
+    sidebar.classList.toggle('visible');
+});
+
+// Alternar entre modos oscuro y claro
+const themeToggle = document.getElementById('theme-toggle');
+themeToggle.addEventListener('click', () => {
+    document.body.classList.toggle('dark-mode');
+    document.body.classList.toggle('light-mode');
 });
