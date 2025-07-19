@@ -4,20 +4,78 @@
 }
 body {
     font-family: Arial, sans-serif;
-    background-color: #f0f4f8;
-    color: #333;
     margin: 0;
     padding: 0;
 }
 
-/* Estilos para el contenedor de login */
-.login-container {
-    max-width: 400px;
-    margin: 100px auto;
+.container {
+    display: flex;
+    height: 100vh;
+}
+
+.top-bar {
+    background-color: #007BFF;
+    color: white;
+    padding: 10px;
+    text-align: center;
+    position: relative;
+    z-index: 1000;
+}
+
+.sidebar {
+    width: 200px;
+    background-color: #343a40;
+    color: white;
     padding: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    height: 100%;
+    position: sticky;
+    top: 0;
+}
+
+.sidebar ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.sidebar ul li {
+    margin-bottom: 15px;
+}
+
+.sidebar ul li a {
+    color: white;
+    text-decoration: none;
+    font-weight: bold;
+    display: block;
+    padding: 10px;
+    border-radius: 5px;
+    transition: background 0.3s;
+}
+
+.sidebar ul li a:hover {
+    background-color: #495057;
+}
+
+.page-container {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.header-dashboard {
+    margin-bottom: 20px;
+}
+
+.header-dashboard h1 {
+    color: #007BFF;
+}
+
+.dashboard-footer {
+    background-color: #f1f1f1;
+    padding: 10px;
+    text-align: center;
+    position: relative;
+    bottom: 0;
+    width: 100%;
 }
 
 /* Estilos para botones */
@@ -35,22 +93,3 @@ body {
 .btn:hover {
     background-color: #0056b3;
 }
-
-/* Estilos para la barra superior y pie de página */
-.top-bar {
-    background-color: #007BFF;
-    color: white;
-    padding: 10px;
-    text-align: center;
-}
-
-.dashboard-footer {
-    background-color: #f1f1f1;
-    padding: 10px;
-    text-align: center;
-    position: relative;
-    bottom: 0;
-    width: 100%;
-}
-
-/* Otros estilos según necesidad... */
