@@ -15,14 +15,9 @@
             <h1>LabFlow Manager</h1>
         </div>
     </header>
-    
-    <main class="page-container" id="page-container">
-        <div class="header-dashboard">
-            <h1>Panel de Control</h1>
-            <p>Gestiona tus operaciones de laboratorio con eficiencia desde un solo lugar</p>
-        </div>
 
-        <nav>
+    <div class="container">
+        <nav class="sidebar">
             <ul>
                 <li><a href="#" onclick="loadModule('insumos')">Insumos</a></li>
                 <li><a href="#" onclick="loadModule('movimientos')">Movimientos</a></li>
@@ -33,12 +28,19 @@
             </ul>
         </nav>
 
-        <div id="module-content"></div> <!-- Contenido dinámico -->
-        
-        <footer class="dashboard-footer">
-            &copy; 2023 LabFlow Manager | <a href="#">Términos de uso</a> | <a href="#">Política de privacidad</a>
-        </footer>
-    </main>
+        <main class="page-container" id="page-container">
+            <div class="header-dashboard">
+                <h1>Panel de Control</h1>
+                <p>Gestiona tus operaciones de laboratorio con eficiencia desde un solo lugar</p>
+            </div>
+
+            <div id="module-content"></div> <!-- Contenido dinámico -->
+
+            <footer class="dashboard-footer">
+                &copy; 2023 LabFlow Manager | <a href="#">Términos de uso</a> | <a href="#">Política de privacidad</a>
+            </footer>
+        </main>
+    </div>
 
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
