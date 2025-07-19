@@ -3,199 +3,36 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>LabFlow Manager - Panel de Control</title>
+    <title>LabFlow Manager - Dashboard</title>
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet" />
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style.css"> <!-- Enlace al CSS -->
 </head>
 <body>
-    <header class="top-bar">
-        <div class="app-brand">
-            <i class="mdi mdi-beaker-outline logo-icon"></i>
-            <h1>LabFlow Manager</h1>
-        </div>
-        <div class="user-info-box" id="user-info-box">
-            <div class="user-details">
-                <div id="user-name-display">Cargando...</div>
-                <small id="user-role-display">...</small>
-            </div>
-            <i class="mdi mdi-account-circle-outline"></i>
-            <div class="user-dropdown" id="user-dropdown">
-                <a href="perfil.html">
-                    <i class="mdi mdi-account-outline"></i>
-                    <span>Mi perfil</span>
-                </a>
-                <a href="configuracion.html">
-                    <i class="mdi mdi-cog-outline"></i>
-                    <span>Configuración</span>
-                </a>
-                <a href="#" id="logout-btn">
-                    <i class="mdi mdi-logout-variant"></i>
-                    <span>Cerrar sesión</span>
-                </a>
-            </div>
-        </div>
-    </header>
 
+    <header class="top-bar">...</header>
+    
     <main class="page-container" id="page-container">
-        <div class="header-dashboard">
-            <div class="header-decoration"></div>
-            <h1>Panel de Control</h1>
-            <p>Gestiona tus operaciones de laboratorio con eficiencia desde un solo lugar</p>
-        </div>
+        <div class="header-dashboard">...</div>
 
-        <div class="modules-container">
-            <!-- Módulo de Insumos -->
-            <div class="module active" id="insumos-module">
-                <div class="module-header">
-                    <i class="mdi mdi-clipboard-list-outline"></i>
-                    <h2>Insumos</h2>
-                </div>
-                <div class="module-content">
-                    <a href="insumos.html" class="module-item">
-                        <i class="mdi mdi-flask-empty-outline"></i>
-                        <div class="item-info">
-                            <h3>Insumos</h3>
-                            <p>Gestiona inventario de reactivos y materiales</p>
-                        </div>
-                    </a>
-                    <a href="movimientos.html" class="module-item">
-                        <i class="mdi mdi-swap-horizontal"></i>
-                        <div class="item-info">
-                            <h3>Entradas/Salidas</h3>
-                            <p>Registra movimientos de inventario</p>
-                        </div>
-                    </a>
-                    <a href="pedidos.html" class="module-item">
-                        <i class="mdi mdi-cart-outline"></i>
-                        <div class="item-info">
-                            <h3>Pedidos de insumos</h3>
-                            <p>Solicita nuevos materiales y reactivos</p>
-                        </div>
-                    </a>
-                    <a href="registro-pedidos.html" class="module-item">
-                        <i class="mdi mdi-clipboard-check-outline"></i>
-                        <div class="item-info">
-                            <h3>Registro de pedido</h3>
-                            <p>Administra pedidos realizados</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            
-            <!-- Módulo de Productos -->
-            <div class="module" id="productos-module">
-                <div class="module-header">
-                    <i class="mdi mdi-cube-outline"></i>
-                    <h2>Productos</h2>
-                </div>
-                <div class="module-content">
-                    <a href="productos.html" class="module-item">
-                        <i class="mdi mdi-package-variant-closed"></i>
-                        <div class="item-info">
-                            <h3>Productos</h3>
-                            <p>Administra tus productos terminados</p>
-                        </div>
-                    </a>
-                    <a href="envios.html" class="module-item">
-                        <i class="mdi mdi-truck-fast-outline"></i>
-                        <div class="item-info">
-                            <h3>Envíos</h3>
-                            <p>Controla tus entregas y logística</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            
-            <!-- Módulo de Configuraciones -->
-            <div class="module" id="configuraciones-module">
-                <div class="module-header">
-                    <i class="mdi mdi-cog-outline"></i>
-                    <h2>Configuraciones</h2>
-                </div>
-                <div class="module-content">
-                    <a href="usuarios.html" class="module-item">
-                        <i class="mdi mdi-account-cog-outline"></i>
-                        <div class="item-info">
-                            <h3>Usuarios</h3>
-                            <p>Gestiona accesos y permisos</p>
-                        </div>
-                    </a>
-                    <a href="ajustes.html" class="module-item">
-                        <i class="mdi mdi-tune-variant"></i>
-                        <div class="item-info">
-                            <h3>Ajustes</h3>
-                            <p>Personaliza la configuración del sistema</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
-            
-            <!-- Módulo de Equipos -->
-            <div class="module" id="equipos-module">
-                <div class="module-header">
-                    <i class="mdi mdi-cogs"></i>
-                    <h2>Equipos</h2>
-                </div>
-                <div class="module-content">
-                    <a href="equipos.html" class="module-item">
-                        <i class="mdi mdi-microscope"></i>
-                        <div class="item-info">
-                            <h3>Equipos</h3>
-                            <p>Administra instrumentos y dispositivos</p>
-                        </div>
-                    </a>
-                    <a href="historial-equipos.html" class="module-item">
-                        <i class="mdi mdi-history"></i>
-                        <div class="item-info">
-                            <h3>Historial de Equipos</h3>
-                            <p>Registro de uso y mantenimiento</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
-        </div>
-        
-        <div class="dashboard-footer">
-            &copy; 2023 LabFlow Manager | <a href="terminos.html">Términos de uso</a> | <a href="privacidad.html">Política de privacidad</a>
-        </div>
+        <nav>
+            <ul>
+                <li><a href="#" onclick="loadModule('insumos')">Insumos</a></li>
+                <li><a href="#" onclick="loadModule('movimientos')">Movimientos</a></li>
+                <li><a href="#" onclick="loadModule('pedidos')">Pedidos</a></li>
+                <li><a href="#" onclick="loadModule('equipos')">Equipos</a></li>
+                <li><a href="#" onclick="loadModule('productos')">Productos</a></li>
+                <li><a href="#" onclick="loadModule('usuarios')">Usuarios</a></li>
+            </ul>
+        </nav>
+
+        <div id="module-content"></div> <!-- Contenido dinámico -->
     </main>
 
-    <!-- Formulario de Login -->
-    <div class="login-container" id="login-section">
-        <h2>Iniciar Sesión</h2>
-        <form id="login-form">
-            <div class="form-group">
-                <label for="login-email">Correo electrónico</label>
-                <input type="email" id="login-email" required>
-            </div>
-            <div class="form-group">
-                <label for="login-password">Contraseña</label>
-                <input type="password" id="login-password" required>
-            </div>
-            <button type="submit" class="btn">Ingresar</button>
-        </form>
-    </div>
+    <footer class="dashboard-footer">...</footer>
 
-    <div id="app-notification">
-        <i class="mdi mdi-information-outline"></i>
-        <div id="notification-content">
-            <div id="notification-title">Sistema</div>
-            <div id="notification-message">Cargando...</div>
-        </div>
-    </div>
-
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-    
-    <!-- Configuración de Firebase separada -->
-    <script src="js/firebase-config.js"></script>
-    
-    <!-- Lógica principal de la aplicación -->
-    <script src="js/main.js"></script>
+    <script src="js/main.js"></script> <!-- Script principal -->
 </body>
 </html>
