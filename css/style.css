@@ -11,6 +11,7 @@ body {
 .container {
     display: flex;
     height: 100vh;
+    transition: margin-left 0.3s; /* Suaviza la transición */
 }
 
 .top-bar {
@@ -30,6 +31,12 @@ body {
     height: 100%;
     position: sticky;
     top: 0;
+    transition: transform 0.3s ease; /* Suaviza la transición de ocultar/mostrar */
+    transform: translateX(-100%); /* Oculta el menú lateral inicialmente */
+}
+
+.sidebar.visible {
+    transform: translateX(0); /* Muestra el menú lateral */
 }
 
 .sidebar ul {
@@ -39,7 +46,6 @@ body {
 
 .sidebar ul li {
     margin-bottom: 15px;
-    position: relative;
 }
 
 .sidebar ul li a {
@@ -83,6 +89,7 @@ body {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
+    transition: margin-left 0.3s; /* Suaviza la transición */
 }
 
 .header-dashboard {
