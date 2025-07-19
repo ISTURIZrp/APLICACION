@@ -73,11 +73,10 @@ auth.onAuthStateChanged((user) => {
 
 // Manejar el comportamiento del sidebar
 const sidebar = document.getElementById('sidebar');
-const menuToggle = document.getElementById('menu-toggle');
 
-// Alternar el sidebar al hacer clic en el botón de menú
-menuToggle.addEventListener('click', () => {
-    sidebar.classList.toggle('visible');
+// Alternar el estado del sidebar al hacer clic
+sidebar.addEventListener('click', () => {
+    sidebar.classList.toggle('collapsed');
 });
 
 // Alternar entre modos oscuro y claro
