@@ -1,10 +1,10 @@
 :root {
     --bg-color-light: #f5f5f7;
     --text-color-light: #1d1d1f;
-    --primary-color-light: #007aff;
+    --primary-color-light: #00bfff; /* Azul Celeste */
     --bg-color-dark: #1e1e1e;
     --text-color-dark: #f5f5f7;
-    --primary-color-dark: #0a84ff;
+    --primary-color-dark: #00a3cc;
 }
 
 body.light-mode {
@@ -40,24 +40,24 @@ body.dark-mode .top-bar {
     color: var(--text-color-dark);
 }
 
-.menu-toggle, .theme-toggle {
+.theme-toggle {
     background: none;
     border: none;
     color: inherit;
     font-size: 24px;
     cursor: pointer;
-    display: none; /* Oculta el botón en pantallas grandes */
 }
 
 .sidebar {
     width: 220px;
+    min-width: 60px;
     background-color: #ffffff;
     color: var(--text-color-light);
     padding: 20px;
     height: 100%;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-    transform: translateX(-100%);
+    transition: width 0.3s ease;
+    overflow: hidden;
 }
 
 body.dark-mode .sidebar {
@@ -65,8 +65,8 @@ body.dark-mode .sidebar {
     color: var(--text-color-dark);
 }
 
-.sidebar.visible {
-    transform: translateX(0);
+.sidebar.collapsed {
+    width: 60px;
 }
 
 .sidebar ul {
@@ -89,14 +89,23 @@ body.dark-mode .sidebar {
     transition: background 0.3s, color 0.3s;
 }
 
+.sidebar ul li a .menu-text {
+    display: none;
+    margin-left: 10px;
+}
+
+.sidebar:not(.collapsed) ul li a .menu-text {
+    display: inline;
+}
+
 .sidebar ul li a:hover {
-    background-color: #e5e5ea;
-    color: var(--primary-color-light);
+    background-color: var(--primary-color-light);
+    color: white;
 }
 
 body.dark-mode .sidebar ul li a:hover {
-    background-color: #3a3a3c;
-    color: var(--primary-color-dark);
+    background-color: var(--primary-color-dark);
+    color: white;
 }
 
 .submenu {
@@ -176,21 +185,21 @@ body.dark-mode .btn {
 }
 
 .btn:hover {
-    background-color: #005bb5;
+    background-color: #0099cc;
 }
 
 body.dark-mode .btn:hover {
-    background-color: #0a84ff;
+    background-color: #0088b3;
 }
 
 /* Estilos para Pantallas Pequeñas */
 @media (max-width: 768px) {
     .sidebar {
-        width: 200px;
+        width: 60px;
     }
 
-    .menu-toggle, .theme-toggle {
-        display: block;
+    .sidebar.collapsed {
+        width: 60px;
     }
 
     .sidebar.visible {
