@@ -14,35 +14,32 @@
             <i class="mdi mdi-beaker-outline logo-icon"></i>
             <h1>LabFlow Manager</h1>
         </div>
-        <button id="menu-toggle" class="menu-toggle">
-            <i class="mdi mdi-menu"></i>
-        </button>
         <button id="theme-toggle" class="theme-toggle">
             <i class="mdi mdi-theme-light-dark"></i>
         </button>
     </header>
 
     <div class="container">
-        <nav class="sidebar" id="sidebar">
+        <nav class="sidebar collapsed" id="sidebar">
             <ul>
                 <li>
                     <a href="#" onclick="loadModule('insumos')">
-                        <i class="mdi mdi-flask-empty-outline"></i> Insumos
+                        <i class="mdi mdi-flask-empty-outline"></i> <span class="menu-text">Insumos</span>
                     </a>
                 </li>
                 <li>
                     <a href="#" onclick="loadModule('movimientos')">
-                        <i class="mdi mdi-swap-horizontal"></i> Movimientos
+                        <i class="mdi mdi-swap-horizontal"></i> <span class="menu-text">Movimientos</span>
                     </a>
                 </li>
                 <li>
                     <a href="#" onclick="loadModule('pedidos')">
-                        <i class="mdi mdi-cart-outline"></i> Pedidos
+                        <i class="mdi mdi-cart-outline"></i> <span class="menu-text">Pedidos</span>
                     </a>
                 </li>
                 <li>
                     <a href="#submenu-equipos" class="submenu-toggle">
-                        <i class="mdi mdi-cogs"></i> Equipos
+                        <i class="mdi mdi-cogs"></i> <span class="menu-text">Equipos</span>
                         <i class="mdi mdi-chevron-down submenu-arrow"></i>
                     </a>
                     <ul class="submenu" id="submenu-equipos">
@@ -52,12 +49,12 @@
                 </li>
                 <li>
                     <a href="#" onclick="loadModule('productos')">
-                        <i class="mdi mdi-package-variant-closed"></i> Productos
+                        <i class="mdi mdi-package-variant-closed"></i> <span class="menu-text">Productos</span>
                     </a>
                 </li>
                 <li>
                     <a href="#" onclick="loadModule('usuarios')">
-                        <i class="mdi mdi-account-cog-outline"></i> Usuarios
+                        <i class="mdi mdi-account-cog-outline"></i> <span class="menu-text">Usuarios</span>
                     </a>
                 </li>
             </ul>
