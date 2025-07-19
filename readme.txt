@@ -1,50 +1,42 @@
 LabFlow-Manager/
 │
 ├── css/
-│   └── style.css         # Estilos principales de la aplicación
+│   └── style.css         # Archivo principal de estilos
 │
 ├── js/
-│   ├── main.js           # Lógica principal de la aplicación
-│   ├── insumos.js        # Lógica para gestión de insumos
-│   ├── movimientos.js    # Lógica para movimientos de inventario
-│   ├── pedidos.js        # Lógica para pedidos
-│   ├── equipos.js        # Lógica para gestión de equipos
-│   ├── productos.js      # Lógica para productos
-│   ├── usuarios.js       # Lógica para gestión de usuarios
-│   └── (más archivos .js según necesidades)
-│
-├── netlify/
-│   └── (configuraciones para despliegue)
+│   ├── auth.js           # Lógica de autenticación
+│   ├── main.js           # Lógica principal
+│   ├── insumos.js        # Para insumos.html
+│   ├── movimientos.js    # Para movimientos.html
+│   ├── pedidos.js        # Para pedidos.html
+│   ├── equipos.js        # Para equipos.html
+│   ├── productos.js      # Para productos.html
+│   └── usuarios.js       # Para usuarios.html
 │
 ├── plantillas/
 │   ├── sidebar.html      # Plantilla del menú lateral
-│   ├── head.html         # Plantilla del head (metadatos, estilos comunes)
-│   └── (otras plantillas)
+│   ├── head.html         # Plantilla de cabecera
+│   ├── navbar.html       # Plantilla de barra de navegación
+│   └── footer.html       # Plantilla de pie de página
 │
-├── ajustes.html
-├── client.html
-├── configuration.html
-├── envios.html
-├── equipos.html
-├── terminos.html
-├── historical-equipos.html
-├── home.html
-├── index.html
-├── insumos.html
-├── movimientos.html
-├── netlify.toml
-├── package.json
-├── pedidos.html
-├── perfil.html
-├── privacidad.html
-├── productos.html
-├── readme.txt
-├── registro-pedidos.html
-├── reportes.html
-├── usuarios.html
+├── index.html            # Página de login (entrada principal)
+├── home.html             # Dashboard principal post-login
 │
-└── (menú de navegación)
-    - Principal
-    - Notificaciones
-    - Explorar
-    - Perfil
+├── insumos.html          # Gestión de insumos
+├── movimientos.html      # Movimientos de inventario
+├── pedidos.html          # Gestión de pedidos
+├── equipos.html          # Gestión de equipos
+├── productos.html        # Gestión de productos
+├── usuarios.html         # Gestión de usuarios
+│
+├── configuration.html    # Configuración del sistema
+├── envios.html           # Gestión de envíos
+├── historical-equipos.html # Historial de equipos
+├── perfil.html           # Perfil de usuario
+├── privacidad.html       # Política de privacidad
+├── reportes.html         # Reportes del sistema
+├── terminos.html         # Términos y condiciones
+│
+├── netlify.toml          # Configuración de despliegue
+├── package.json          # Configuración de Node.js
+└── readme.txt            # Documentación del proyecto
