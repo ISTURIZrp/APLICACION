@@ -1,35 +1,29 @@
-// Configuración de Firebase
+// Configuración e inicialización de Firebase
 const firebaseConfig = {
-            apiKey: "AIzaSyCxJOpBEXZUo7WrAqDTrlJV_2kJBsL8Ym0",
-            authDomain: "labflow-manager.firebaseapp.com",
-            projectId: "labflow-manager",
-            storageBucket: "labflow-manager.appspot.com",
-            messagingSenderId: "742212306654",
-            appId: "1:742212306654:web:a53bf890fc63cd5d05e44f"
-        };
+    apiKey: "AIzaSyCxJOpBEXZUo7WrAqDTrlJV_2kJBsL8Ym0",
+    authDomain: "labflow-manager.firebaseapp.com",
+    projectId: "labflow-manager",
+    storageBucket: "labflow-manager.appspot.com",
+    messagingSenderId: "742212306654",
+    appId: "1:742212306654:web:a53bf890fc63cd5d05e44f",
+    measurementId: "G-YVZDBCJR3B"
+};
 
 // Inicializar Firebase
-console.log("Inicializando Firebase...");
 firebase.initializeApp(firebaseConfig);
 
-// Referencias a servicios de Firebase
-const auth = firebase.auth();
+// Exportar servicios
 const db = firebase.firestore();
+const auth = firebase.auth();
 const storage = firebase.storage();
 
-console.log("Firebase inicializado correctamente");
-
-// Configuración de Firestore
-db.settings({
-  cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
-});
-
-// Habilitar persistencia offline
-db.enablePersistence()
-  .catch(err => {
-    if (err.code === 'failed-precondition') {
-      console.error('Persistencia falló: múltiples pestañas abiertas');
-    } else if (err.code === 'unimplemented') {
-      console.error('El navegador no soporta persistencia offline');
+// Habilitar persistencia para funcionamiento offline
+db.enablePersistence().catch(err => {
+    if (err.code == 'failed-precondition') {
+        console.warn("La persistencia falló debido a múltiples pestañas abiertas");
+    } else if (err.code == 'unimplemented') {
+        console.warn("El navegador no soporta persistencia");
+    } else {
+        console.error("Error en persistencia:", err);
     }
-  });
+});
