@@ -1,402 +1,293 @@
-// Variables globales
-let insumosData = [];
-let currentFilters = {
-    search: '',
-    categoria: '',
-    estado: ''
-};
+// Funciones para gestión de insumos y lotes
 
-// Inicialización cuando se carga la página
-document.addEventListener('DOMContentLoaded', () => {
-    // Cargar insumos
-    loadInsumos();
+// Cargar insumos y lotes
+async function loadInsumosYLotes(container) {
+    if (!container) return;
     
-    // Inicializar eventos
-    initEvents();
-});
-
-// Cargar insumos desde Firestore
-function loadInsumos() {
-    const insumosList = document.getElementById('insumos-list');
-    if (!insumosList) return;
+    toggleLoader(true, 'Cargando insumos...');
     
-    insumosList.innerHTML = '<tr><td colspan="7" class="loading-cell">Cargando insumos...</td></tr>';
-    
-    db.collection('insumos')
-        .orderBy('nombre')
-        .get()
-        .then(snapshot => {
-            insumosData = [];
-            
-            if (snapshot.empty) {
-                insumosList.innerHTML = '<tr><td colspan="7" class="empty-message">No hay insumos registrados</td></tr>';
-                return;
-            }
-            
-            snapshot.forEach(doc => {
-                const insumo = doc.data();
-                insumo.id = doc.id;
-                insumosData.push(insumo);
-            });
-            
-            // Aplicar filtros iniciales y mostrar
-            filterAndDisplayInsumos();
-        })
-        .catch(error => {
-            console.error("Error al cargar insumos:", error);
-            insumosList.innerHTML = `<tr><td colspan="7" class="error-message">Error al cargar insumos: ${error.message}</td></tr>`;
-            showNotification('Error', 'No se pudieron cargar los insumos', 'error');
-        });
-}
-
-// Filtrar y mostrar insumos
-function filterAndDisplayInsumos() {
-    const insumosList = document.getElementById('insumos-list');
-    if (!insumosList) return;
-    
-    // Aplicar filtros
-    let filteredInsumos = insumosData;
-    
-    if (currentFilters.search) {
-        const searchTerm = currentFilters.search.toLowerCase();
-        filteredInsumos = filteredInsumos.filter(insumo => 
-            insumo.nombre.toLowerCase().includes(searchTerm) ||
-            insumo.codigo?.toLowerCase().includes(searchTerm) ||
-            insumo.proveedor?.toLowerCase().includes(searchTerm)
-        );
-    }
-    
-    if (currentFilters.categoria) {
-        filteredInsumos = filteredInsumos.filter(insumo => 
-            insumo.categoria === currentFilters.categoria
-        );
-    }
-    
-    if (currentFilters.estado) {
-        filteredInsumos = filteredInsumos.filter(insumo => {
-            if (currentFilters.estado === 'critico') {
-                return insumo.cantidad <= insumo.stockMinimo;
-            } else if (currentFilters.estado === 'normal') {
-                return insumo.cantidad > insumo.stockMinimo;
-            }
-            return true;
-        });
-    }
-    
-    // Mostrar resultados
-    if (filteredInsumos.length === 0) {
-        insumosList.innerHTML = '<tr><td colspan="7" class="empty-message">No se encontraron insumos con los filtros aplicados</td></tr>';
-        return;
-    }
-    
-    insumosList.innerHTML = '';
-    filteredInsumos.forEach(insumo => {
-        const row = document.createElement('tr');
+    try {
+        const insumosSnapshot = await db.collection('insumos').orderBy('nombre').get();
         
-        // Determinar estado del stock
-        let stockStatus = 'normal';
-        let stockLabel = 'Normal';
-        
-        if (insumo.stockMinimo && insumo.cantidad <= insumo.stockMinimo) {
-            stockStatus = 'critico';
-            stockLabel = 'Crítico';
-        }
-        
-        row.innerHTML = `
-            <td>${insumo.codigo || '-'}</td>
-            <td>${insumo.nombre || ''}</td>
-            <td>${insumo.categoria || '-'}</td>
-            <td>
-                <div class="stock-indicator ${stockStatus}">
-                    <span class="stock-value">${insumo.cantidad || 0}</span>
-                    <span class="stock-unit">${insumo.unidad || 'u'}</span>
-                </div>
-            </td>
-            <td>${insumo.ubicacion || '-'}</td>
-            <td>${insumo.proveedor || '-'}</td>
-            <td class="actions-cell">
-                <button class="action-btn view-btn" onclick="viewInsumo('${insumo.id}')" title="Ver detalles">
-                    <i class="mdi mdi-eye-outline"></i>
-                </button>
-                <button class="action-btn edit-btn" onclick="editInsumo('${insumo.id}')" title="Editar">
-                    <i class="mdi mdi-pencil-outline"></i>
-                </button>
-                <button class="action-btn delete-btn" onclick="deleteInsumo('${insumo.id}')" title="Eliminar">
-                    <i class="mdi mdi-delete-outline"></i>
-                </button>
-            </td>
-        `;
-        insumosList.appendChild(row);
-    });
-    
-    // Actualizar contador
-    const countElement = document.getElementById('insumos-count');
-    if (countElement) {
-        countElement.textContent = filteredInsumos.length;
-    }
-}
-
-// Inicializar eventos
-function initEvents() {
-    // Botón para agregar insumo
-    const addBtn = document.getElementById('add-insumo-btn');
-    if (addBtn) {
-        addBtn.addEventListener('click', () => showInsumoForm());
-    }
-    
-    // Búsqueda
-    const searchInput = document.getElementById('search-insumos');
-    if (searchInput) {
-        searchInput.addEventListener('input', () => {
-            currentFilters.search = searchInput.value;
-            filterAndDisplayInsumos();
-        });
-    }
-    
-    // Filtro de categoría
-    const categoriaFilter = document.getElementById('filter-categoria');
-    if (categoriaFilter) {
-        categoriaFilter.addEventListener('change', () => {
-            currentFilters.categoria = categoriaFilter.value;
-            filterAndDisplayInsumos();
-        });
-    }
-    
-    // Filtro de estado
-    const estadoFilter = document.getElementById('filter-estado');
-    if (estadoFilter) {
-        estadoFilter.addEventListener('change', () => {
-            currentFilters.estado = estadoFilter.value;
-            filterAndDisplayInsumos();
-        });
-    }
-    
-    // Botón para limpiar filtros
-    const clearFiltersBtn = document.getElementById('clear-filters');
-    if (clearFiltersBtn) {
-        clearFiltersBtn.addEventListener('click', () => {
-            currentFilters = {
-                search: '',
-                categoria: '',
-                estado: ''
-            };
-            
-            if (searchInput) searchInput.value = '';
-            if (categoriaFilter) categoriaFilter.value = '';
-            if (estadoFilter) estadoFilter.value = '';
-            
-            filterAndDisplayInsumos();
-        });
-    }
-}
-
-// Mostrar formulario de insumo (para agregar o editar)
-function showInsumoForm(insumoId = null) {
-    // Título del modal
-    const modalTitle = insumoId ? 'Editar Insumo' : 'Agregar Nuevo Insumo';
-    
-    // Crear modal
-    const modalHTML = `
-        <div class="modal-overlay" id="insumo-modal">
-            <div class="modal-container">
-                <div class="modal-header">
-                    <h3>${modalTitle}</h3>
-                    <button class="modal-close-btn" id="close-modal">
-                        <i class="mdi mdi-close"></i>
+        if (insumosSnapshot.empty) {
+            container.innerHTML = `
+                <div class="no-data">
+                    <span class="material-symbols-outlined">inventory_2</span>
+                    <p>No hay insumos registrados</p>
+                    <button id="btn-nuevo-insumo" class="btn btn-primary">
+                        <span class="material-symbols-outlined">add_box</span> Agregar Insumo
                     </button>
                 </div>
-                <div class="modal-body">
-                    <form id="insumo-form">
-                        <input type="hidden" id="insumo-id" value="${insumoId || ''}">
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="insumo-codigo">Código</label>
-                                <input type="text" id="insumo-codigo" placeholder="Código único">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="insumo-nombre">Nombre *</label>
-                                <input type="text" id="insumo-nombre" required placeholder="Nombre del insumo">
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="insumo-categoria">Categoría *</label>
-                                <select id="insumo-categoria" required>
-                                    <option value="">Seleccione una categoría</option>
-                                    <option value="Reactivos">Reactivos</option>
-                                    <option value="Material de vidrio">Material de vidrio</option>
-                                    <option value="Plásticos">Plásticos</option>
-                                    <option value="Equipos pequeños">Equipos pequeños</option>
-                                    <option value="Consumibles">Consumibles</option>
-                                    <option value="Seguridad">Seguridad</option>
-                                    <option value="Otros">Otros</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="insumo-proveedor">Proveedor</label>
-                                <input type="text" id="insumo-proveedor" placeholder="Proveedor principal">
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="insumo-cantidad">Cantidad *</label>
-                                <input type="number" id="insumo-cantidad" min="0" step="0.01" required placeholder="Cantidad actual">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="insumo-unidad">Unidad</label>
-                                <select id="insumo-unidad">
-                                    <option value="u">Unidades</option>
-                                    <option value="g">Gramos</option>
-                                    <option value="kg">Kilogramos</option>
-                                    <option value="ml">Mililitros</option>
-                                    <option value="l">Litros</option>
-                                    <option value="cm">Centímetros</option>
-                                    <option value="m">Metros</option>
-                                    <option value="paq">Paquetes</option>
-                                    <option value="caja">Cajas</option>
-                                </select>
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="insumo-stock-minimo">Stock Mínimo</label>
-                                <input type="number" id="insumo-stock-minimo" min="0" step="0.01" placeholder="Cantidad mínima requerida">
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="insumo-ubicacion">Ubicación</label>
-                                <input type="text" id="insumo-ubicacion" placeholder="Ubicación en almacén">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="insumo-descripcion">Descripción</label>
-                            <textarea id="insumo-descripcion" rows="3" placeholder="Descripción detallada del insumo"></textarea>
-                        </div>
-                        
-                        <div class="form-actions">
-                            <button type="button" class="btn-secondary" id="cancel-form">Cancelar</button>
-                            <button type="submit" class="btn-primary">Guardar</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-    `;
-    
-    // Agregar modal al DOM
-    document.body.insertAdjacentHTML('beforeend', modalHTML);
-    
-    // Configurar eventos del modal
-    document.getElementById('close-modal').addEventListener('click', closeModal);
-    document.getElementById('cancel-form').addEventListener('click', closeModal);
-    document.getElementById('insumo-form').addEventListener('submit', saveInsumo);
-    
-    // Si es edición, cargar datos del insumo
-    if (insumoId) {
-        const insumo = insumosData.find(i => i.id === insumoId);
-        
-        if (insumo) {
-            document.getElementById('insumo-codigo').value = insumo.codigo || '';
-            document.getElementById('insumo-nombre').value = insumo.nombre || '';
-            document.getElementById('insumo-categoria').value = insumo.categoria || '';
-            document.getElementById('insumo-proveedor').value = insumo.proveedor || '';
-            document.getElementById('insumo-cantidad').value = insumo.cantidad || 0;
-            document.getElementById('insumo-unidad').value = insumo.unidad || 'u';
-            document.getElementById('insumo-stock-minimo').value = insumo.stockMinimo || '';
-            document.getElementById('insumo-ubicacion').value = insumo.ubicacion || '';
-            document.getElementById('insumo-descripcion').value = insumo.descripcion || '';
-        }
-    }
-}
-
-// Cerrar modal
-function closeModal() {
-    const modal = document.getElementById('insumo-modal');
-    if (modal) {
-        modal.classList.add('closing');
-        setTimeout(() => {
-            modal.remove();
-        }, 300);
-    }
-}
-
-// Guardar insumo
-function saveInsumo(e) {
-    e.preventDefault();
-    
-    const insumoId = document.getElementById('insumo-id').value;
-    const insumoData = {
-        codigo: document.getElementById('insumo-codigo').value,
-        nombre: document.getElementById('insumo-nombre').value,
-        categoria: document.getElementById('insumo-categoria').value,
-        proveedor: document.getElementById('insumo-proveedor').value,
-        cantidad: parseFloat(document.getElementById('insumo-cantidad').value),
-        unidad: document.getElementById('insumo-unidad').value,
-        stockMinimo: document.getElementById('insumo-stock-minimo').value ? parseFloat(document.getElementById('insumo-stock-minimo').value) : null,
-        ubicacion: document.getElementById('insumo-ubicacion').value,
-        descripcion: document.getElementById('insumo-descripcion').value,
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    
-    // Guardar en Firestore
-    let savePromise;
-    
-    if (insumoId) {
-        // Actualizar insumo existente
-        savePromise = db.collection('insumos').doc(insumoId).update(insumoData);
-    } else {
-        // Crear nuevo insumo
-        insumoData.createdAt = firebase.firestore.FieldValue.serverTimestamp();
-        insumoData.createdBy = auth.currentUser.uid;
-        savePromise = db.collection('insumos').add(insumoData);
-    }
-    
-    savePromise
-        .then(() => {
-            closeModal();
-            loadInsumos();
-            showNotification(
-                insumoId ? 'Insumo actualizado' : 'Insumo agregado',
-                `El insumo "${insumoData.nombre}" ha sido ${insumoId ? 'actualizado' : 'agregado'} correctamente.`,
-                'success'
-            );
+            `;
             
-            // Registrar movimiento si cambió la cantidad
-            if (insumoId) {
-                const originalInsumo = insumosData.find(i => i.id === insumoId);
-                if (originalInsumo && originalInsumo.cantidad !== insumoData.cantidad) {
-                    registerMovimiento(insumoId, originalInsumo.cantidad, insumoData.cantidad, 'ajuste');
+            document.getElementById('btn-nuevo-insumo')?.addEventListener('click', () => {
+                openInsumoModal();
+            });
+            
+            toggleLoader(false);
+            return;
+        }
+        
+        let tableHtml = `
+            <div class="table-controls">
+                <div class="search-container">
+                    <span class="material-symbols-outlined search-icon">search</span>
+                    <input type="search" id="searchInput" placeholder="Buscar insumo..." autocomplete="off">
+                </div>
+                <button id="btnAddProduct" class="btn btn-primary">
+                    <span class="material-symbols-outlined">add_box</span> Agregar Insumo
+                </button>
+            </div>
+            
+            <table class="users-table" id="tableProducts">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" id="selectAllCheckbox" title="Seleccionar todo"></th>
+                        <th>Nombre Insumo</th>
+                        <th>Existencia Total</th>
+                        <th>Stock Mínimo</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+        `;
+        
+        for (const insumoDoc of insumosSnapshot.docs) {
+            const insumo = { id: insumoDoc.id, ...insumoDoc.data() };
+            
+            // Obtener lotes del insumo
+            const lotesSnapshot = await db.collection('lotes')
+                .where('insumo_id', '==', insumo.id)
+                .get();
+            
+            const lotes = lotesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            // Determinar estado
+            let estadoHtml = '';
+            if (insumo.existencia_total === 0) {
+                estadoHtml = '<span class="status-indicator status-critical"></span>Agotado';
+            } else if (insumo.existencia_total <= insumo.stock_minimo * 0.3) {
+                estadoHtml = '<span class="status-indicator status-critical"></span>Crítico';
+            } else if (insumo.existencia_total <= insumo.stock_minimo) {
+                estadoHtml = '<span class="status-indicator status-low"></span>Bajo';
+            } else {
+                estadoHtml = '<span class="status-indicator status-ok"></span>Normal';
+            }
+            
+            // Agregar fila del insumo
+            tableHtml += `
+                <tr class="insumo-row" data-insumo-id="${insumo.id}">
+                    <td><input type="checkbox" class="insumo-checkbox" data-id="${insumo.id}"></td>
+                    <td><strong>${insumo.nombre}</strong></td>
+                    <td>${insumo.existencia_total || 0}</td>
+                    <td>${insumo.stock_minimo}</td>
+                    <td>${estadoHtml}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-edit" data-action="edit-insumo" data-id="${insumo.id}">
+                            <span class="material-symbols-outlined" style="font-size: 1.1rem;">edit</span> Editar
+                        </button>
+                        <button class="btn btn-delete" data-action="delete-insumo" data-id="${insumo.id}">
+                            <span class="material-symbols-outlined" style="font-size: 1.1rem;">delete</span> Eliminar
+                        </button>
+                    </td>
+                </tr>
+            `;
+            
+            // Agregar filas de lotes si existen
+            if (lotes.length > 0) {
+                tableHtml += `
+                    <tr class="lote-row" data-lote-for="${insumo.id}" style="display:none;">
+                        <td colspan="6">
+                            <table style="width: 100%; background: var(--background-light); border-radius: 8px; overflow: hidden;">
+                                <thead>
+                                    <tr>
+                                        <th>Lote</th>
+                                        <th>Caducidad</th>
+                                        <th>Existencia</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                `;
+                
+                lotes.forEach(lote => {
+                    const fechaCaducidad = lote.fecha_caducidad || 'N/A';
+                    
+                    tableHtml += `
+                        <tr>
+                            <td>${lote.lote || 'N/A'}</td>
+                            <td>${fechaCaducidad}</td>
+                            <td>${lote.existencia}</td>
+                            <td class="action-buttons">
+                                <button class="btn btn-edit" data-action="edit-lote" data-id="${lote.id}" data-insumo-id="${insumo.id}">
+                                    <span class="material-symbols-outlined" style="font-size: 1.1rem;">edit</span> Editar
+                                </button>
+                                <button class="btn btn-delete" data-action="delete-lote" data-id="${lote.id}">
+                                    <span class="material-symbols-outlined" style="font-size: 1.1rem;">delete</span> Eliminar
+                                </button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                
+                tableHtml += `
+                                </tbody>
+                            </table>
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+        
+        tableHtml += `
+                </tbody>
+            </table>
+            <div id="deleteSelectedContainer" style="display: none; margin-top: 15px;">
+                <button id="btnDeleteSelected" class="btn btn-danger">
+                    <span class="material-symbols-outlined">delete_sweep</span> Eliminar Seleccionados
+                </button>
+            </div>
+        `;
+        
+        container.innerHTML = tableHtml;
+        
+        // Configurar eventos
+        setupInsumoEventListeners();
+        
+        toggleLoader(false);
+    } catch (error) {
+        console.error("Error cargando insumos:", error);
+        showNotification("Error", "Error al cargar los insumos.", "error");
+        
+        container.innerHTML = `
+            <div class="error-message">
+                <span class="material-symbols-outlined">error</span>
+                <p>Error al cargar los datos: ${error.message}</p>
+            </div>
+        `;
+        
+        toggleLoader(false);
+    }
+}
+
+// Configurar eventos de la tabla de insumos
+function setupInsumoEventListeners() {
+    // Evento para expandir/colapsar lotes
+    document.querySelectorAll('.insumo-row').forEach(row => {
+        row.addEventListener('click', (e) => {
+            if (!e.target.closest('button') && !e.target.closest('input[type="checkbox"]')) {
+                const insumoId = row.getAttribute('data-insumo-id');
+                const loteRow = document.querySelector(`tr[data-lote-for="${insumoId}"]`);
+                
+                if (loteRow) {
+                    loteRow.style.display = loteRow.style.display === 'none' ? 'table-row' : 'none';
                 }
             }
-        })
-        .catch(error => {
-            console.error("Error al guardar insumo:", error);
-            showNotification('Error', `No se pudo ${insumoId ? 'actualizar' : 'agregar'} el insumo: ${error.message}`, 'error');
         });
-}
-
-// Ver detalles de insumo
-function viewInsumo(insumoId) {
-    const insumo = insumosData.find(i => i.id === insumoId);
+    });
     
-    if (!insumo) {
-        showNotification('Error', 'Insumo no encontrado', 'error');
-        return;
+    // Evento para agregar insumo
+    document.getElementById('btnAddProduct')?.addEventListener('click', () => {
+        openInsumoModal();
+    });
+    
+    // Eventos para botones de acción
+    document.querySelectorAll('[data-action]').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const action = btn.getAttribute('data-action');
+            const id = btn.getAttribute('data-id');
+            const insumoId = btn.getAttribute('data-insumo-id');
+            
+            if (action === 'edit-insumo') {
+                openInsumoModal(id);
+            } else if (action === 'edit-lote') {
+                openLoteModal(id, insumoId);
+            } else if (action === 'delete-insumo') {
+                deleteInsumo(id);
+            } else if (action === 'delete-lote') {
+                deleteLote(id, insumoId);
+            }
+        });
+    });
+    
+    // Búsqueda
+    document.getElementById('searchInput')?.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        
+        document.querySelectorAll('.insumo-row').forEach(row => {
+            const nombre = row.querySelector('td:nth-child(2)').textContent.toLowerCase();
+            const visible = nombre.includes(searchTerm);
+            
+            row.style.display = visible ? '' : 'none';
+            
+            // Ocultar lotes si se oculta el insumo
+            const insumoId = row.getAttribute('data-insumo-id');
+            const loteRow = document.querySelector(`tr[data-lote-for="${insumoId}"]`);
+            
+            if (loteRow) {
+                loteRow.style.display = 'none';
+            }
+        });
+    });
+    
+    // Selección de insumos
+    const selectAllCheckbox = document.getElementById('selectAllCheckbox');
+    
+    if (selectAllCheckbox) {
+        selectAllCheckbox.addEventListener('change', () => {
+            const isChecked = selectAllCheckbox.checked;
+            
+            document.querySelectorAll('.insumo-checkbox').forEach(checkbox => {
+                checkbox.checked = isChecked;
+            });
+            
+            updateDeleteSelectedButton();
+        });
     }
     
-    // Crear modal
-    const modalHTML = `
-        <div class="modal-overlay" id="insumo-modal">
-            <div class="modal-container">
-                <div class="modal-header">
-                    <h3>Detalles del Insumo</h3>
-                    <button class="modal-close-btn" id="close-modal">
-                        <i class="mdi mdi-close"></i>
+    document.querySelectorAll('.insumo-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('change', () => {
+            updateDeleteSelectedButton();
+        });
+    });
+    
+    document.getElementById('btnDeleteSelected')?.addEventListener('click', () => {
+        deleteSelectedInsumos();
+    });
+}
+
+// Actualizar botón de eliminar seleccionados
+function updateDeleteSelectedButton() {
+    const selectedCheckboxes = document.querySelectorAll('.insumo-checkbox:checked');
+    const deleteSelectedContainer = document.getElementById('deleteSelectedContainer');
+    
+    if (deleteSelectedContainer) {
+        deleteSelectedContainer.style.display = selectedCheckboxes.length > 0 ? 'block' : 'none';
+    }
+}
+
+// Abrir modal de insumo
+function openInsumoModal(insumoId = null) {
+    // Implementación del modal para crear/editar insumo
+}
+
+// Abrir modal de lote
+function openLoteModal(loteId, insumoId) {
+    // Implementación del modal para crear/editar lote
+}
+
+// Eliminar insumo
+function deleteInsumo(insumoId) {
+    // Implementación para eliminar insumo
+}
+
+// Eliminar lote
+function deleteLote(loteId, insumoId) {
+    // Implementación para eliminar lote
+}
+
+// Eliminar insumos seleccionados
+function deleteSelectedInsumos() {
+    // Implementación para eliminar insumos seleccionados
+}
