@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Proveedores - LabFlow Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="light-mode">
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="app-brand">
+                    <i class="mdi mdi-flask-outline logo-icon"></i>
+                    <h1>LabFlow</h1>
+                </div>
+                <button id="collapse-sidebar" class="collapse-sidebar">
+                    <i class="mdi mdi-menu"></i>
+                </button>
+            </div>
+            <div class="sidebar-content">
+                <!-- El contenido del sidebar se cargará aquí desde la plantilla -->
+            </div>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <span>JD</span>
+                    </div>
+                    <div class="user-details">
+                        <p class="user-name">John Doe</p>
+                        <p class="user-role">Administrador</p>
+                    </div>
+                </div>
+                <button id="logout-btn" class="logout-btn" title="Cerrar Sesión">
+                    <i class="mdi mdi-logout"></i>
+                </button>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="page-title">
+                    <h1 id="current-module-title">Proveedores</h1>
+                </div>
+                <div class="top-bar-actions">
+                    <div class="search-container">
+                        <i class="mdi mdi-magnify search-icon"></i>
+                        <input type="text" placeholder="Buscar..." class="search-input">
+                    </div>
+                    <button id="notifications-btn" class="icon-btn" title="Notificaciones">
+                        <i class="mdi mdi-bell-outline"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <button id="theme-toggle" class="icon-btn" title="Cambiar tema">
+                        <i class="mdi mdi-theme-light-dark"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="page-container" id="page-container">
+                <div id="module-content">
+                    <div class="module-header">
+                        <div class="module-title">
+                            <h2>Gestión de Proveedores</h2>
+                            <p class="module-subtitle">Administra los proveedores de insumos y servicios</p>
+                        </div>
+                        <div class="module-actions">
+                            <button id="add-proveedor-btn" class="btn-primary">
+                                <i class="mdi mdi-plus"></i> Agregar Proveedor
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="filters-bar">
+                        <div class="filters-container">
+                            <div class="filter-group">
+                                <label for="search-proveedores">Buscar:</label>
+                                <div class="search-input-container">
+                                    <i class="mdi mdi-magnify"></i>
+                                    <input type="text" id="search-proveedores" placeholder="Buscar por nombre, contacto...">
+                                </div>
+                            </div>
+                            <div class="filter-group">
+                                <label for="filter-categoria">Categoría:</label>
+                                <select id="filter-categoria">
+                                    <option value="">Todas</option>
+                                    <option value="Reactivos">Reactivos</option>
+                                    <option value="Equipos">Equipos</option>
+                                    <option value="Consumibles">Consumibles</option>
+                                    <option value="Servicios">Servicios</option>
+                                    <option value="Otro">Otro</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="filter-status">Estado:</label>
+                                <select id="filter-status">
+                                    <option value="">Todos</option>
+                                    <option value="active">Activo</option>
+                                    <option value="inactive">Inactivo</option>
+                                </select>
+                            </div>
+                            <button id="clear-filters" class="btn-text">
+                                <i class="mdi mdi-filter-remove"></i> Limpiar filtros
+                            </button>
+                        </div>
+                        <div class="results-count">
+                            <span id="proveedores-count">0</span> proveedores encontrados
+                        </div>
+                    </div>
+
+                    <div class="data-table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Nombre</th>
+                                    <th>Categoría</th>
+                                    <th>Contacto</th>
+                                    <th>Email/Teléfono</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="proveedores-list">
+                                <!-- Los datos se cargarán dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="notification-container" class="notification-container"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/proveedores.js"></script>
+</body>
+</html>
