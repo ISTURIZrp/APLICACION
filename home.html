@@ -61,343 +61,173 @@
 
             <div class="page-container" id="page-container">
                 <div id="module-content">
-                    <!-- El contenido del módulo seleccionado se cargará aquí -->
-                    <div class="dashboard-welcome">
-                        <div class="welcome-header">
-                            <h2>Bienvenido, <span id="user-name">John</span></h2>
-                            <p class="welcome-date">Hoy es <span id="current-date">Lunes, 20 de Julio de 2025</span></p>
+                    <div class="module-header">
+                        <div class="module-title">
+                            <h2>Panel de Control</h2>
+                            <p class="module-subtitle">Resumen general del estado del laboratorio</p>
                         </div>
-                        
-                        <div class="stats-grid">
-                            <div class="stat-card">
-                                <div class="stat-icon" style="background-color: rgba(52, 152, 219, 0.1);">
-                                    <i class="mdi mdi-flask" style="color: #3498db;"></i>
-                                </div>
-                                <div class="stat-info">
-                                    <h3>245</h3>
-                                    <p>Total Insumos</p>
-                                </div>
-                                <div class="stat-change increase">
-                                    <i class="mdi mdi-arrow-up"></i>
-                                    <span>5.2%</span>
-                                </div>
+                        <div class="module-actions">
+                            <div class="date-display">
+                                <i class="mdi mdi-calendar"></i>
+                                <span id="current-date">Cargando fecha...</span>
                             </div>
-                            
-                            <div class="stat-card">
-                                <div class="stat-icon" style="background-color: rgba(46, 204, 113, 0.1);">
-                                    <i class="mdi mdi-microscope" style="color: #2ecc71;"></i>
-                                </div>
-                                <div class="stat-info">
-                                    <h3>32</h3>
-                                    <p>Equipos Activos</p>
-                                </div>
-                                <div class="stat-change">
-                                    <i class="mdi mdi-arrow-right"></i>
-                                    <span>0%</span>
-                                </div>
+                        </div>
+                    </div>
+
+                    <!-- Tarjetas de resumen -->
+                    <div class="dashboard-cards">
+                        <div class="dashboard-card">
+                            <div class="card-icon insumos-icon">
+                                <i class="mdi mdi-flask"></i>
                             </div>
-                            
-                            <div class="stat-card">
-                                <div class="stat-icon" style="background-color: rgba(231, 76, 60, 0.1);">
-                                    <i class="mdi mdi-alert-circle" style="color: #e74c3c;"></i>
-                                </div>
-                                <div class="stat-info">
-                                    <h3>12</h3>
-                                    <p>Stock Crítico</p>
-                                </div>
-                                <div class="stat-change decrease">
-                                    <i class="mdi mdi-arrow-down"></i>
-                                    <span>3.1%</span>
-                                </div>
-                            </div>
-                            
-                            <div class="stat-card">
-                                <div class="stat-icon" style="background-color: rgba(155, 89, 182, 0.1);">
-                                    <i class="mdi mdi-calendar-check" style="color: #9b59b6;"></i>
-                                </div>
-                                <div class="stat-info">
-                                    <h3>8</h3>
-                                    <p>Tareas Pendientes</p>
-                                </div>
-                                <div class="stat-change decrease">
-                                    <i class="mdi mdi-arrow-down"></i>
-                                    <span>2</span>
-                                </div>
+                            <div class="card-content">
+                                <h3 class="card-title">Insumos</h3>
+                                <p class="card-value" id="insumos-total">0</p>
+                                <p class="card-subtitle" id="insumos-alert">0 con stock bajo</p>
                             </div>
                         </div>
                         
-                        <div class="dashboard-row">
-                            <div class="dashboard-card activity-card">
-                                <div class="card-header">
-                                    <h3>Actividad Reciente</h3>
-                                    <button class="card-action-btn">
-                                        <i class="mdi mdi-dots-vertical"></i>
-                                    </button>
-                                </div>
-                                <div class="card-body">
-                                    <div class="activity-list">
-                                        <div class="activity-item">
-                                            <div class="activity-icon" style="background-color: rgba(52, 152, 219, 0.1);">
-                                                <i class="mdi mdi-plus" style="color: #3498db;"></i>
-                                            </div>
-                                            <div class="activity-content">
-                                                <p>Se agregó <strong>Metanol 99%</strong> al inventario</p>
-                                                <span class="activity-time">Hace 35 minutos</span>
-                                            </div>
-                                        </div>
-                                        <div class="activity-item">
-                                            <div class="activity-icon" style="background-color: rgba(46, 204, 113, 0.1);">
-                                                <i class="mdi mdi-check" style="color: #2ecc71;"></i>
-                                            </div>
-                                            <div class="activity-content">
-                                                <p>Mantenimiento completado para <strong>Centrífuga #3</strong></p>
-                                                <span class="activity-time">Hace 2 horas</span>
-                                            </div>
-                                        </div>
-                                        <div class="activity-item">
-                                            <div class="activity-icon" style="background-color: rgba(231, 76, 60, 0.1);">
-                                                <i class="mdi mdi-alert" style="color: #e74c3c;"></i>
-                                            </div>
-                                            <div class="activity-content">
-                                                <p><strong>Ácido Clorhídrico</strong> alcanzó nivel de stock crítico</p>
-                                                <span class="activity-time">Hace 5 horas</span>
-                                            </div>
-                                        </div>
-                                        <div class="activity-item">
-                                            <div class="activity-icon" style="background-color: rgba(155, 89, 182, 0.1);">
-                                                <i class="mdi mdi-calendar" style="color: #9b59b6;"></i>
-                                            </div>
-                                            <div class="activity-content">
-                                                <p>Programado mantenimiento para <strong>Espectrofotómetro</strong></p>
-                                                <span class="activity-time">Ayer, 16:42</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-footer">
-                                    <a href="#" class="view-all">Ver todas las actividades</a>
-                                </div>
+                        <div class="dashboard-card">
+                            <div class="card-icon equipos-icon">
+                                <i class="mdi mdi-microscope"></i>
                             </div>
-                            
-                            <div class="dashboard-card chart-card">
-                                <div class="card-header">
-                                    <h3>Consumo de Insumos</h3>
-                                    <div class="card-actions">
-                                        <select class="time-selector">
-                                            <option value="7">Última semana</option>
-                                            <option value="30" selected>Último mes</option>
-                                            <option value="90">Último trimestre</option>
-                                        </select>
-                                        <button class="card-action-btn">
-                                            <i class="mdi mdi-dots-vertical"></i>
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="chart-placeholder">
-                                        <!-- Aquí iría el gráfico real -->
-                                        <div class="chart-image"></div>
-                                    </div>
-                                </div>
+                            <div class="card-content">
+                                <h3 class="card-title">Equipos</h3>
+                                <p class="card-value" id="equipos-total">0</p>
+                                <p class="card-subtitle" id="equipos-alert">0 en mantenimiento</p>
                             </div>
                         </div>
                         
-                        <div class="dashboard-row">
-                            <div class="dashboard-card tasks-card">
-                                <div class="card-header">
-                                    <h3>Tareas Pendientes</h3>
-                                    <button class="btn-sm">
-                                        <i class="mdi mdi-plus"></i> Nueva Tarea
-                                    </button>
-                                </div>
-                                <div class="card-body">
-                                    <div class="tasks-list">
-                                        <div class="task-item">
-                                            <div class="task-checkbox">
-                                                <input type="checkbox" id="task1">
-                                                <label for="task1"></label>
-                                            </div>
-                                            <div class="task-content">
-                                                <p>Realizar inventario de reactivos</p>
-                                                <span class="task-date">Hoy, 17:00</span>
-                                            </div>
-                                            <div class="task-priority high">Alta</div>
-                                        </div>
-                                        <div class="task-item">
-                                            <div class="task-checkbox">
-                                                <input type="checkbox" id="task2">
-                                                <label for="task2"></label>
-                                            </div>
-                                            <div class="task-content">
-                                                <p>Calibrar pH-metro</p>
-                                                <span class="task-date">Mañana, 09:30</span>
-                                            </div>
-                                            <div class="task-priority medium">Media</div>
-                                        </div>
-                                        <div class="task-item">
-                                            <div class="task-checkbox">
-                                                <input type="checkbox" id="task3">
-                                                <label for="task3"></label>
-                                            </div>
-                                            <div class="task-content">
-                                                <p>Solicitar cotización de nuevos equipos</p>
-                                                <span class="task-date">22 Jul, 12:00</span>
-                                            </div>
-                                            <div class="task-priority low">Baja</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-footer">
-                                    <a href="#" class="view-all">Ver todas las tareas</a>
-                                </div>
+                        <div class="dashboard-card">
+                            <div class="card-icon pedidos-icon">
+                                <i class="mdi mdi-package-variant-closed"></i>
                             </div>
-                            
-                            <div class="dashboard-card calendar-card">
-                                <div class="card-header">
-                                    <h3>Calendario</h3>
-                                    <div class="card-actions">
-                                        <button class="btn-sm">
-                                            <i class="mdi mdi-plus"></i> Evento
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="card-body">
-                                    <div class="calendar-header">
-                                        <button class="calendar-nav-btn"><i class="mdi mdi-chevron-left"></i></button>
-                                        <h4>Julio 2025</h4>
-                                        <button class="calendar-nav-btn"><i class="mdi mdi-chevron-right"></i></button>
-                                    </div>
-                                    <div class="calendar-placeholder">
-                                        <!-- Aquí iría el calendario real -->
-                                        <div class="calendar-image"></div>
-                                    </div>
-                                </div>
-                                <div class="card-footer">
-                                    <div class="upcoming-event">
-                                        <div class="event-dot" style="background-color: #3498db;"></div>
-                                        <div class="event-info">
-                                            <p>Auditoría de Calidad</p>
-                                            <span>25 Jul, 10:00 - 12:00</span>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="card-content">
+                                <h3 class="card-title">Pedidos</h3>
+                                <p class="card-value" id="pedidos-total">0</p>
+                                <p class="card-subtitle" id="pedidos-alert">0 pendientes</p>
                             </div>
                         </div>
                         
-                        <div class="dashboard-row">
-                            <div class="dashboard-card stock-card">
-                                <div class="card-header">
-                                    <h3>Insumos en Stock Crítico</h3>
-                                    <button class="card-action-btn">
-                                        <i class="mdi mdi-dots-vertical"></i>
-                                    </button>
-                                </div>
-                                <div class="card-body">
-                                    <div class="stock-list">
-                                        <div class="stock-item">
-                                            <div class="stock-info">
-                                                <p class="stock-name">Ácido Clorhídrico 37%</p>
-                                                <div class="stock-details">
-                                                    <span class="stock-category">Reactivos</span>
-                                                    <span class="stock-location">Almacén A-12</span>
-                                                </div>
-                                            </div>
-                                            <div class="stock-level">
-                                                <div class="progress-bar">
-                                                    <div class="progress" style="width: 15%;"></div>
-                                                </div>
-                                                <div class="stock-values">
-                                                    <span class="current-stock">1.5 L</span>
-                                                    <span class="min-stock">Min: 10 L</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="stock-item">
-                                            <div class="stock-info">
-                                                <p class="stock-name">Pipetas Pasteur 3 ml</p>
-                                                <div class="stock-details">
-                                                    <span class="stock-category">Material de vidrio</span>
-                                                    <span class="stock-location">Estante B-04</span>
-                                                </div>
-                                            </div>
-                                            <div class="stock-level">
-                                                <div class="progress-bar">
-                                                    <div class="progress" style="width: 25%;"></div>
-                                                </div>
-                                                <div class="stock-values">
-                                                    <span class="current-stock">25 u</span>
-                                                    <span class="min-stock">Min: 100 u</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        
-                                        <div class="stock-item">
-                                            <div class="stock-info">
-                                                <p class="stock-name">Etanol Absoluto</p>
-                                                <div class="stock-details">
-                                                    <span class="stock-category">Reactivos</span>
-                                                    <span class="stock-location">Almacén A-08</span>
-                                                </div>
-                                            </div>
-                                            <div class="stock-level">
-                                                <div class="progress-bar">
-                                                    <div class="progress" style="width: 35%;"></div>
-                                                </div>
-                                                <div class="stock-values">
-                                                    <span class="current-stock">3.5 L</span>
-                                                    <span class="min-stock">Min: 10 L</span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-footer">
-                                    <a href="insumos.html?filter=critico" class="view-all">Ver todos los insumos críticos</a>
-                                </div>
+                        <div class="dashboard-card">
+                            <div class="card-icon movimientos-icon">
+                                <i class="mdi mdi-swap-horizontal"></i>
                             </div>
-                            
-                            <div class="dashboard-card maintenance-card">
-                                <div class="card-header">
-                                    <h3>Próximos Mantenimientos</h3>
-                                    <button class="card-action-btn">
-                                        <i class="mdi mdi-dots-vertical"></i>
-                                    </button>
-                                </div>
-                                <div class="card-body">
-                                    <div class="maintenance-schedule">
-                                        <div class="maintenance-date">
-                                            <div class="date-day">22</div>
-                                            <div class="date-month">Jul</div>
-                                        </div>
-                                        <div class="maintenance-details">
-                                            <h4>Calibración de Balanza Analítica</h4>
-                                            <p>Balanza Mettler Toledo XS205</p>
-                                            <div class="maintenance-meta">
-                                                <span><i class="mdi mdi-account"></i> Técnico: Carlos Ramírez</span>
-                                                <span><i class="mdi mdi-clock-outline"></i> 10:00 - 12:00</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="maintenance-schedule">
-                                        <div class="maintenance-date">
-                                            <div class="date-day">24</div>
-                                            <div class="date-month">Jul</div>
-                                        </div>
-                                        <div class="maintenance-details">
-                                            <h4>Mantenimiento Preventivo</h4>
-                                            <p>Centrífuga Eppendorf 5424R</p>
-                                            <div class="maintenance-meta">
-                                                <span><i class="mdi mdi-account"></i> Técnico: ServiLab</span>
-                                                <span><i class="mdi mdi-clock-outline"></i> 14:00 - 16:00</span>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="card-footer">
-                                    <a href="equipos.html" class="view-all">Ver todos los mantenimientos</a>
-                                </div>
+                            <div class="card-content">
+                                <h3 class="card-title">Movimientos</h3>
+                                <p class="card-value" id="movimientos-total">0</p>
+                                <p class="card-subtitle" id="movimientos-hoy">0 hoy</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Sección de alertas -->
+                    <div class="dashboard-section">
+                        <div class="section-header">
+                            <h3>
+                                <i class="mdi mdi-alert-circle-outline"></i>
+                                Alertas y Notificaciones
+                            </h3>
+                            <a href="#" class="view-all">Ver todas</a>
+                        </div>
+                        <div class="alerts-container" id="alerts-container">
+                            <!-- Las alertas se cargarán dinámicamente -->
+                            <div class="empty-state-message">
+                                <i class="mdi mdi-check-circle-outline"></i>
+                                <p>No hay alertas pendientes</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contenedores de gráficos y tablas -->
+                    <div class="dashboard-row">
+                        <div class="dashboard-section half-width">
+                            <div class="section-header">
+                                <h3>
+                                    <i class="mdi mdi-chart-line"></i>
+                                    Movimientos Recientes
+                                </h3>
+                                <a href="movimientos.html" class="view-all">Ver todos</a>
+                            </div>
+                            <div class="chart-container">
+                                <canvas id="movimientos-chart"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="dashboard-section half-width">
+                            <div class="section-header">
+                                <h3>
+                                    <i class="mdi mdi-flask-empty-outline"></i>
+                                    Stock Crítico
+                                </h3>
+                                <a href="insumos.html" class="view-all">Ver todos</a>
+                            </div>
+                            <div class="table-container">
+                                <table class="data-table compact">
+                                    <thead>
+                                        <tr>
+                                            <th>Insumo</th>
+                                            <th>Stock Actual</th>
+                                            <th>Mínimo</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="stock-critico-list">
+                                        <!-- Los datos se cargarán dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="dashboard-row">
+                        <div class="dashboard-section half-width">
+                            <div class="section-header">
+                                <h3>
+                                    <i class="mdi mdi-wrench-outline"></i>
+                                    Próximos Mantenimientos
+                                </h3>
+                                <a href="equipos.html" class="view-all">Ver todos</a>
+                            </div>
+                            <div class="table-container">
+                                <table class="data-table compact">
+                                    <thead>
+                                        <tr>
+                                            <th>Equipo</th>
+                                            <th>Ubicación</th>
+                                            <th>Fecha Programada</th>
+                                            <th>Días Restantes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="mantenimientos-list">
+                                        <!-- Los datos se cargarán dinámicamente -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div class="dashboard-section half-width">
+                            <div class="section-header">
+                                <h3>
+                                    <i class="mdi mdi-truck-delivery-outline"></i>
+                                    Pedidos Pendientes
+                                </h3>
+                                <a href="pedidos.html" class="view-all">Ver todos</a>
+                            </div>
+                            <div class="table-container">
+                                <table class="data-table compact">
+                                    <thead>
+                                        <tr>
+                                            <th>Número</th>
+                                            <th>Proveedor</th>
+                                            <th>Fecha</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="pedidos-list">
+                                        <!-- Los datos se cargarán dinámicamente -->
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     </div>
@@ -411,69 +241,9 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="js/firebase.js"></script>
     <script src="js/main.js"></script>
-    <script>
-        // Establecer fecha actual
-        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-        const today = new Date();
-        document.getElementById('current-date').textContent = today.toLocaleDateString('es-ES', options);
-        
-        // Evento para colapsar/expandir sidebar
-        document.getElementById('collapse-sidebar').addEventListener('click', function() {
-            document.querySelector('.app-container').classList.toggle('collapsed-sidebar');
-        });
-        
-        // Cargar datos del dashboard
-        document.addEventListener('DOMContentLoaded', function() {
-            // Aquí se cargarían los datos reales desde Firebase
-            // Este es solo un ejemplo de cómo se podría implementar
-            
-            // Ejemplo: Cargar estadísticas
-            loadDashboardStats();
-            
-            // Ejemplo: Cargar actividad reciente
-            loadRecentActivity();
-            
-            // Ejemplo: Cargar tareas pendientes
-            loadPendingTasks();
-            
-            // Ejemplo: Cargar insumos críticos
-            loadCriticalStock();
-            
-            // Ejemplo: Cargar próximos mantenimientos
-            loadUpcomingMaintenance();
-        });
-        
-        // Función de ejemplo para cargar estadísticas
-        function loadDashboardStats() {
-            // En una implementación real, estos datos vendrían de Firebase
-            console.log("Cargando estadísticas del dashboard...");
-        }
-        
-        // Función de ejemplo para cargar actividad reciente
-        function loadRecentActivity() {
-            // En una implementación real, estos datos vendrían de Firebase
-            console.log("Cargando actividad reciente...");
-        }
-        
-        // Función de ejemplo para cargar tareas pendientes
-        function loadPendingTasks() {
-            // En una implementación real, estos datos vendrían de Firebase
-            console.log("Cargando tareas pendientes...");
-        }
-        
-        // Función de ejemplo para cargar insumos críticos
-        function loadCriticalStock() {
-            // En una implementación real, estos datos vendrían de Firebase
-            console.log("Cargando insumos en stock crítico...");
-        }
-        
-        // Función de ejemplo para cargar próximos mantenimientos
-        function loadUpcomingMaintenance() {
-            // En una implementación real, estos datos vendrían de Firebase
-            console.log("Cargando próximos mantenimientos...");
-        }
-    </script>
+    <script src="js/dashboard.js"></script>
 </body>
 </html>
