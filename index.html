@@ -9,119 +9,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
     <link href="css/styles.css" rel="stylesheet">
-    <style>
-        /* Estilos básicos en caso de que no cargue el CSS externo */
-        .login-page {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            padding: 20px;
-        }
-        .login-container {
-            width: 100%;
-            max-width: 400px;
-            background: #fff;
-            border-radius: 20px;
-            padding: 40px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-        }
-        .form-group {
-            margin-bottom: 20px;
-        }
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-        .form-group input {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 1rem;
-        }
-        .login-btn {
-            width: 100%;
-            padding: 14px;
-            background: #0ea5e9;
-            color: white;
-            border: none;
-            border-radius: 12px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-        }
-        .form-error {
-            color: #ef4444;
-            font-size: 0.85rem;
-            margin-top: 5px;
-            display: none;
-        }
-        #app-notification {
-            position: fixed;
-            top: 30px;
-            right: 30px;
-            background: #fff;
-            border-radius: 12px;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            max-width: 350px;
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
-            transform: translateX(calc(100% + 30px));
-            transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-            z-index: 9998;
-        }
-        #app-notification.show {
-            transform: translateX(0);
-        }
-        #app-loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
-        }
-        #app-loader.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        .loader-content {
-            background: #fff;
-            padding: 25px 40px;
-            border-radius: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .loader-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-            border-top-color: #0ea5e9;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </style>
 </head>
 <body class="login-page">
     <div class="login-container">
@@ -174,73 +61,16 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
     
+    <!-- Scripts de la aplicación -->
+    <script src="js/firebase.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
     <script>
-        // Configuración de Firebase directamente en el archivo
-        const firebaseConfig = {
-            apiKey: "AIzaSyCxJOpBEXZUo7WrAqDTrlJV_2kJBsL8Ym0",
-            authDomain: "labflow-manager.firebaseapp.com",
-            projectId: "labflow-manager",
-            storageBucket: "labflow-manager.appspot.com",
-            messagingSenderId: "742212306654",
-            appId: "1:742212306654:web:a53bf890fc63cd5d05e44f",
-            measurementId: "G-YVZDBCJR3B"
-        };
-
-        // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
-        // Funciones de utilidad
-        function showNotification(title, message, type = 'info') {
-            const notification = document.getElementById('app-notification');
-            const notificationTitle = document.getElementById('notification-title');
-            const notificationMessage = document.getElementById('notification-message');
-            const notificationIcon = document.getElementById('notification-icon');
-            
-            notificationTitle.textContent = title;
-            notificationMessage.textContent = message;
-            
-            notification.className = '';
-            notification.classList.add('show');
-            
-            if (type === 'success') notificationIcon.className = 'mdi mdi-check-circle';
-            else if (type === 'error') notificationIcon.className = 'mdi mdi-alert-circle';
-            else notificationIcon.className = 'mdi mdi-information';
-            
-            setTimeout(() => {
-                notification.className = '';
-            }, 3000);
-        }
-
-        function toggleLoader(show, message = 'Cargando...') {
-            const loader = document.getElementById('app-loader');
-            const loaderMessage = loader.querySelector('.loader-message');
-            
-            if (show) {
-                loaderMessage.textContent = message;
-                loader.classList.add('active');
-            } else {
-                loader.classList.remove('active');
-            }
-        }
-
-        // Verificar autenticación al cargar la página
         document.addEventListener('DOMContentLoaded', function() {
-            toggleLoader(true, 'Verificando sesión...');
-            
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    // Usuario ya autenticado, redirigir al dashboard
-                    console.log("Usuario autenticado:", user.email);
-                    window.location.href = 'dashboard.html';
-                } else {
-                    // No hay usuario autenticado, mostrar formulario de login
-                    console.log("No hay usuario autenticado");
-                    toggleLoader(false);
-                }
-            });
+            // Inicializar la autenticación
+            initAuth();
             
             // Configurar el formulario de login
             const loginForm = document.getElementById('login-form');
@@ -248,18 +78,24 @@
             loginForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
-                const email = document.getElementById('email').value.trim();
-                const password = document.getElementById('password').value.trim();
-                
                 // Limpiar errores anteriores
+                document.getElementById('email-error').textContent = '';
+                document.getElementById('password-error').textContent = '';
                 document.getElementById('email-error').style.display = 'none';
                 document.getElementById('password-error').style.display = 'none';
                 
-                // Validación básica
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value.trim();
+                
+                // Validación básica en el cliente
                 let isValid = true;
                 
                 if (!email) {
                     document.getElementById('email-error').textContent = 'El correo electrónico es obligatorio';
+                    document.getElementById('email-error').style.display = 'block';
+                    isValid = false;
+                } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                    document.getElementById('email-error').textContent = 'Ingrese un correo electrónico válido';
                     document.getElementById('email-error').style.display = 'block';
                     isValid = false;
                 }
@@ -272,36 +108,10 @@
                 
                 if (isValid) {
                     // Intentar iniciar sesión
-                    toggleLoader(true, 'Iniciando sesión...');
-                    
-                    auth.signInWithEmailAndPassword(email, password)
-                        .then(userCredential => {
-                            // La redirección se maneja en onAuthStateChanged
-                            console.log("Login exitoso");
-                        })
-                        .catch(error => {
-                            console.error("Error de login:", error.code, error.message);
-                            
-                            let errorMessage = 'Error al iniciar sesión';
-                            
-                            if (error.code === 'auth/invalid-email') {
-                                errorMessage = 'El formato del correo electrónico no es válido';
-                            } else if (error.code === 'auth/user-disabled') {
-                                errorMessage = 'Esta cuenta ha sido deshabilitada';
-                            } else if (error.code === 'auth/user-not-found') {
-                                errorMessage = 'No existe una cuenta con este correo electrónico';
-                            } else if (error.code === 'auth/wrong-password') {
-                                errorMessage = 'Contraseña incorrecta';
-                            } else if (error.code === 'auth/too-many-requests') {
-                                errorMessage = 'Demasiados intentos fallidos. Intente más tarde';
-                            }
-                            
-                            showNotification('Error', errorMessage, 'error');
-                            toggleLoader(false);
-                        });
+                    login(email, password);
                 }
             });
         });
     </script>
 </body>
-</html> 
+</html>
