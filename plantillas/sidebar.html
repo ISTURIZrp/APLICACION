@@ -1,73 +1,77 @@
-<div class="sidebar-category">Principal</div>
-<ul class="sidebar-menu">
-    <li class="sidebar-menu-item">
-        <a href="home.html" class="sidebar-menu-link">
-            <i class="sidebar-menu-icon mdi mdi-view-dashboard-outline"></i>
-            <span class="sidebar-menu-text">Dashboard</span>
-        </a>
-    </li>
-    <li class="sidebar-menu-item">
-        <a href="insumos.html" class="sidebar-menu-link">
-            <i class="sidebar-menu-icon mdi mdi-flask-outline"></i>
-            <span class="sidebar-menu-text">Insumos</span>
-            <span class="sidebar-badge">12</span>
-        </a>
-    </li>
-    <li class="sidebar-menu-item">
-        <a href="equipos.html" class="sidebar-menu-link">
-            <i class="sidebar-menu-icon mdi mdi-microscope"></i>
-            <span class="sidebar-menu-text">Equipos</span>
-        </a>
-    </li>
-    <li class="sidebar-menu-item">
-        <a href="movimientos.html" class="sidebar-menu-link">
-            <i class="sidebar-menu-icon mdi mdi-swap-horizontal"></i>
-            <span class="sidebar-menu-text">Movimientos</span>
-        </a>
-    </li>
-</ul>
-
-<div class="sidebar-category">Gestión</div>
-<ul class="sidebar-menu">
-    <li class="sidebar-menu-item">
-        <a href="pedidos.html" class="sidebar-menu-link">
-            <i class="sidebar-menu-icon mdi mdi-package-variant-closed"></i>
-            <span class="sidebar-menu-text">Pedidos</span>
-            <span class="sidebar-badge">3</span>
-        </a>
-    </li>
-    <li class="sidebar-menu-item">
-        <a href="proveedores.html" class="sidebar-menu-link">
-            <i class="sidebar-menu-icon mdi mdi-truck-outline"></i>
-            <span class="sidebar-menu-text">Proveedores</span>
-        </a>
-    </li>
-    <li class="sidebar-menu-item">
-        <a href="usuarios.html" class="sidebar-menu-link">
-            <i class="sidebar-menu-icon mdi mdi-account-group-outline"></i>
-            <span class="sidebar-menu-text">Usuarios</span>
-        </a>
-    </li>
-</ul>
-
-<div class="sidebar-category">Sistema</div>
-<ul class="sidebar-menu">
-    <li class="sidebar-menu-item">
-        <a href="configuracion.html" class="sidebar-menu-link">
-            <i class="sidebar-menu-icon mdi mdi-cog-outline"></i>
-            <span class="sidebar-menu-text">Configuración</span>
-        </a>
-    </li>
-    <li class="sidebar-menu-item">
-        <a href="reportes.html" class="sidebar-menu-link">
-            <i class="sidebar-menu-icon mdi mdi-chart-bar"></i>
-            <span class="sidebar-menu-text">Reportes</span>
-        </a>
-    </li>
-    <li class="sidebar-menu-item">
-        <a href="ayuda.html" class="sidebar-menu-link">
-            <i class="sidebar-menu-icon mdi mdi-help-circle-outline"></i>
-            <span class="sidebar-menu-text">Ayuda</span>
-        </a>
-    </li>
-</ul>
+<div id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+        <div class="logo">
+            <i class="mdi mdi-flask"></i>
+            <span class="logo-text">LabFlow</span>
+        </div>
+        <button id="toggle-sidebar" class="toggle-sidebar">
+            <i class="mdi mdi-menu"></i>
+        </button>
+    </div>
+    
+    <div class="sidebar-content">
+        <div class="user-info">
+            <div class="user-avatar">
+                <i class="mdi mdi-account-circle"></i>
+            </div>
+            <div class="user-details">
+                <div class="user-name">Usuario</div>
+                <div class="user-role">Rol</div>
+            </div>
+        </div>
+        
+        <nav class="sidebar-menu">
+            <ul>
+                <li>
+                    <a href="dashboard.html" class="menu-item">
+                        <i class="mdi mdi-view-dashboard"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="insumos-lotes.html" class="menu-item">
+                        <i class="mdi mdi-flask-outline"></i>
+                        <span>Insumos y Lotes</span>
+                    </a>
+                </li>
+                
+                <li>
+                    <a href="movimientos.html" class="menu-item">
+                        <i class="mdi mdi-swap-horizontal"></i>
+                        <span>Movimientos</span>
+                    </a>
+                </li>
+                
+                <li class="menu-section">
+                    <div class="menu-section-header">
+                        <i class="mdi mdi-cog-outline"></i>
+                        <span>Administración</span>
+                        <i class="mdi mdi-chevron-down dropdown-arrow"></i>
+                    </div>
+                    <ul class="submenu">
+                        <li>
+                            <a href="usuarios.html" class="menu-item">
+                                <i class="mdi mdi-account-group-outline"></i>
+                                <span>Usuarios</span>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="reportes.html" class="menu-item">
+                                <i class="mdi mdi-chart-bar"></i>
+                                <span>Reportes</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </div>
+    
+    <div class="sidebar-footer">
+        <button id="user-logout-btn" class="logout-btn">
+            <i class="mdi mdi-logout"></i>
+            <span>Cerrar Sesión</span>
+        </button>
+    </div>
+</div>
