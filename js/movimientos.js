@@ -1,192 +1,172 @@
-import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { collection, query, where, getDocs, doc, getDoc, writeBatch } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { auth, db } from './firebase-config.js';
-import { loadSidebar } from './main.js';
+// Variables globales
+let movimientosData = [];
+let insumosData = [];
+let currentFilters = {
+    search: '',
+    tipo: '',
+    fecha: '',
+    insumo: ''
+};
 
-// --- ELEMENTOS DEL DOM ---
-const singleTransactionForm = document.getElementById('singleTransactionForm');
-const insumoSelect = document.getElementById('insumoSelect');
-const loteSelect = document.getElementById('loteSelect');
-const loteSelectGroup = document.getElementById('loteSelectGroup');
-const nuevoLoteGroup = document.getElementById('nuevoLoteGroup');
-const pendingTransactionsTableBody = document.getElementById('pendingTransactionsTableBody');
-const confirmAllTransactionsBtn = document.getElementById('confirmAllTransactionsBtn');
-const transactionsHistoryTableBody = document.getElementById('transactionsHistoryTableBody');
-const customConfirmModal = document.getElementById('customConfirmModal');
+// Inicialización cuando se carga la página
+document.addEventListener('DOMContentLoaded', () => {
+    // Cargar insumos para el selector
+    loadInsumos();
+    
+    // Cargar movimientos
+    loadMovimientos();
+    
+    // Inicializar eventos
+    initEvents();
+});
 
-let pendingTransactions = [];
-let allInsumosCached = [];
-let currentUserEmail = null;
-let resolveModalPromise;
-
-// --- FUNCIONES AUXILIARES ---
-function showNotification(message, type = 'info') {
-    const notification = document.getElementById('app-notification');
-    if (!notification) return;
-    notification.textContent = message;
-    notification.className = `show ${type}`;
-    setTimeout(() => notification.classList.remove('show'), 3000);
-}
-
-function customConfirm(title, message) {
-    document.getElementById('modalTitle').textContent = title;
-    document.getElementById('modalMessage').textContent = message;
-    customConfirmModal.classList.add('visible');
-    return new Promise(resolve => {
-        resolveModalPromise = resolve;
-    });
-}
-
-// --- LÓGICA PRINCIPAL ---
-async function loadInsumos() {
-    try {
-        const querySnapshot = await getDocs(collection(db, "insumos"));
-        allInsumosCached = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        insumoSelect.innerHTML = '<option value="">Selecciona un insumo</option>';
-        allInsumosCached.sort((a, b) => a.nombre.localeCompare(b.nombre))
-            .forEach(insumo => insumoSelect.add(new Option(insumo.nombre, insumo.id)));
-        insumoSelect.disabled = false;
-    } catch(error) {
-        console.error("Error al cargar insumos:", error);
-        showNotification("Error al cargar insumos.", "error");
-    }
-}
-
-async function populateLotes() {
-    const insumoId = insumoSelect.value;
-    loteSelect.innerHTML = '<option value="">Selecciona un lote</option>';
-    if (!insumoId) return;
-    try {
-        const q = query(collection(db, "lotes"), where("insumo_id", "==", insumoId));
-        const querySnapshot = await getDocs(q);
-        querySnapshot.forEach(doc => {
-            const lote = doc.data();
-            loteSelect.add(new Option(`${lote.lote} (Stock: ${lote.existencia})`, doc.id));
+// Cargar insumos desde Firestore
+function loadInsumos() {
+    const insumoSelector = document.getElementById('filter-insumo');
+    if (!insumoSelector) return;
+    
+    db.collection('insumos')
+        .orderBy('nombre')
+        .get()
+        .then(snapshot => {
+            insumosData = [];
+            
+            if (!snapshot.empty) {
+                snapshot.forEach(doc => {
+                    const insumo = doc.data();
+                    insumo.id = doc.id;
+                    insumosData.push(insumo);
+                    
+                    // Agregar opción al selector
+                    const option = document.createElement('option');
+                    option.value = doc.id;
+                    option.textContent = insumo.nombre;
+                    insumoSelector.appendChild(option);
+                });
+            }
+        })
+        .catch(error => {
+            console.error("Error al cargar insumos:", error);
+            showNotification('Error', 'No se pudieron cargar los insumos para el filtro', 'error');
         });
-    } catch (error) {
-        console.error("Error al poblar lotes:", error);
-    }
 }
 
-function addTransactionToPendingList(e) {
-    e.preventDefault();
-    const insumoId = insumoSelect.value;
-    const tipo = document.querySelector('input[name="tipoTransaccion"]:checked')?.value;
-    const cantidad = parseInt(document.getElementById('cantidad').value, 10);
-    const loteId = loteSelect.value || `new-${document.getElementById('nuevoLoteInput').value.trim()}`;
-    const loteNombre = loteId.startsWith('new-') ? loteId.substring(4) : loteSelect.options[loteSelect.selectedIndex].text.split(' (')[0];
-    const insumoNombre = allInsumosCached.find(i => i.id === insumoId)?.nombre;
+// Cargar movimientos desde Firestore
+function loadMovimientos() {
+    const movimientosList = document.getElementById('movimientos-list');
+    if (!movimientosList) return;
+    
+    movimientosList.innerHTML = '<tr><td colspan="7" class="loading-cell">Cargando movimientos...</td></tr>';
+    
+    db.collection('movimientos')
+        .orderBy('fecha', 'desc')
+        .limit(100) // Limitar a 100 movimientos por rendimiento
+        .get()
+        .then(snapshot => {
+            movimientosData = [];
+            
+            if (snapshot.empty) {
+                movimientosList.innerHTML = '<tr><td colspan="7" class="empty-message">No hay movimientos registrados</td></tr>';
+                return;
+            }
+            
+            const promesas = [];
+            
+            snapshot.forEach(doc => {
+                const movimiento = doc.data();
+                movimiento.id = doc.id;
+                
+                // Cargar datos del insumo relacionado
+                if (movimiento.insumoId) {
+                    const promesa = db.collection('insumos').doc(movimiento.insumoId).get()
+                        .then(insumoDoc => {
+                            if (insumoDoc.exists) {
+                                movimiento.insumo = insumoDoc.data();
+                            }
+                            return movimiento;
+                        })
+                        .catch(error => {
+                            console.error("Error al cargar insumo del movimiento:", error);
+                            movimiento.insumo = { nombre: 'Insumo no encontrado' };
+                            return movimiento;
+                        });
+                    
+                    promesas.push(promesa);
+                } else {
+                    movimiento.insumo = { nombre: 'No especificado' };
+                    promesas.push(Promise.resolve(movimiento));
+                }
+            });
+            
+            Promise.all(promesas)
+                .then(resultados => {
+                    movimientosData = resultados;
+                    filterAndDisplayMovimientos();
+                });
+        })
+        .catch(error => {
+            console.error("Error al cargar movimientos:", error);
+            movimientosList.innerHTML = `<tr><td colspan="7" class="error-message">Error al cargar movimientos: ${error.message}</td></tr>`;
+            showNotification('Error', 'No se pudieron cargar los movimientos', 'error');
+        });
+}
 
-    if (!insumoId || !tipo || !cantidad || !loteNombre) {
-        showNotification('Completa todos los campos requeridos.', 'error');
+// Filtrar y mostrar movimientos
+function filterAndDisplayMovimientos() {
+    const movimientosList = document.getElementById('movimientos-list');
+    if (!movimientosList) return;
+    
+    // Aplicar filtros
+    let filteredMovimientos = movimientosData;
+    
+    if (currentFilters.search) {
+        const searchTerm = currentFilters.search.toLowerCase();
+        filteredMovimientos = filteredMovimientos.filter(movimiento => 
+            movimiento.insumo?.nombre.toLowerCase().includes(searchTerm) ||
+            movimiento.usuario?.toLowerCase().includes(searchTerm) ||
+            movimiento.observaciones?.toLowerCase().includes(searchTerm)
+        );
+    }
+    
+    if (currentFilters.tipo) {
+        filteredMovimientos = filteredMovimientos.filter(movimiento => 
+            movimiento.tipo === currentFilters.tipo
+        );
+    }
+    
+    if (currentFilters.fecha) {
+        const fechaFiltro = new Date(currentFilters.fecha);
+        fechaFiltro.setHours(0, 0, 0, 0);
+        
+        filteredMovimientos = filteredMovimientos.filter(movimiento => {
+            if (movimiento.fecha) {
+                const fechaMovimiento = movimiento.fecha.toDate();
+                fechaMovimiento.setHours(0, 0, 0, 0);
+                return fechaMovimiento.getTime() === fechaFiltro.getTime();
+            }
+            return false;
+        });
+    }
+    
+    if (currentFilters.insumo) {
+        filteredMovimientos = filteredMovimientos.filter(movimiento => 
+            movimiento.insumoId === currentFilters.insumo
+        );
+    }
+    
+    // Mostrar resultados
+    if (filteredMovimientos.length === 0) {
+        movimientosList.innerHTML = '<tr><td colspan="7" class="empty-message">No se encontraron movimientos con los filtros aplicados</td></tr>';
         return;
     }
     
-    pendingTransactions.push({ insumoId, insumoNombre, loteId, loteNombre, tipo, cantidad, fechaCaducidad: document.getElementById('fechaCaducidadNuevoLote').value });
-    renderPendingTransactions();
-    singleTransactionForm.reset();
-    loteSelectGroup.style.display = 'none';
-    nuevoLoteGroup.style.display = 'none';
-}
-
-function renderPendingTransactions() {
-    pendingTransactionsTableBody.innerHTML = '';
-    if (pendingTransactions.length === 0) {
-        pendingTransactionsTableBody.innerHTML = '<tr><td colspan="5" class="empty-message">No hay movimientos pendientes</td></tr>';
-        confirmAllTransactionsBtn.disabled = true;
-        return;
-    }
-    confirmAllTransactionsBtn.disabled = false;
-    pendingTransactions.forEach((tx, index) => {
-        const row = `<tr><td>${tx.insumoNombre}</td><td>${tx.loteNombre}</td><td class="transaction-type ${tx.tipo}">${tx.tipo}</td><td>${tx.cantidad}</td><td><button class="btn-remove" data-index="${index}">Quitar</button></td></tr>`;
-        pendingTransactionsTableBody.innerHTML += row;
-    });
-}
-
-async function confirmAllTransactions() {
-    if (pendingTransactions.length === 0) return;
-    const confirmed = await customConfirm('Confirmar Movimientos', `¿Confirmar ${pendingTransactions.length} movimiento(s)? Esta acción modificará el inventario.`);
-    if (!confirmed) return;
-
-    // 1. Calcular cambio neto por lote
-    const loteChanges = new Map();
-    for (const tx of pendingTransactions) {
-        const change = tx.tipo === 'entrada' ? tx.cantidad : -tx.cantidad;
-        const currentChange = loteChanges.get(tx.loteId) || 0;
-        loteChanges.set(tx.loteId, currentChange + change);
-    }
-
-    // 2. Verificar stock ANTES de escribir
-    try {
-        for (const [loteId, netChange] of loteChanges.entries()) {
-            if (loteId.startsWith('new-')) continue;
-            const loteRef = doc(db, "lotes", loteId);
-            const loteSnap = await getDoc(loteRef);
-            if (!loteSnap.exists() || (loteSnap.data().existencia + netChange) < 0) {
-                throw new Error(`Stock insuficiente para el lote ${loteSnap.data().lote}.`);
-            }
+    movimientosList.innerHTML = '';
+    filteredMovimientos.forEach(movimiento => {
+        const row = document.createElement('tr');
+        
+        // Formatear fecha
+        let fechaFormateada = 'No disponible';
+        if (movimiento.fecha) {
+            const fecha = movimiento.fecha.toDate();
+            fechaFormateada = fecha.toLocaleDateString('es-ES') + ' ' + fecha.toLocaleTimeString('es-ES', {hour: '2-digit', minute: '2-digit'});
         }
-    } catch (error) {
-        showNotification(error.message, 'error');
-        return;
-    }
-
-    // 3. Escribir en batch si todo es válido
-    try {
-        const batch = writeBatch(db);
-        for (const tx of pendingTransactions) {
-            let loteRef;
-            if (tx.loteId.startsWith('new-')) {
-                loteRef = doc(collection(db, "lotes"));
-                batch.set(loteRef, { insumo_id: tx.insumoId, lote: tx.loteNombre, existencia: tx.cantidad, fecha_caducidad: tx.fechaCaducidad });
-            } else {
-                loteRef = doc(db, "lotes", tx.loteId);
-                const loteSnap = await getDoc(loteRef);
-                const change = tx.tipo === 'entrada' ? tx.cantidad : -tx.cantidad;
-                const newStock = (loteSnap.data().existencia || 0) + change;
-                batch.update(loteRef, { existencia: newStock });
-            }
-            const transaccionRef = doc(collection(db, "transacciones"));
-            batch.set(transaccionRef, { insumo_id: tx.insumoId, insumo_nombre: tx.insumoNombre, lote: tx.loteNombre, tipo: tx.tipo, cantidad: tx.cantidad, fecha_transaccion: new Date().toISOString(), responsable: currentUserEmail });
-        }
-        await batch.commit();
-        showNotification('Movimientos confirmados con éxito.');
-        pendingTransactions = [];
-        renderPendingTransactions();
-        populateLotes();
-    } catch (error) {
-        showNotification('Error al confirmar movimientos.', 'error');
-        console.error(error);
-    }
-}
-
-// --- EVENT LISTENERS ---
-insumoSelect.addEventListener('change', populateLotes);
-document.querySelectorAll('input[name="tipoTransaccion"]').forEach(radio => {
-    radio.addEventListener('change', () => {
-        const tipo = radio.value;
-        loteSelectGroup.style.display = tipo ? 'block' : 'none';
-        nuevoLoteGroup.style.display = tipo === 'entrada' ? 'block' : 'none';
-    });
-});
-singleTransactionForm.addEventListener('submit', addTransactionToPendingList);
-confirmAllTransactionsBtn.addEventListener('click', confirmAllTransactions);
-pendingTransactionsTableBody.addEventListener('click', e => {
-    if (e.target.classList.contains('btn-remove')) {
-        pendingTransactions.splice(e.target.dataset.index, 1);
-        renderPendingTransactions();
-    }
-});
-document.getElementById('modalConfirmBtn').addEventListener('click', () => { if (resolveModalPromise) resolveModalPromise(true); customConfirmModal.classList.remove('visible'); });
-document.getElementById('modalCancelBtn').addEventListener('click', () => { if (resolveModalPromise) resolveModalPromise(false); customConfirmModal.classList.remove('visible'); });
-
-// --- PUNTO DE ENTRADA ---
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        currentUserEmail = user.email;
-        await loadSidebar();
-        await loadInsumos();
-    } else {
-        window.location.href = 'index.html';
-    }
-});
