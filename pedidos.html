@@ -1,1 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pedidos - LabFlow Manager</title>
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body class="light-mode">
+    <div class="app-container">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="app-brand">
+                    <i class="mdi mdi-flask-outline logo-icon"></i>
+                    <h1>LabFlow</h1>
+                </div>
+                <button id="collapse-sidebar" class="collapse-sidebar">
+                    <i class="mdi mdi-menu"></i>
+                </button>
+            </div>
+            <div class="sidebar-content">
+                <!-- El contenido del sidebar se cargará aquí desde la plantilla -->
+            </div>
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <span>JD</span>
+                    </div>
+                    <div class="user-details">
+                        <p class="user-name">John Doe</p>
+                        <p class="user-role">Administrador</p>
+                    </div>
+                </div>
+                <button id="logout-btn" class="logout-btn" title="Cerrar Sesión">
+                    <i class="mdi mdi-logout"></i>
+                </button>
+            </div>
+        </aside>
 
+        <main class="main-content">
+            <header class="top-bar">
+                <div class="page-title">
+                    <h1 id="current-module-title">Pedidos</h1>
+                </div>
+                <div class="top-bar-actions">
+                    <div class="search-container">
+                        <i class="mdi mdi-magnify search-icon"></i>
+                        <input type="text" placeholder="Buscar..." class="search-input">
+                    </div>
+                    <button id="notifications-btn" class="icon-btn" title="Notificaciones">
+                        <i class="mdi mdi-bell-outline"></i>
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <button id="theme-toggle" class="icon-btn" title="Cambiar tema">
+                        <i class="mdi mdi-theme-light-dark"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="page-container" id="page-container">
+                <div id="module-content">
+                    <div class="module-header">
+                        <div class="module-title">
+                            <h2>Gestión de Pedidos</h2>
+                            <p class="module-subtitle">Administra los pedidos a proveedores y su seguimiento</p>
+                        </div>
+                        <div class="module-actions">
+                            <button id="add-pedido-btn" class="btn-primary">
+                                <i class="mdi mdi-plus"></i> Crear Pedido
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="filters-bar">
+                        <div class="filters-container">
+                            <div class="filter-group">
+                                <label for="search-pedidos">Buscar:</label>
+                                <div class="search-input-container">
+                                    <i class="mdi mdi-magnify"></i>
+                                    <input type="text" id="search-pedidos" placeholder="Buscar por número, proveedor...">
+                                </div>
+                            </div>
+                            <div class="filter-group">
+                                <label for="filter-estado">Estado:</label>
+                                <select id="filter-estado">
+                                    <option value="">Todos</option>
+                                    <option value="pendiente">Pendiente</option>
+                                    <option value="aprobado">Aprobado</option>
+                                    <option value="enviado">Enviado</option>
+                                    <option value="recibido">Recibido</option>
+                                    <option value="cancelado">Cancelado</option>
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="filter-proveedor">Proveedor:</label>
+                                <select id="filter-proveedor">
+                                    <option value="">Todos</option>
+                                    <!-- Los proveedores se cargarán dinámicamente -->
+                                </select>
+                            </div>
+                            <div class="filter-group">
+                                <label for="filter-fecha">Fecha:</label>
+                                <input type="date" id="filter-fecha">
+                            </div>
+                            <button id="clear-filters" class="btn-text">
+                                <i class="mdi mdi-filter-remove"></i> Limpiar filtros
+                            </button>
+                        </div>
+                        <div class="results-count">
+                            <span id="pedidos-count">0</span> pedidos encontrados
+                        </div>
+                    </div>
+
+                    <div class="data-table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Número</th>
+                                    <th>Fecha</th>
+                                    <th>Proveedor</th>
+                                    <th>Estado</th>
+                                    <th>Ítems</th>
+                                    <th>Total</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="pedidos-list">
+                                <!-- Los datos se cargarán dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="notification-container" class="notification-container"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase.js"></script>
+    <script src="js/main.js"></script>
+    <script src="js/pedidos.js"></script>
+</body>
+</html>
