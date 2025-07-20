@@ -91,11 +91,25 @@ function initCurrentPage() {
     const currentPage = window.location.pathname.split('/').pop() || 'index.html';
     
     // Inicializar según la página
-    if (currentPage === 'insumos-lotes.html') {
+    if (currentPage === 'insumos.html') {
         const container = document.getElementById('insumos-container');
         if (container) loadInsumosYLotes(container);
+    } 
+    else if (currentPage === 'movimientos.html') {
+        const container = document.getElementById('movimientos-container');
+        if (container) loadMovimientos(container);
     }
-    // Agregar más páginas según sea necesario
+    else if (currentPage === 'usuarios.html') {
+        const container = document.getElementById('usuarios-container');
+        if (container) loadUsuarios(container);
+    }
+    else if (currentPage === 'reportes.html') {
+        const container = document.getElementById('reportes-container');
+        if (container) loadReportes(container);
+    }
+    else if (currentPage === 'dashboard.html') {
+        initDashboard();
+    }
 }
 
 // Cargar datos del usuario
@@ -125,28 +139,5 @@ function loadUserData(userId) {
         })
         .catch(error => {
             console.error("Error cargando datos del usuario:", error);
-        });
-}
-
-// Crear perfil básico de usuario
-function createBasicUserProfile(userId) {
-    const user = auth.currentUser;
-    if (!user) return;
-    
-    const userData = {
-        nombre: user.displayName || user.email.split('@')[0] || 'Usuario',
-        email: user.email,
-        role: 'viewer',
-        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    
-    db.collection('usuarios').doc(userId).set(userData)
-        .then(() => {
-            console.log("Perfil de usuario creado");
-            showNotification('Bienvenido', 'Se ha creado tu perfil de usuario', 'success');
-        })
-        .catch(error => {
-            console.error("Error creando perfil:", error);
         });
 }
