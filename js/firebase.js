@@ -10,12 +10,15 @@ const firebaseConfig = {
 };
 
 // Inicializar Firebase
+console.log("Inicializando Firebase...");
 firebase.initializeApp(firebaseConfig);
 
 // Referencias a servicios de Firebase
 const auth = firebase.auth();
 const db = firebase.firestore();
 const storage = firebase.storage();
+
+console.log("Firebase inicializado correctamente");
 
 // Configuración de Firestore
 db.settings({
@@ -30,4 +33,4 @@ db.enablePersistence()
     } else if (err.code === 'unimplemented') {
       console.error('El navegador no soporta persistencia offline');
     }
-  }); 
+  });
