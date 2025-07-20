@@ -1,13 +1,12 @@
 // Configuración de Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyA1234567890abcdefghijklmnopqrstuvwxyz",
-  authDomain: "labflow-manager.firebaseapp.com",
-  projectId: "labflow-manager",
-  storageBucket: "labflow-manager.appspot.com",
-  messagingSenderId: "123456789012",
-  appId: "1:123456789012:web:abcdef1234567890abcdef",
-  measurementId: "G-ABCDEFGHIJ"
-};
+            apiKey: "AIzaSyCxJOpBEXZUo7WrAqDTrlJV_2kJBsL8Ym0",
+            authDomain: "labflow-manager.firebaseapp.com",
+            projectId: "labflow-manager",
+            storageBucket: "labflow-manager.appspot.com",
+            messagingSenderId: "742212306654",
+            appId: "1:742212306654:web:a53bf890fc63cd5d05e44f"
+        };
 
 // Inicializar Firebase
 console.log("Inicializando Firebase...");
