@@ -1,3 +1,6 @@
+// Variables globales
+let isMobileView = window.innerWidth <= 768;
+
 // Verificar autenticación
 auth.onAuthStateChanged(user => {
     if (user) {
@@ -14,6 +17,9 @@ auth.onAuthStateChanged(user => {
         
         // Inicializar eventos globales
         initGlobalEvents();
+        
+        // Inicializar eventos específicos para dispositivos móviles
+        initMobileEvents();
     }
 });
 
@@ -45,6 +51,13 @@ function loadUserData(userId) {
                         const initials = getInitials(userData.nombre || 'Usuario');
                         el.innerHTML = `<span>${initials}</span>`;
                     }
+                });
+                
+                // Actualizar última conexión
+                db.collection('usuarios').doc(userId).update({
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                }).catch(error => {
+                    console.error("Error al actualizar última conexión:", error);
                 });
             }
         })
@@ -87,7 +100,7 @@ function loadSidebar() {
             document.querySelector('.sidebar-content').innerHTML = data;
             
             // Marcar el elemento activo según la página actual
-            const currentPage = window.location.pathname.split('/').pop();
+            const currentPage = window.location.pathname.split('/').pop() || 'home.html';
             const menuItems = document.querySelectorAll('.sidebar-menu-link');
             
             menuItems.forEach(item => {
@@ -128,11 +141,18 @@ function initGlobalEvents() {
         themeToggle.addEventListener('click', toggleTheme);
     }
     
-    // Colapsar/expandir sidebar
+    // Colapsar/expandir sidebar (sólo en desktop)
     const collapseSidebar = document.getElementById('collapse-sidebar');
     if (collapseSidebar) {
         collapseSidebar.addEventListener('click', () => {
-            document.querySelector('.app-container').classList.toggle('collapsed-sidebar');
+            if (!isMobileView) {
+                // En desktop, colapsar/expandir el sidebar
+                const sidebar = document.getElementById('sidebar');
+                sidebar.classList.toggle('collapsed');
+            } else {
+                // En móvil, mostrar/ocultar el sidebar
+                toggleMobileSidebar();
+            }
         });
     }
     
@@ -144,10 +164,239 @@ function initGlobalEvents() {
                 window.location.href = 'index.html';
             }).catch(error => {
                 console.error("Error al cerrar sesión:", error);
-                alert("Error al cerrar sesión: " + error.message);
+                showNotification('Error', 'No se pudo cerrar sesión: ' + error.message, 'error');
             });
         });
     }
+}
+
+// Inicializar eventos para dispositivos móviles
+function initMobileEvents() {
+    // Crear overlay para sidebar si no existe
+    if (!document.querySelector('.sidebar-overlay')) {
+        const sidebarOverlay = document.createElement('div');
+        sidebarOverlay.className = 'sidebar-overlay';
+        document.body.appendChild(sidebarOverlay);
+        
+        // Evento para cerrar sidebar al hacer clic en overlay
+        sidebarOverlay.addEventListener('click', () => {
+            toggleMobileSidebar(false);
+        });
+    }
+    
+    // Crear botón de menú móvil si no existe y estamos en vista móvil
+    if (!document.querySelector('.mobile-menu-btn') && isMobileView) {
+        const menuButton = document.createElement('button');
+        menuButton.className = 'mobile-menu-btn';
+        menuButton.innerHTML = '<i class="mdi mdi-menu"></i>';
+        menuButton.setAttribute('title', 'Menú');
+        
+        const topBar = document.querySelector('.top-bar');
+        if (topBar) {
+            topBar.insertBefore(menuButton, topBar.firstChild);
+            
+            // Evento para abrir sidebar en móvil
+            menuButton.addEventListener('click', () => {
+                toggleMobileSidebar(true);
+            });
+        }
+    }
+    
+    // Crear botón de búsqueda móvil si no existe y estamos en vista móvil
+    if (!document.querySelector('.mobile-search-btn') && isMobileView) {
+        const searchButton = document.createElement('button');
+        searchButton.className = 'mobile-search-btn';
+        searchButton.innerHTML = '<i class="mdi mdi-magnify"></i>';
+        searchButton.setAttribute('title', 'Buscar');
+        
+        const topBarActions = document.querySelector('.top-bar-actions');
+        if (topBarActions) {
+            topBarActions.insertBefore(searchButton, topBarActions.firstChild);
+            
+            // Evento para mostrar/ocultar búsqueda en móvil
+            searchButton.addEventListener('click', toggleMobileSearch);
+        }
+    }
+    
+    // Cerrar sidebar al hacer clic en un enlace (en móvil)
+    const sidebarLinks = document.querySelectorAll('.sidebar-menu-link');
+    sidebarLinks.forEach(link => {
+        link.addEventListener('click', function() {
+            if (isMobileView) {
+                toggleMobileSidebar(false);
+            }
+        });
+    });
+    
+    // Crear barra de navegación para PWA si es necesario
+    if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+        createPWANavBar();
+    }
+    
+    // Ajustar UI al cambiar tamaño de ventana
+    window.addEventListener('resize', handleWindowResize);
+}
+
+// Alternar sidebar en móvil
+function toggleMobileSidebar(show) {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.querySelector('.sidebar-overlay');
+    
+    if (sidebar && overlay) {
+        if (show === undefined) {
+            // Alternar
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+        } else if (show) {
+            // Mostrar
+            sidebar.classList.add('active');
+            overlay.classList.add('active');
+        } else {
+            // Ocultar
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+        }
+    }
+}
+
+// Alternar búsqueda en móvil
+function toggleMobileSearch() {
+    const searchContainer = document.querySelector('.search-container');
+    
+    if (searchContainer) {
+        searchContainer.classList.toggle('active');
+        
+        if (searchContainer.classList.contains('active')) {
+            // Enfocar el campo de búsqueda
+            const searchInput = searchContainer.querySelector('input');
+            if (searchInput) {
+                searchInput.focus();
+                
+                // Agregar evento para cerrar al presionar Escape
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        searchContainer.classList.remove('active');
+                    }
+                });
+            }
+        }
+    }
+}
+
+// Manejar cambio de tamaño de ventana
+function handleWindowResize() {
+    const newIsMobileView = window.innerWidth <= 768;
+    
+    // Si cambió el tipo de vista
+    if (newIsMobileView !== isMobileView) {
+        isMobileView = newIsMobileView;
+        
+        if (isMobileView) {
+            // Cambiar a vista móvil
+            
+            // Crear botón de menú si no existe
+            if (!document.querySelector('.mobile-menu-btn')) {
+                const menuButton = document.createElement('button');
+                menuButton.className = 'mobile-menu-btn';
+                menuButton.innerHTML = '<i class="mdi mdi-menu"></i>';
+                menuButton.setAttribute('title', 'Menú');
+                
+                const topBar = document.querySelector('.top-bar');
+                if (topBar) {
+                    topBar.insertBefore(menuButton, topBar.firstChild);
+                    
+                    // Evento para abrir sidebar en móvil
+                    menuButton.addEventListener('click', () => {
+                        toggleMobileSidebar(true);
+                    });
+                }
+            }
+            
+            // Crear botón de búsqueda si no existe
+            if (!document.querySelector('.mobile-search-btn')) {
+                const searchButton = document.createElement('button');
+                searchButton.className = 'mobile-search-btn';
+                searchButton.innerHTML = '<i class="mdi mdi-magnify"></i>';
+                searchButton.setAttribute('title', 'Buscar');
+                
+                const topBarActions = document.querySelector('.top-bar-actions');
+                if (topBarActions) {
+                    topBarActions.insertBefore(searchButton, topBarActions.firstChild);
+                    
+                    // Evento para mostrar/ocultar búsqueda en móvil
+                    searchButton.addEventListener('click', toggleMobileSearch);
+                }
+            }
+        } else {
+            // Cambiar a vista desktop
+            
+            // Eliminar botón de menú móvil
+            const mobileMenuBtn = document.querySelector('.mobile-menu-btn');
+            if (mobileMenuBtn) {
+                mobileMenuBtn.remove();
+            }
+            
+            // Eliminar botón de búsqueda móvil
+            const mobileSearchBtn = document.querySelector('.mobile-search-btn');
+            if (mobileSearchBtn) {
+                mobileSearchBtn.remove();
+            }
+            
+            // Restaurar sidebar
+            const sidebar = document.getElementById('sidebar');
+            if (sidebar) {
+                sidebar.classList.remove('active');
+            }
+            
+            // Ocultar overlay
+            const overlay = document.querySelector('.sidebar-overlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+            }
+            
+            // Restaurar búsqueda
+            const searchContainer = document.querySelector('.search-container');
+            if (searchContainer) {
+                searchContainer.classList.remove('active');
+            }
+        }
+    }
+}
+
+// Crear barra de navegación para PWA
+function createPWANavBar() {
+    if (document.querySelector('.pwa-nav-bar')) return;
+    
+    const navBar = document.createElement('div');
+    navBar.className = 'pwa-nav-bar';
+    
+    const navItems = [
+        { icon: 'mdi-view-dashboard-outline', text: 'Inicio', url: 'home.html' },
+        { icon: 'mdi-flask-outline', text: 'Insumos', url: 'insumos.html' },
+        { icon: 'mdi-microscope', text: 'Equipos', url: 'equipos.html' },
+        { icon: 'mdi-swap-horizontal', text: 'Movimientos', url: 'movimientos.html' },
+        { icon: 'mdi-account-outline', text: 'Perfil', url: 'profile.html' }
+    ];
+    
+    const currentPage = window.location.pathname.split('/').pop() || 'home.html';
+    
+    navItems.forEach(item => {
+        const navItem = document.createElement('a');
+        navItem.className = 'pwa-nav-item';
+        if (currentPage === item.url) {
+            navItem.classList.add('active');
+        }
+        navItem.href = item.url;
+        
+        navItem.innerHTML = `
+            <i class="pwa-nav-icon mdi ${item.icon}"></i>
+            <span class="pwa-nav-text">${item.text}</span>
+        `;
+        
+        navBar.appendChild(navItem);
+    });
+    
+    document.body.appendChild(navBar);
 }
 
 // Alternar entre modos oscuro y claro
@@ -166,7 +415,7 @@ function toggleTheme() {
 }
 
 // Cargar preferencia de tema al iniciar
-document.addEventListener('DOMContentLoaded', () => {
+function initTheme() {
     const savedTheme = localStorage.getItem('theme');
     
     if (savedTheme === 'dark') {
@@ -176,7 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.body.classList.remove('dark-mode');
         document.body.classList.add('light-mode');
     }
-});
+}
 
 // Mostrar notificación
 function showNotification(title, message, type = 'info') {
@@ -246,3 +495,30 @@ function closeNotification(notification) {
         }
     }, 300);
 }
+
+// Registrar Service Worker para soporte offline
+function registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('/sw.js')
+                .then(registration => {
+                    console.log('Service Worker registrado con éxito:', registration.scope);
+                })
+                .catch(error => {
+                    console.log('Error al registrar el Service Worker:', error);
+                });
+        });
+    }
+}
+
+// Inicializar al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+    // Inicializar tema
+    initTheme();
+    
+    // Registrar Service Worker
+    registerServiceWorker();
+    
+    // Comprobar si es vista móvil
+    isMobileView = window.innerWidth <= 768;
+});
