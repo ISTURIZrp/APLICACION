@@ -1,19 +1,33 @@
-// js/firebase-config.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-
+// Configuración de Firebase
 const firebaseConfig = {
-    apiKey: "AIzaSyCxJOpBEXZUo7WrAqDTrlJV_2kJBsL8Ym0",
-    authDomain: "labflow-manager.firebaseapp.com",
-    projectId: "labflow-manager",
-    storageBucket: "labflow-manager.firebasestorage.app",
-    messagingSenderId: "742212306654",
-    appId: "1:742212306654:web:a53bf890fc63cd5d05e44f"
+  apiKey: "AIzaSyA1234567890abcdefghijklmnopqrstuvwxyz",
+  authDomain: "labflow-manager.firebaseapp.com",
+  projectId: "labflow-manager",
+  storageBucket: "labflow-manager.appspot.com",
+  messagingSenderId: "123456789012",
+  appId: "1:123456789012:web:abcdef1234567890abcdef",
+  measurementId: "G-ABCDEFGHIJ"
 };
 
-const app = initializeApp(firebaseConfig);
+// Inicializar Firebase
+firebase.initializeApp(firebaseConfig);
 
-// Exporta ambos servicios para usarlos en todo el proyecto
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+// Referencias a servicios de Firebase
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+// Configuración de Firestore
+db.settings({
+  cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED
+});
+
+// Habilitar persistencia offline
+db.enablePersistence()
+  .catch(err => {
+    if (err.code === 'failed-precondition') {
+      console.error('Persistencia falló: múltiples pestañas abiertas');
+    } else if (err.code === 'unimplemented') {
+      console.error('El navegador no soporta persistencia offline');
+    }
+  });
