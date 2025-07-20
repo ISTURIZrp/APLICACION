@@ -150,4 +150,4 @@ function createBasicUserProfile(userId) {
         .catch(error => {
             console.error("Error creando perfil:", error);
         });
-}
+} 
