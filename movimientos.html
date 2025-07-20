@@ -3,145 +3,102 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movimientos - LabFlow Manager</title>
+    <title>LabFlow Manager - Movimientos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link href="css/styles.css" rel="stylesheet">
 </head>
-<body class="light-mode">
-    <div class="app-container">
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="app-brand">
-                    <i class="mdi mdi-flask-outline logo-icon"></i>
-                    <h1>LabFlow</h1>
+<body>
+    <div id="sidebar-container"></div>
+
+    <main id="content">
+        <div class="table-header">
+            <h1>Movimientos de Insumos</h1>
+            <button id="exportMovimientosBtn" class="btn btn-secondary">
+                <i class="mdi mdi-file-export-outline"></i> Exportar CSV
+            </button>
+        </div>
+        
+        <div class="content-wrapper">
+            <div class="filters-container">
+                <div class="search-container">
+                    <i class="mdi mdi-magnify search-icon"></i>
+                    <input type="search" id="buscarMovimiento" placeholder="Buscar movimiento...">
                 </div>
-                <button id="collapse-sidebar" class="collapse-sidebar">
-                    <i class="mdi mdi-menu"></i>
+                
+                <div class="filter-group">
+                    <label for="filtroTipo">Tipo:</label>
+                    <select id="filtroTipo">
+                        <option value="">Todos</option>
+                        <option value="entrada">Entradas</option>
+                        <option value="salida">Salidas</option>
+                    </select>
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filtroFechaDesde">Desde:</label>
+                    <input type="date" id="filtroFechaDesde">
+                </div>
+                
+                <div class="filter-group">
+                    <label for="filtroFechaHasta">Hasta:</label>
+                    <input type="date" id="filtroFechaHasta">
+                </div>
+                
+                <button id="aplicarFiltrosBtn" class="btn btn-primary">
+                    <i class="mdi mdi-filter"></i> Aplicar filtros
                 </button>
             </div>
-            <div class="sidebar-content">
-                <!-- El contenido del sidebar se cargará aquí desde la plantilla -->
+            
+            <div id="movimientos-container">
+                <!-- Aquí se cargarán los movimientos dinámicamente -->
             </div>
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <div class="user-avatar">
-                        <span>JD</span>
-                    </div>
-                    <div class="user-details">
-                        <p class="user-name">John Doe</p>
-                        <p class="user-role">Administrador</p>
-                    </div>
-                </div>
-                <button id="logout-btn" class="logout-btn" title="Cerrar Sesión">
-                    <i class="mdi mdi-logout"></i>
-                </button>
+        </div>
+    </main>
+
+    <!-- Modal para confirmar acciones -->
+    <div class="modal-backdrop" id="confirmModal">
+        <div class="modal-content" style="max-width: 450px;">
+            <h2 id="confirmModalTitle">Confirmar Acción</h2>
+            <p id="confirmModalMessage" style="margin-top: 15px; margin-bottom: 25px;"></p>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="confirmCancelBtn">Cancelar</button>
+                <button type="button" class="btn-danger" id="confirmOkBtn">Aceptar</button>
             </div>
-        </aside>
-
-        <main class="main-content">
-            <header class="top-bar">
-                <div class="page-title">
-                    <h1 id="current-module-title">Movimientos</h1>
-                </div>
-                <div class="top-bar-actions">
-                    <div class="search-container">
-                        <i class="mdi mdi-magnify search-icon"></i>
-                        <input type="text" placeholder="Buscar..." class="search-input">
-                    </div>
-                    <button id="notifications-btn" class="icon-btn" title="Notificaciones">
-                        <i class="mdi mdi-bell-outline"></i>
-                        <span class="notification-badge">3</span>
-                    </button>
-                    <button id="theme-toggle" class="icon-btn" title="Cambiar tema">
-                        <i class="mdi mdi-theme-light-dark"></i>
-                    </button>
-                </div>
-            </header>
-
-            <div class="page-container" id="page-container">
-                <div id="module-content">
-                    <div class="module-header">
-                        <div class="module-title">
-                            <h2>Movimientos de Inventario</h2>
-                            <p class="module-subtitle">Registro de entradas, salidas y ajustes de insumos</p>
-                        </div>
-                        <div class="module-actions">
-                            <button id="add-movimiento-btn" class="btn-primary">
-                                <i class="mdi mdi-plus"></i> Registrar Movimiento
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="filters-bar">
-                        <div class="filters-container">
-                            <div class="filter-group">
-                                <label for="search-movimientos">Buscar:</label>
-                                <div class="search-input-container">
-                                    <i class="mdi mdi-magnify"></i>
-                                    <input type="text" id="search-movimientos" placeholder="Buscar por insumo, usuario...">
-                                </div>
-                            </div>
-                            <div class="filter-group">
-                                <label for="filter-tipo">Tipo:</label>
-                                <select id="filter-tipo">
-                                    <option value="">Todos</option>
-                                    <option value="entrada">Entrada</option>
-                                    <option value="salida">Salida</option>
-                                    <option value="ajuste">Ajuste</option>
-                                    <option value="transferencia">Transferencia</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label for="filter-fecha">Fecha:</label>
-                                <input type="date" id="filter-fecha">
-                            </div>
-                            <div class="filter-group">
-                                <label for="filter-insumo">Insumo:</label>
-                                <select id="filter-insumo">
-                                    <option value="">Todos</option>
-                                    <!-- Los insumos se cargarán dinámicamente -->
-                                </select>
-                            </div>
-                            <button id="clear-filters" class="btn-text">
-                                <i class="mdi mdi-filter-remove"></i> Limpiar filtros
-                            </button>
-                        </div>
-                        <div class="results-count">
-                            <span id="movimientos-count">0</span> movimientos encontrados
-                        </div>
-                    </div>
-
-                    <div class="data-table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Tipo</th>
-                                    <th>Insumo</th>
-                                    <th>Cantidad</th>
-                                    <th>Stock (Antes → Después)</th>
-                                    <th>Usuario</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="movimientos-list">
-                                <!-- Los datos se cargarán dinámicamente -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </main>
+        </div>
     </div>
 
-    <div id="notification-container" class="notification-container"></div>
+    <!-- Loader -->
+    <div id="app-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p class="loader-message">Cargando...</p>
+        </div>
+    </div>
+    
+    <!-- Notificación -->
+    <div id="app-notification">
+        <i class="mdi mdi-information-outline" id="notification-icon"></i>
+        <div id="notification-content">
+            <div id="notification-title">Notificación</div>
+            <div id="notification-message">Mensaje de notificación</div>
+        </div>
+    </div>
 
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    
+    <!-- Scripts de la aplicación -->
     <script src="js/firebase.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/movimientos.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
