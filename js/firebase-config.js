@@ -30,4 +30,4 @@ db.enablePersistence()
     } else if (err.code === 'unimplemented') {
       console.error('El navegador no soporta persistencia offline');
     }
-  });
+  }); 
