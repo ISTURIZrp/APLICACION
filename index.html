@@ -67,21 +67,113 @@
     <script src="js/firebase.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/auth.js"></script>
-    <script src="js/main.js"></script>
     
     <script>
+        // Variables globales necesarias
+        let currentUser = null;
+        
         document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar la autenticación (solo verificación)
+            initAuth();
+            
+            // Configurar el formulario de login
             const loginForm = document.getElementById('login-form');
             
             loginForm.addEventListener('submit', function(e) {
                 e.preventDefault();
                 
-                const email = document.getElementById('email').value;
-                const password = document.getElementById('password').value;
+                const email = document.getElementById('email').value.trim();
+                const password = document.getElementById('password').value.trim();
                 
-                login(email, password);
+                // Limpiar errores anteriores
+                document.getElementById('email-error').textContent = '';
+                document.getElementById('password-error').textContent = '';
+                document.getElementById('email-error').style.display = 'none';
+                document.getElementById('password-error').style.display = 'none';
+                
+                // Validación básica en el cliente
+                let isValid = true;
+                
+                if (!email) {
+                    document.getElementById('email-error').textContent = 'El correo electrónico es obligatorio';
+                    document.getElementById('email-error').style.display = 'block';
+                    isValid = false;
+                } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                    document.getElementById('email-error').textContent = 'Ingrese un correo electrónico válido';
+                    document.getElementById('email-error').style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (!password) {
+                    document.getElementById('password-error').textContent = 'La contraseña es obligatoria';
+                    document.getElementById('password-error').style.display = 'block';
+                    isValid = false;
+                }
+                
+                if (isValid) {
+                    // Intentar iniciar sesión
+                    login(email, password);
+                }
             });
         });
+        
+        // Función de notificación básica (por si no se carga utils.js)
+        function showNotification(title, message, type) {
+            if (typeof window.showNotification === 'function') {
+                // Usar la función de utils.js si está disponible
+                window.showNotification(title, message, type);
+            } else {
+                // Implementación básica de respaldo
+                const notification = document.getElementById('app-notification');
+                const notificationTitle = document.getElementById('notification-title');
+                const notificationMessage = document.getElementById('notification-message');
+                const notificationIcon = document.getElementById('notification-icon');
+                
+                if (!notification || !notificationTitle || !notificationMessage || !notificationIcon) {
+                    console.error("Elementos de notificación no encontrados");
+                    alert(`${title}: ${message}`);
+                    return;
+                }
+                
+                notificationTitle.textContent = title;
+                notificationMessage.textContent = message;
+                
+                notification.className = 'show';
+                if (type) notification.classList.add(type);
+                
+                if (type === 'success') notificationIcon.className = 'mdi mdi-check-circle';
+                else if (type === 'error') notificationIcon.className = 'mdi mdi-alert-circle';
+                else notificationIcon.className = 'mdi mdi-information';
+                
+                setTimeout(() => {
+                    notification.className = '';
+                }, 3000);
+            }
+        }
+        
+        // Función de loader básica (por si no se carga utils.js)
+        function toggleLoader(show, message) {
+            if (typeof window.toggleLoader === 'function') {
+                // Usar la función de utils.js si está disponible
+                window.toggleLoader(show, message);
+            } else {
+                // Implementación básica de respaldo
+                const loader = document.getElementById('app-loader');
+                const loaderMessage = document.querySelector('.loader-message');
+                
+                if (!loader) {
+                    console.error("Elemento loader no encontrado");
+                    return;
+                }
+                
+                if (show) {
+                    if (loaderMessage && message) loaderMessage.textContent = message;
+                    loader.classList.add('active');
+                } else {
+                    loader.classList.remove('active');
+                }
+            }
+        }
     </script>
 </body>
 </html>
