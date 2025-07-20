@@ -3,86 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LabFlow Manager - Login</title>
+    <title>LabFlow Manager - Inicio de Sesión</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link href="css/styles.css" rel="stylesheet">
 </head>
-<body class="light-mode">
+<body class="login-page">
     <div class="login-container">
-        <div class="login-card">
-            <div class="login-logo">
-                <i class="mdi mdi-flask-outline logo-icon"></i>
-                <h1>LabFlow Manager</h1>
+        <div class="login-header">
+            <h1>LabFlow Manager</h1>
+            <p>Sistema de Gestión de Insumos de Laboratorio</p>
+        </div>
+        
+        <form id="login-form">
+            <div class="form-group">
+                <label for="email">Correo electrónico</label>
+                <input type="email" id="email" name="email" placeholder="usuario@ejemplo.com" required>
+                <div class="form-error" id="email-error"></div>
             </div>
-            <div class="login-form-container">
-                <h2>Iniciar Sesión</h2>
-                <p class="login-subtitle">Ingresa tus credenciales para continuar</p>
-                <form id="login-form">
-                    <div class="form-group">
-                        <label for="email">Correo Electrónico</label>
-                        <div class="input-container">
-                            <i class="mdi mdi-email-outline input-icon"></i>
-                            <input type="email" id="email" required>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Contraseña</label>
-                        <div class="input-container">
-                            <i class="mdi mdi-lock-outline input-icon"></i>
-                            <input type="password" id="password" required>
-                            <button type="button" class="toggle-password" tabindex="-1">
-                                <i class="mdi mdi-eye-outline"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div class="form-options">
-                        <div class="remember-me">
-                            <input type="checkbox" id="remember">
-                            <label for="remember">Recordarme</label>
-                        </div>
-                        <a href="#" class="forgot-password">¿Olvidaste tu contraseña?</a>
-                    </div>
-                    <button type="submit" class="btn-primary">Iniciar Sesión</button>
-                </form>
-                <p id="login-error" class="error-message"></p>
+            
+            <div class="form-group">
+                <label for="password">Contraseña</label>
+                <input type="password" id="password" name="password" placeholder="••••••••" required>
+                <div class="form-error" id="password-error"></div>
             </div>
+            
+            <button type="submit" class="login-btn">
+                <i class="mdi mdi-login"></i> Iniciar Sesión
+            </button>
+        </form>
+        
+        <div class="login-footer">
+            <p>© 2024 LabFlow Manager</p>
+        </div>
+    </div>
+    
+    <!-- Loader -->
+    <div id="app-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p class="loader-message">Cargando...</p>
+        </div>
+    </div>
+    
+    <!-- Notificación -->
+    <div id="app-notification">
+        <i class="mdi mdi-information-outline" id="notification-icon"></i>
+        <div id="notification-content">
+            <div id="notification-title">Notificación</div>
+            <div id="notification-message">Mensaje de notificación</div>
         </div>
     </div>
 
-    <!-- Asegúrate de que estos scripts se cargan en el orden correcto -->
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
     
-    <!-- Primero carga la configuración de Firebase -->
+    <!-- Scripts de la aplicación -->
     <script src="js/firebase.js"></script>
-    
-    <!-- Luego carga la lógica de autenticación -->
+    <script src="js/utils.js"></script>
     <script src="js/auth.js"></script>
+    <script src="js/main.js"></script>
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            console.log("Página de login cargada completamente");
+            const loginForm = document.getElementById('login-form');
             
-            // Toggle password visibility
-            const togglePasswordBtn = document.querySelector('.toggle-password');
-            if (togglePasswordBtn) {
-                togglePasswordBtn.addEventListener('click', function() {
-                    const passwordInput = document.getElementById('password');
-                    const icon = this.querySelector('i');
-                    
-                    if (passwordInput.type === 'password') {
-                        passwordInput.type = 'text';
-                        icon.classList.remove('mdi-eye-outline');
-                        icon.classList.add('mdi-eye-off-outline');
-                    } else {
-                        passwordInput.type = 'password';
-                        icon.classList.remove('mdi-eye-off-outline');
-                        icon.classList.add('mdi-eye-outline');
-                    }
-                });
-            }
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                const email = document.getElementById('email').value;
+                const password = document.getElementById('password').value;
+                
+                login(email, password);
+            });
         });
     </script>
 </body>
