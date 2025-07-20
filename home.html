@@ -3,247 +3,171 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - LabFlow Manager</title>
+    <title>LabFlow Manager - Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link href="css/styles.css" rel="stylesheet">
+    <style>
+        /* Estilos básicos en caso de que no cargue el CSS externo */
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            padding: 20px;
+            margin: 0;
+        }
+        .dashboard-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .logout-btn {
+            padding: 10px 16px;
+            background-color: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        #app-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+        }
+        #app-loader.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .loader-content {
+            background: #fff;
+            padding: 25px 40px;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .loader-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top-color: #0ea5e9;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
-<body class="light-mode">
-    <div class="app-container">
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="app-brand">
-                    <i class="mdi mdi-flask-outline logo-icon"></i>
-                    <h1>LabFlow</h1>
-                </div>
-                <button id="collapse-sidebar" class="collapse-sidebar">
-                    <i class="mdi mdi-menu"></i>
-                </button>
-            </div>
-            <div class="sidebar-content">
-                <!-- El contenido del sidebar se cargará aquí desde la plantilla -->
-            </div>
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <div class="user-avatar">
-                        <span>JD</span>
-                    </div>
-                    <div class="user-details">
-                        <p class="user-name">John Doe</p>
-                        <p class="user-role">Administrador</p>
-                    </div>
-                </div>
-                <button id="logout-btn" class="logout-btn" title="Cerrar Sesión">
-                    <i class="mdi mdi-logout"></i>
-                </button>
-            </div>
-        </aside>
-
-        <main class="main-content">
-            <header class="top-bar">
-                <div class="page-title">
-                    <h1 id="current-module-title">Dashboard</h1>
-                </div>
-                <div class="top-bar-actions">
-                    <div class="search-container">
-                        <i class="mdi mdi-magnify search-icon"></i>
-                        <input type="text" placeholder="Buscar..." class="search-input">
-                    </div>
-                    <button id="notifications-btn" class="icon-btn" title="Notificaciones">
-                        <i class="mdi mdi-bell-outline"></i>
-                        <span class="notification-badge">3</span>
-                    </button>
-                    <button id="theme-toggle" class="icon-btn" title="Cambiar tema">
-                        <i class="mdi mdi-theme-light-dark"></i>
-                    </button>
-                </div>
-            </header>
-
-            <div class="page-container" id="page-container">
-                <div id="module-content">
-                    <div class="module-header">
-                        <div class="module-title">
-                            <h2>Panel de Control</h2>
-                            <p class="module-subtitle">Resumen general del estado del laboratorio</p>
-                        </div>
-                        <div class="module-actions">
-                            <div class="date-display">
-                                <i class="mdi mdi-calendar"></i>
-                                <span id="current-date">Cargando fecha...</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Tarjetas de resumen -->
-                    <div class="dashboard-cards">
-                        <div class="dashboard-card">
-                            <div class="card-icon insumos-icon">
-                                <i class="mdi mdi-flask"></i>
-                            </div>
-                            <div class="card-content">
-                                <h3 class="card-title">Insumos</h3>
-                                <p class="card-value" id="insumos-total">0</p>
-                                <p class="card-subtitle" id="insumos-alert">0 con stock bajo</p>
-                            </div>
-                        </div>
-                        
-                        <div class="dashboard-card">
-                            <div class="card-icon equipos-icon">
-                                <i class="mdi mdi-microscope"></i>
-                            </div>
-                            <div class="card-content">
-                                <h3 class="card-title">Equipos</h3>
-                                <p class="card-value" id="equipos-total">0</p>
-                                <p class="card-subtitle" id="equipos-alert">0 en mantenimiento</p>
-                            </div>
-                        </div>
-                        
-                        <div class="dashboard-card">
-                            <div class="card-icon pedidos-icon">
-                                <i class="mdi mdi-package-variant-closed"></i>
-                            </div>
-                            <div class="card-content">
-                                <h3 class="card-title">Pedidos</h3>
-                                <p class="card-value" id="pedidos-total">0</p>
-                                <p class="card-subtitle" id="pedidos-alert">0 pendientes</p>
-                            </div>
-                        </div>
-                        
-                        <div class="dashboard-card">
-                            <div class="card-icon movimientos-icon">
-                                <i class="mdi mdi-swap-horizontal"></i>
-                            </div>
-                            <div class="card-content">
-                                <h3 class="card-title">Movimientos</h3>
-                                <p class="card-value" id="movimientos-total">0</p>
-                                <p class="card-subtitle" id="movimientos-hoy">0 hoy</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Sección de alertas -->
-                    <div class="dashboard-section">
-                        <div class="section-header">
-                            <h3>
-                                <i class="mdi mdi-alert-circle-outline"></i>
-                                Alertas y Notificaciones
-                            </h3>
-                            <a href="#" class="view-all">Ver todas</a>
-                        </div>
-                        <div class="alerts-container" id="alerts-container">
-                            <!-- Las alertas se cargarán dinámicamente -->
-                            <div class="empty-state-message">
-                                <i class="mdi mdi-check-circle-outline"></i>
-                                <p>No hay alertas pendientes</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Contenedores de gráficos y tablas -->
-                    <div class="dashboard-row">
-                        <div class="dashboard-section half-width">
-                            <div class="section-header">
-                                <h3>
-                                    <i class="mdi mdi-chart-line"></i>
-                                    Movimientos Recientes
-                                </h3>
-                                <a href="movimientos.html" class="view-all">Ver todos</a>
-                            </div>
-                            <div class="chart-container">
-                                <canvas id="movimientos-chart"></canvas>
-                            </div>
-                        </div>
-                        
-                        <div class="dashboard-section half-width">
-                            <div class="section-header">
-                                <h3>
-                                    <i class="mdi mdi-flask-empty-outline"></i>
-                                    Stock Crítico
-                                </h3>
-                                <a href="insumos.html" class="view-all">Ver todos</a>
-                            </div>
-                            <div class="table-container">
-                                <table class="data-table compact">
-                                    <thead>
-                                        <tr>
-                                            <th>Insumo</th>
-                                            <th>Stock Actual</th>
-                                            <th>Mínimo</th>
-                                            <th>Estado</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="stock-critico-list">
-                                        <!-- Los datos se cargarán dinámicamente -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="dashboard-row">
-                        <div class="dashboard-section half-width">
-                            <div class="section-header">
-                                <h3>
-                                    <i class="mdi mdi-wrench-outline"></i>
-                                    Próximos Mantenimientos
-                                </h3>
-                                <a href="equipos.html" class="view-all">Ver todos</a>
-                            </div>
-                            <div class="table-container">
-                                <table class="data-table compact">
-                                    <thead>
-                                        <tr>
-                                            <th>Equipo</th>
-                                            <th>Ubicación</th>
-                                            <th>Fecha Programada</th>
-                                            <th>Días Restantes</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="mantenimientos-list">
-                                        <!-- Los datos se cargarán dinámicamente -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                        
-                        <div class="dashboard-section half-width">
-                            <div class="section-header">
-                                <h3>
-                                    <i class="mdi mdi-truck-delivery-outline"></i>
-                                    Pedidos Pendientes
-                                </h3>
-                                <a href="pedidos.html" class="view-all">Ver todos</a>
-                            </div>
-                            <div class="table-container">
-                                <table class="data-table compact">
-                                    <thead>
-                                        <tr>
-                                            <th>Número</th>
-                                            <th>Proveedor</th>
-                                            <th>Fecha</th>
-                                            <th>Estado</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="pedidos-list">
-                                        <!-- Los datos se cargarán dinámicamente -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>Dashboard</h1>
+            <button id="logout-btn" class="logout-btn">
+                <i class="mdi mdi-logout"></i> Cerrar Sesión
+            </button>
+        </div>
+        
+        <div class="dashboard-content">
+            <p>¡Bienvenido al sistema LabFlow Manager!</p>
+            <p>Has iniciado sesión correctamente.</p>
+            <p>Correo del usuario: <span id="user-email">Cargando...</span></p>
+        </div>
+    </div>
+    
+    <!-- Loader -->
+    <div id="app-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p class="loader-message">Cargando...</p>
+        </div>
     </div>
 
-    <div id="notification-container" class="notification-container"></div>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    
+    <script>
+        // Configuración de Firebase directamente en el archivo
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxJOpBEXZUo7WrAqDTrlJV_2kJBsL8Ym0",
+            authDomain: "labflow-manager.firebaseapp.com",
+            projectId: "labflow-manager",
+            storageBucket: "labflow-manager.appspot.com",
+            messagingSenderId: "742212306654",
+            appId: "1:742212306654:web:a53bf890fc63cd5d05e44f",
+            measurementId: "G-YVZDBCJR3B"
+        };
 
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="js/firebase.js"></script>
-    <script src="js/main.js"></script>
-    <script src="js/dashboard.js"></script>
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+
+        function toggleLoader(show, message = 'Cargando...') {
+            const loader = document.getElementById('app-loader');
+            const loaderMessage = loader.querySelector('.loader-message');
+            
+            if (show) {
+                loaderMessage.textContent = message;
+                loader.classList.add('active');
+            } else {
+                loader.classList.remove('active');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            toggleLoader(true, 'Verificando sesión...');
+            
+            // Verificar autenticación
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // Usuario autenticado, mostrar información
+                    console.log("Usuario autenticado:", user.email);
+                    document.getElementById('user-email').textContent = user.email;
+                    toggleLoader(false);
+                } else {
+                    // No hay usuario autenticado, redirigir al login
+                    console.log("No hay usuario autenticado, redirigiendo...");
+                    window.location.href = 'index.html';
+                }
+            });
+            
+            // Configurar botón de logout
+            document.getElementById('logout-btn').addEventListener('click', function() {
+                toggleLoader(true, 'Cerrando sesión...');
+                
+                auth.signOut()
+                    .then(() => {
+                        window.location.href = 'index.html';
+                    })
+                    .catch(error => {
+                        console.error("Error al cerrar sesión:", error);
+                        toggleLoader(false);
+                        alert('Error al cerrar sesión');
+                    });
+            });
+        });
+    </script>
 </body>
 </html>
