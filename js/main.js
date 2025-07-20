@@ -140,4 +140,4 @@ function loadUserData(userId) {
         .catch(error => {
             console.error("Error cargando datos del usuario:", error);
         });
-}
+} 
