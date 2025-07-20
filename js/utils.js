@@ -1,19 +1,5 @@
 // Funciones de utilidad
 
-// Formatear fecha
-function formatDate(date, format = 'dd/MM/yyyy') {
-    if (!date) return '';
-    
-    if (typeof date === 'string') date = new Date(date);
-    if (date instanceof firebase.firestore.Timestamp) date = date.toDate();
-    
-    const day = date.getDate().toString().padStart(2, '0');
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const year = date.getFullYear();
-    
-    return format.replace('dd', day).replace('MM', month).replace('yyyy', year);
-}
-
 // Mostrar notificación
 function showNotification(title, message, type = 'info') {
     const notification = document.getElementById('app-notification');
@@ -21,15 +7,46 @@ function showNotification(title, message, type = 'info') {
     const notificationMessage = document.getElementById('notification-message');
     const notificationIcon = document.getElementById('notification-icon');
     
+    if (!notification || !notificationTitle || !notificationMessage || !notificationIcon) {
+        console.error("Elementos de notificación no encontrados");
+        alert(`${title}: ${message}`);
+        return;
+    }
+    
     notificationTitle.textContent = title;
     notificationMessage.textContent = message;
-    notification.className = 'show ' + type;
     
-    if (type === 'success') notificationIcon.textContent = 'check_circle';
-    else if (type === 'error') notificationIcon.textContent = 'error';
-    else notificationIcon.textContent = 'info';
+    // Eliminar clases anteriores
+    notification.className = '';
+    notification.classList.add('show');
     
-    setTimeout(() => notification.className = '', 3000);
+    if (type) notification.classList.add(type);
+    
+    if (type === 'success') notificationIcon.className = 'mdi mdi-check-circle';
+    else if (type === 'error') notificationIcon.className = 'mdi mdi-alert-circle';
+    else notificationIcon.className = 'mdi mdi-information';
+    
+    setTimeout(() => {
+        notification.className = '';
+    }, 3000);
+}
+
+// Mostrar/ocultar loader
+function toggleLoader(show, message = 'Cargando...') {
+    const loader = document.getElementById('app-loader');
+    const loaderMessage = loader ? loader.querySelector('.loader-message') : null;
+    
+    if (!loader) {
+        console.error("Elemento loader no encontrado");
+        return;
+    }
+    
+    if (show) {
+        if (loaderMessage) loaderMessage.textContent = message;
+        loader.classList.add('active');
+    } else {
+        loader.classList.remove('active');
+    }
 }
 
 // Mostrar confirmación
@@ -39,6 +56,13 @@ function showConfirm(message) {
         const confirmMessage = document.getElementById('confirmModalMessage');
         const confirmOkBtn = document.getElementById('confirmOkBtn');
         const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+        
+        if (!confirmModal || !confirmMessage || !confirmOkBtn || !confirmCancelBtn) {
+            console.error("Elementos de confirmación no encontrados");
+            const userConfirmed = confirm(message);
+            resolve(userConfirmed);
+            return;
+        }
         
         confirmMessage.textContent = message;
         confirmModal.classList.add('active');
@@ -55,19 +79,4 @@ function showConfirm(message) {
         confirmOkBtn.addEventListener('click', onOk, { once: true });
         confirmCancelBtn.addEventListener('click', onCancel, { once: true });
     });
-}
-
-// Mostrar/ocultar loader
-function toggleLoader(show, message = 'Cargando...') {
-    const loader = document.getElementById('app-loader');
-    const loaderMessage = loader ? loader.querySelector('.loader-message') : null;
-    
-    if (!loader) return;
-    
-    if (show) {
-        if (loaderMessage) loaderMessage.textContent = message;
-        loader.classList.add('active');
-    } else {
-        loader.classList.remove('active');
-    }
 }
