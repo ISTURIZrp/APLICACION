@@ -88,27 +88,27 @@ function highlightCurrentPage() {
 
 // Inicializar página actual
 function initCurrentPage() {
-    const currentPage = window.location.pathname.split('/').pop() || 'index.html';
+    const currentPath = window.location.pathname;
     
-    // Inicializar según la página
-    if (currentPage === 'insumos.html') {
-        const container = document.getElementById('insumos-container');
-        if (container) loadInsumosYLotes(container);
-    } 
-    else if (currentPage === 'movimientos.html') {
-        const container = document.getElementById('movimientos-container');
-        if (container) loadMovimientos(container);
-    }
-    else if (currentPage === 'usuarios.html') {
-        const container = document.getElementById('usuarios-container');
-        if (container) loadUsuarios(container);
-    }
-    else if (currentPage === 'reportes.html') {
-        const container = document.getElementById('reportes-container');
-        if (container) loadReportes(container);
-    }
-    else if (currentPage === 'dashboard.html') {
+    if (currentPath === '/' || currentPath.includes('index.html')) {
+        // Si estamos en la página de login, redirigir al dashboard si el usuario está autenticado
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                window.location.href = 'dashboard.html';
+            } else {
+                toggleLoader(false);
+            }
+        });
+    } else if (currentPath.includes('dashboard.html')) {
         initDashboard();
+    } else if (currentPath.includes('insumos.html')) {
+        initInsumosPage();
+    } else if (currentPath.includes('movimientos.html')) {
+        initMovimientosPage();
+    } else if (currentPath.includes('usuarios.html')) {
+        initUsuariosPage();
+    } else if (currentPath.includes('reportes.html')) {
+        initReportesPage();
     }
 }
 
@@ -140,4 +140,4 @@ function loadUserData(userId) {
         .catch(error => {
             console.error("Error cargando datos del usuario:", error);
         });
-} 
+}
