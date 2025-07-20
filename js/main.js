@@ -1,87 +1,248 @@
-// main.js
+// Verificar autenticación
+auth.onAuthStateChanged(user => {
+    if (user) {
+        // Cargar datos del usuario
+        loadUserData(user.uid);
+        
+        // Cargar plantillas
+        if (document.querySelector('.sidebar-content')) {
+            loadSidebar();
+        }
+        
+        // Actualizar fecha actual
+        updateCurrentDate();
+        
+        // Inicializar eventos globales
+        initGlobalEvents();
+    }
+});
 
-// Inicialización de Firebase
-const firebaseConfig = {
-    apiKey: "AIzaSyCxJOpBEXZUo7WrAqDTrlJV_2kJBsL8Ym0",
-    authDomain: "labflow-manager.firebaseapp.com",
-    projectId: "labflow-manager",
-    storageBucket: "labflow-manager.appspot.com",
-    messagingSenderId: "742212306654",
-    appId: "1:742212306654:web:a53bf890fc63cd5d05e44f"
-};
+// Cargar datos del usuario
+function loadUserData(userId) {
+    db.collection('usuarios').doc(userId).get()
+        .then(doc => {
+            if (doc.exists) {
+                const userData = doc.data();
+                
+                // Actualizar información del usuario en la UI
+                const userNameElements = document.querySelectorAll('.user-name');
+                const userRoleElements = document.querySelectorAll('.user-role');
+                const userAvatarElements = document.querySelectorAll('.user-avatar');
+                
+                userNameElements.forEach(el => {
+                    el.textContent = userData.nombre || 'Usuario';
+                });
+                
+                userRoleElements.forEach(el => {
+                    el.textContent = getRoleName(userData.role) || 'Usuario';
+                });
+                
+                userAvatarElements.forEach(el => {
+                    if (userData.photoURL) {
+                        el.innerHTML = `<img src="${userData.photoURL}" alt="${userData.nombre}">`;
+                    } else {
+                        // Iniciales del nombre
+                        const initials = getInitials(userData.nombre || 'Usuario');
+                        el.innerHTML = `<span>${initials}</span>`;
+                    }
+                });
+            }
+        })
+        .catch(error => {
+            console.error("Error al cargar datos del usuario:", error);
+        });
+}
 
-// Inicializa Firebase
-firebase.initializeApp(firebaseConfig);
-const auth = firebase.auth();
-const db = firebase.firestore();
+// Obtener iniciales del nombre
+function getInitials(name) {
+    return name
+        .split(' ')
+        .map(part => part.charAt(0))
+        .join('')
+        .toUpperCase()
+        .substring(0, 2);
+}
 
-// Función para cargar módulos dinámicamente
-function loadModule(module) {
-    const moduleContent = document.getElementById('module-content');
-    switch (module) {
-        case 'insumos':
-            moduleContent.innerHTML = '<h2>Insumos</h2>'; // Aquí puedes cargar el contenido de insumos
-            break;
-        case 'movimientos':
-            moduleContent.innerHTML = '<h2>Movimientos</h2>'; // Aquí puedes cargar el contenido de movimientos
-            break;
-        case 'pedidos':
-            moduleContent.innerHTML = '<h2>Pedidos</h2>'; // Aquí puedes cargar el contenido de pedidos
-            break;
-        case 'equipos':
-            moduleContent.innerHTML = '<h2>Gestionar Equipos</h2>'; // Aquí puedes cargar el contenido de gestionar equipos
-            break;
-        case 'historical-equipos':
-            moduleContent.innerHTML = '<h2>Historial de Equipos</h2>'; // Aquí puedes cargar el contenido del historial
-            break;
-        case 'productos':
-            moduleContent.innerHTML = '<h2>Productos</h2>'; // Aquí puedes cargar el contenido de productos
-            break;
-        case 'usuarios':
-            moduleContent.innerHTML = '<h2>Usuarios</h2>'; // Aquí puedes cargar el contenido de usuarios
-            break;
-        default:
-            moduleContent.innerHTML = '<h2>Selecciona un módulo</h2>';
+// Obtener nombre del rol
+function getRoleName(role) {
+    switch(role) {
+        case 'admin': return 'Administrador';
+        case 'supervisor': return 'Supervisor';
+        case 'tecnico': return 'Técnico';
+        case 'viewer': return 'Visualizador';
+        default: return 'Usuario';
     }
 }
 
-// Manejar el inicio de sesión
-document.getElementById('login-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const email = document.getElementById('login-email').value;
-    const password = document.getElementById('login-password').value;
+// Cargar sidebar
+function loadSidebar() {
+    fetch('plantillas/sidebar.html')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('No se pudo cargar la plantilla del sidebar');
+            }
+            return response.text();
+        })
+        .then(data => {
+            document.querySelector('.sidebar-content').innerHTML = data;
+            
+            // Marcar el elemento activo según la página actual
+            const currentPage = window.location.pathname.split('/').pop();
+            const menuItems = document.querySelectorAll('.sidebar-menu-link');
+            
+            menuItems.forEach(item => {
+                const itemPage = item.getAttribute('href');
+                if (itemPage === currentPage) {
+                    item.classList.add('active');
+                }
+                
+                // Prevenir la navegación si ya estamos en la página
+                item.addEventListener('click', function(e) {
+                    if (itemPage === currentPage) {
+                        e.preventDefault();
+                    }
+                });
+            });
+        })
+        .catch(error => {
+            console.error("Error al cargar el sidebar:", error);
+            document.querySelector('.sidebar-content').innerHTML = `<div class="error-message">Error al cargar el menú: ${error.message}</div>`;
+        });
+}
 
-    try {
-        await auth.signInWithEmailAndPassword(email, password);
-        // Redirigir a dashboard después de iniciar sesión
-        window.location.href = 'dashboard.html';
-    } catch (error) {
-        console.error("Error al iniciar sesión:", error.message);
-        alert("Error al iniciar sesión: " + error.message);
+// Actualizar fecha actual
+function updateCurrentDate() {
+    const currentDateElement = document.getElementById('current-date');
+    if (currentDateElement) {
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const today = new Date();
+        currentDateElement.textContent = today.toLocaleDateString('es-ES', options);
     }
-});
+}
 
-// Manejar estado de autenticación
-auth.onAuthStateChanged((user) => {
-    if (user) {
-        console.log("Usuario autenticado:", user);
-        // Aquí puedes cargar información adicional del usuario si lo deseas
-    } else {
-        console.log("No hay usuario autenticado");
+// Inicializar eventos globales
+function initGlobalEvents() {
+    // Alternar entre modos oscuro y claro
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', toggleTheme);
     }
-});
-
-// Manejar el comportamiento del sidebar
-const sidebar = document.getElementById('sidebar');
-
-// Alternar el estado del sidebar al hacer clic
-sidebar.addEventListener('click', () => {
-    sidebar.classList.toggle('collapsed');
-});
+    
+    // Colapsar/expandir sidebar
+    const collapseSidebar = document.getElementById('collapse-sidebar');
+    if (collapseSidebar) {
+        collapseSidebar.addEventListener('click', () => {
+            document.querySelector('.app-container').classList.toggle('collapsed-sidebar');
+        });
+    }
+    
+    // Cerrar sesión
+    const logoutBtn = document.getElementById('logout-btn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            }).catch(error => {
+                console.error("Error al cerrar sesión:", error);
+                alert("Error al cerrar sesión: " + error.message);
+            });
+        });
+    }
+}
 
 // Alternar entre modos oscuro y claro
-const themeToggle = document.getElementById('theme-toggle');
-themeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    document.body.classList.toggle('light-mode');
+function toggleTheme() {
+    const body = document.body;
+    
+    if (body.classList.contains('light-mode')) {
+        body.classList.remove('light-mode');
+        body.classList.add('dark-mode');
+        localStorage.setItem('theme', 'dark');
+    } else {
+        body.classList.remove('dark-mode');
+        body.classList.add('light-mode');
+        localStorage.setItem('theme', 'light');
+    }
+}
+
+// Cargar preferencia de tema al iniciar
+document.addEventListener('DOMContentLoaded', () => {
+    const savedTheme = localStorage.getItem('theme');
+    
+    if (savedTheme === 'dark') {
+        document.body.classList.remove('light-mode');
+        document.body.classList.add('dark-mode');
+    } else {
+        document.body.classList.remove('dark-mode');
+        document.body.classList.add('light-mode');
+    }
 });
+
+// Mostrar notificación
+function showNotification(title, message, type = 'info') {
+    // Verificar si existe el contenedor de notificaciones, si no, crearlo
+    let notificationContainer = document.getElementById('notification-container');
+    if (!notificationContainer) {
+        notificationContainer = document.createElement('div');
+        notificationContainer.id = 'notification-container';
+        notificationContainer.className = 'notification-container';
+        document.body.appendChild(notificationContainer);
+    }
+    
+    // Crear la notificación
+    const notification = document.createElement('div');
+    notification.className = `notification notification-${type}`;
+    
+    // Determinar icono según tipo
+    let icon;
+    switch(type) {
+        case 'success': icon = 'check-circle'; break;
+        case 'error': icon = 'alert-circle'; break;
+        case 'warning': icon = 'alert'; break;
+        default: icon = 'information'; break;
+    }
+    
+    notification.innerHTML = `
+        <div class="notification-icon">
+            <i class="mdi mdi-${icon}"></i>
+        </div>
+        <div class="notification-content">
+            <div class="notification-title">${title}</div>
+            <div class="notification-message">${message}</div>
+        </div>
+        <button class="notification-close">
+            <i class="mdi mdi-close"></i>
+        </button>
+    `;
+    
+    // Agregar al contenedor
+    notificationContainer.appendChild(notification);
+    
+    // Mostrar con animación
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+    
+    // Configurar evento para cerrar
+    notification.querySelector('.notification-close').addEventListener('click', () => {
+        closeNotification(notification);
+    });
+    
+    // Auto-cerrar después de 5 segundos
+    setTimeout(() => {
+        closeNotification(notification);
+    }, 5000);
+}
+
+// Cerrar notificación
+function closeNotification(notification) {
+    notification.classList.remove('show');
+    notification.classList.add('hide');
+    
+    // Eliminar del DOM después de la animación
+    setTimeout(() => {
+        if (notification.parentNode) {
+            notification.parentNode.removeChild(notification);
+        }
+    }, 300);
+}
