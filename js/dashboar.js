@@ -312,4 +312,4 @@ async function initDashboard() {
     } finally {
         toggleLoader(false);
     }
-}
+} 
