@@ -3,43 +3,124 @@ let isMobileView = window.innerWidth <= 768;
 let currentUser = null;
 
 // Verificar autenticación
-auth.onAuthStateChanged(user => {
-    if (user) {
-        // Guardar usuario actual
-        currentUser = user;
-        
-        // Cargar datos del usuario
-        loadUserData(user.uid);
-        
-        // Cargar plantillas
-        if (document.querySelector('.sidebar-content')) {
-            loadSidebar();
-        }
-        
-        // Actualizar fecha actual
-        updateCurrentDate();
-        
-        // Inicializar eventos globales
-        initGlobalEvents();
-        
-        // Inicializar eventos específicos para dispositivos móviles
-        initMobileEvents();
-        
-        // Inicializar tema
-        initTheme();
-    } else {
-        // Redirigir a login si no está en la página de login
-        if (!window.location.pathname.includes('index.html') && !window.location.pathname.endsWith('/')) {
-            window.location.href = 'index.html';
-        }
-    }
+document.addEventListener('DOMContentLoaded', () => {
+    // Inicializar Firebase (asegúrate de que esto se ejecute primero)
+    initFirebase();
+    
+    // Inicializar tema
+    initTheme();
+    
+    // Comprobar si es vista móvil
+    isMobileView = window.innerWidth <= 768;
+    
+    // Verificar autenticación después de inicializar Firebase
+    initAuth();
+    
+    // Registrar Service Worker
+    registerServiceWorker();
 });
+
+// Inicializar Firebase
+function initFirebase() {
+    // Verifica si Firebase ya está inicializado para evitar errores
+    if (!firebase.apps.length) {
+        // Configuración de Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxJOpBEXZUo7WrAqDTrlJV_2kJBsL8Ym0",
+            authDomain: "labflow-manager.firebaseapp.com",
+            projectId: "labflow-manager",
+            storageBucket: "labflow-manager.firebasestorage.app",
+            messagingSenderId: "742212306654",
+            appId: "1:742212306654:web:a53bf890fc63cd5d05e44f",
+            measurementId: "G-YVZDBCJR3B"
+        };
+        
+        // Inicializar Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Inicializar servicios
+        window.db = firebase.firestore();
+        window.auth = firebase.auth();
+        window.storage = firebase.storage();
+        
+        // Configurar persistencia para funcionamiento offline
+        db.enablePersistence({ synchronizeTabs: true })
+            .then(() => {
+                console.log("Persistencia de Firestore habilitada");
+            })
+            .catch(err => {
+                if (err.code == 'failed-precondition') {
+                    console.warn("La persistencia falló debido a múltiples pestañas abiertas");
+                } else if (err.code == 'unimplemented') {
+                    console.warn("El navegador no soporta persistencia");
+                }
+            });
+        
+        console.log("Firebase inicializado correctamente");
+    } else {
+        // Si ya está inicializado, asignar referencias globales
+        window.db = firebase.firestore();
+        window.auth = firebase.auth();
+        window.storage = firebase.storage();
+    }
+}
+
+// Inicializar autenticación
+function initAuth() {
+    // Mostrar loader mientras se verifica la autenticación
+    toggleLoader(true, 'Verificando sesión...');
+    
+    // Escuchar cambios en el estado de autenticación
+    auth.onAuthStateChanged(user => {
+        if (user) {
+            // Usuario autenticado
+            console.log("Usuario autenticado:", user.uid);
+            currentUser = user;
+            
+            // Cargar datos del usuario
+            loadUserData(user.uid);
+            
+            // Cargar plantillas
+            if (document.querySelector('.sidebar-content')) {
+                loadSidebar();
+            }
+            
+            // Actualizar fecha actual
+            updateCurrentDate();
+            
+            // Inicializar eventos globales
+            initGlobalEvents();
+            
+            // Inicializar eventos específicos para dispositivos móviles
+            initMobileEvents();
+            
+        } else {
+            // No hay usuario autenticado
+            console.log("No hay usuario autenticado");
+            
+            // Si no estamos en la página de login, redirigir
+            if (!window.location.pathname.includes('index.html') && !window.location.pathname.endsWith('/')) {
+                window.location.href = 'index.html';
+            }
+            
+            // Ocultar loader
+            toggleLoader(false);
+        }
+    }, error => {
+        console.error("Error en la autenticación:", error);
+        showNotification('Error', 'Error al verificar la autenticación', 'error');
+        toggleLoader(false);
+    });
+}
 
 // Cargar datos del usuario
 function loadUserData(userId) {
+    console.log("Cargando datos del usuario:", userId);
+    
     db.collection('usuarios').doc(userId).get()
         .then(doc => {
             if (doc.exists) {
+                console.log("Datos de usuario obtenidos:", doc.data());
                 const userData = doc.data();
                 
                 // Actualizar información del usuario en la UI
@@ -71,11 +152,44 @@ function loadUserData(userId) {
                 }).catch(error => {
                     console.error("Error al actualizar última conexión:", error);
                 });
+                
+                // Ocultar loader
+                toggleLoader(false);
+            } else {
+                console.warn("No se encontraron datos del usuario");
+                
+                // Si no hay datos, podríamos crear un perfil básico
+                const user = auth.currentUser;
+                if (user) {
+                    const newUserData = {
+                        nombre: user.displayName || 'Usuario',
+                        email: user.email,
+                        role: 'viewer', // Rol por defecto
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    
+                    db.collection('usuarios').doc(userId).set(newUserData)
+                        .then(() => {
+                            console.log("Perfil de usuario creado");
+                            // Ocultar loader
+                            toggleLoader(false);
+                            // Recargar la página para aplicar los cambios
+                            window.location.reload();
+                        })
+                        .catch(error => {
+                            console.error("Error al crear perfil de usuario:", error);
+                            toggleLoader(false);
+                        });
+                } else {
+                    toggleLoader(false);
+                }
             }
         })
         .catch(error => {
             console.error("Error al cargar datos del usuario:", error);
             showNotification('Error', 'No se pudieron cargar los datos del usuario', 'error');
+            toggleLoader(false);
         });
 }
 
@@ -102,6 +216,8 @@ function getRoleName(role) {
 
 // Cargar sidebar
 function loadSidebar() {
+    console.log("Cargando sidebar");
+    
     fetch('plantillas/sidebar.html')
         .then(response => {
             if (!response.ok) {
@@ -157,11 +273,14 @@ function loadSidebar() {
 
 // Actualizar badges del sidebar con datos reales
 function updateSidebarBadges() {
+    console.log("Actualizando badges del sidebar");
+    
     // Actualizar badge de insumos con stock bajo
     db.collection('insumos')
         .where('stockActual', '<', 10)
         .get()
         .then(snapshot => {
+            console.log(`Insumos con stock bajo: ${snapshot.size}`);
             const insumosCount = snapshot.size;
             const insumosLink = document.querySelector('a[href="insumos.html"] .sidebar-badge');
             if (insumosLink) {
@@ -178,6 +297,7 @@ function updateSidebarBadges() {
         .where('estado', '==', 'pendiente')
         .get()
         .then(snapshot => {
+            console.log(`Pedidos pendientes: ${snapshot.size}`);
             const pedidosCount = snapshot.size;
             const pedidosLink = document.querySelector('a[href="pedidos.html"] .sidebar-badge');
             if (pedidosLink) {
@@ -709,6 +829,7 @@ function createPWANavBar() {
     const navItems = [
         { icon: 'mdi-view-dashboard-outline', text: 'Inicio', url: 'home.html' },
         { icon: 'mdi-flask-outline', text: 'Insumos', url: 'insumos.html' },
+        { icon: 'mdi-microscope', text:
         { icon: 'mdi-microscope', text: 'Equipos', url: 'equipos.html' },
         { icon: 'mdi-swap-horizontal', text: 'Movimientos', url: 'movimientos.html' },
         { icon: 'mdi-account-outline', text: 'Perfil', url: 'profile.html' }
@@ -1281,21 +1402,6 @@ function exportToCSV(data, filename = 'export.csv') {
     showNotification('Exportación completada', `Se ha exportado a ${filename}`, 'success');
 }
 
-// Inicializar al cargar la página
-document.addEventListener('DOMContentLoaded', () => {
-    // Inicializar tema
-    initTheme();
-    
-    // Registrar Service Worker
-    registerServiceWorker();
-    
-    // Comprobar si es vista móvil
-    isMobileView = window.innerWidth <= 768;
-    
-    // Inicializar animaciones de entrada
-    initEntranceAnimations();
-});
-
 // Inicializar animaciones de entrada
 function initEntranceAnimations() {
     // Animar elementos al entrar en viewport
@@ -1331,4 +1437,905 @@ function getUrlParams() {
     }
     
     return params;
+}
+
+// Cargar datos de insumos (para la página de insumos)
+function loadInsumos(container, filters = {}) {
+    if (!container) return;
+    
+    toggleLoader(true, 'Cargando insumos...');
+    
+    let query = db.collection('insumos');
+    
+    // Aplicar filtros
+    if (filters.categoria) {
+        query = query.where('categoria', '==', filters.categoria);
+    }
+    
+    if (filters.stockBajo) {
+        query = query.where('stockActual', '<', 10);
+    }
+    
+    // Ordenar
+    query = query.orderBy(filters.orderBy || 'nombre', filters.orderDir || 'asc');
+    
+    query.get()
+        .then(snapshot => {
+            if (snapshot.empty) {
+                container.innerHTML = `
+                    <div class="no-data">
+                        <i class="mdi mdi-flask-empty-outline"></i>
+                        <p>No se encontraron insumos</p>
+                    </div>
+                `;
+                toggleLoader(false);
+                return;
+            }
+            
+            const insumos = [];
+            snapshot.forEach(doc => {
+                insumos.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
+            });
+            
+            renderInsumos(container, insumos);
+            toggleLoader(false);
+        })
+        .catch(error => {
+            console.error("Error al cargar insumos:", error);
+            container.innerHTML = `
+                <div class="error-message">
+                    <i class="mdi mdi-alert-circle-outline"></i>
+                    <p>Error al cargar insumos: ${error.message}</p>
+                </div>
+            `;
+            toggleLoader(false);
+        });
+}
+
+// Renderizar insumos en el contenedor
+function renderInsumos(container, insumos) {
+    let html = `
+        <div class="insumos-grid">
+    `;
+    
+    insumos.forEach(insumo => {
+        // Determinar clase según stock
+        let stockClass = '';
+        let stockIcon = '';
+        
+        if (insumo.stockActual <= insumo.stockMinimo) {
+            stockClass = 'stock-bajo';
+            stockIcon = '<i class="mdi mdi-alert-circle"></i>';
+        } else if (insumo.stockActual < insumo.stockOptimo) {
+            stockClass = 'stock-medio';
+            stockIcon = '<i class="mdi mdi-alert"></i>';
+        } else {
+            stockClass = 'stock-normal';
+            stockIcon = '<i class="mdi mdi-check-circle"></i>';
+        }
+        
+        html += `
+            <div class="insumo-card" data-id="${insumo.id}">
+                <div class="insumo-header">
+                    <h3 class="insumo-nombre">${insumo.nombre}</h3>
+                    <span class="insumo-codigo">${insumo.codigo}</span>
+                </div>
+                <div class="insumo-body">
+                    <div class="insumo-info">
+                        <p class="insumo-categoria">${insumo.categoria}</p>
+                        <p class="insumo-ubicacion">${insumo.ubicacion || 'Sin ubicación'}</p>
+                    </div>
+                    <div class="insumo-stock ${stockClass}">
+                        ${stockIcon}
+                        <span>${insumo.stockActual} ${insumo.unidad}</span>
+                    </div>
+                </div>
+                <div class="insumo-footer">
+                    <button class="btn-icon ver-insumo" title="Ver detalles">
+                        <i class="mdi mdi-eye-outline"></i>
+                    </button>
+                    <button class="btn-icon editar-insumo" title="Editar">
+                        <i class="mdi mdi-pencil-outline"></i>
+                    </button>
+                    <button class="btn-icon movimiento-insumo" title="Registrar movimiento">
+                        <i class="mdi mdi-swap-horizontal"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += `
+        </div>
+    `;
+    
+    container.innerHTML = html;
+    
+    // Eventos para los botones
+    container.querySelectorAll('.ver-insumo').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const insumoId = btn.closest('.insumo-card').getAttribute('data-id');
+            verDetallesInsumo(insumoId);
+        });
+    });
+    
+    container.querySelectorAll('.editar-insumo').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const insumoId = btn.closest('.insumo-card').getAttribute('data-id');
+            editarInsumo(insumoId);
+        });
+    });
+    
+    container.querySelectorAll('.movimiento-insumo').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const insumoId = btn.closest('.insumo-card').getAttribute('data-id');
+            registrarMovimiento(insumoId);
+        });
+    });
+}
+
+// Ver detalles de un insumo
+function verDetallesInsumo(insumoId) {
+    toggleLoader(true, 'Cargando detalles...');
+    
+    db.collection('insumos').doc(insumoId).get()
+        .then(doc => {
+            if (!doc.exists) {
+                showNotification('Error', 'No se encontró el insumo', 'error');
+                toggleLoader(false);
+                return;
+            }
+            
+            const insumo = {
+                id: doc.id,
+                ...doc.data()
+            };
+            
+            // Cargar últimos movimientos
+            db.collection('movimientos')
+                .where('insumoId', '==', insumoId)
+                .orderBy('fecha', 'desc')
+                .limit(5)
+                .get()
+                .then(snapshot => {
+                    const movimientos = [];
+                    snapshot.forEach(doc => {
+                        movimientos.push({
+                            id: doc.id,
+                            ...doc.data()
+                        });
+                    });
+                    
+                    mostrarDetallesInsumo(insumo, movimientos);
+                    toggleLoader(false);
+                })
+                .catch(error => {
+                    console.error("Error al cargar movimientos:", error);
+                    mostrarDetallesInsumo(insumo, []);
+                    toggleLoader(false);
+                });
+        })
+        .catch(error => {
+            console.error("Error al cargar detalles del insumo:", error);
+            showNotification('Error', 'No se pudieron cargar los detalles', 'error');
+            toggleLoader(false);
+        });
+}
+
+// Mostrar modal con detalles del insumo
+function mostrarDetallesInsumo(insumo, movimientos) {
+    // Formatear fecha
+    const fechaCreacion = insumo.fechaCreacion ? formatDate(insumo.fechaCreacion, 'dd/MM/yyyy') : 'N/A';
+    const fechaActualizacion = insumo.fechaActualizacion ? formatDate(insumo.fechaActualizacion, 'dd/MM/yyyy') : 'N/A';
+    
+    // Determinar clase según stock
+    let stockClass = '';
+    let stockText = '';
+    
+    if (insumo.stockActual <= insumo.stockMinimo) {
+        stockClass = 'stock-bajo';
+        stockText = 'Stock bajo';
+    } else if (insumo.stockActual < insumo.stockOptimo) {
+        stockClass = 'stock-medio';
+        stockText = 'Stock medio';
+    } else {
+        stockClass = 'stock-normal';
+        stockText = 'Stock normal';
+    }
+    
+    // Crear movimientos HTML
+    let movimientosHTML = '';
+    if (movimientos.length > 0) {
+        movimientosHTML = `
+            <div class="insumo-movimientos">
+                <h4>Últimos movimientos</h4>
+                <div class="movimientos-lista">
+        `;
+        
+        movimientos.forEach(mov => {
+            const fecha = formatDate(mov.fecha, 'dd/MM/yyyy HH:mm');
+            const tipoClass = mov.tipo === 'entrada' ? 'entrada' : 'salida';
+            const cantidad = mov.cantidad + ' ' + insumo.unidad;
+            
+            movimientosHTML += `
+                <div class="movimiento-item">
+                    <div class="movimiento-tipo ${tipoClass}">
+                        <i class="mdi mdi-${mov.tipo === 'entrada' ? 'arrow-down' : 'arrow-up'}"></i>
+                        <span>${mov.tipo === 'entrada' ? 'Entrada' : 'Salida'}</span>
+                    </div>
+                    <div class="movimiento-info">
+                        <p class="movimiento-cantidad">${cantidad}</p>
+                        <p class="movimiento-motivo">${mov.motivo}</p>
+                    </div>
+                    <div class="movimiento-meta">
+                    <div class="movimiento-meta">
+                        <p class="movimiento-fecha">${fecha}</p>
+                        <p class="movimiento-usuario">${mov.usuarioNombre || 'Usuario'}</p>
+                    </div>
+                </div>
+            `;
+        });
+        
+        movimientosHTML += `
+                </div>
+                <a href="movimientos.html?insumo=${insumo.id}" class="ver-todos-link">Ver todos los movimientos</a>
+            </div>
+        `;
+    } else {
+        movimientosHTML = `
+            <div class="insumo-movimientos">
+                <h4>Últimos movimientos</h4>
+                <div class="no-data">
+                    <i class="mdi mdi-swap-horizontal"></i>
+                    <p>No hay movimientos registrados</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    // Crear contenido del modal
+    const content = `
+        <div class="insumo-detalle">
+            <div class="insumo-detalle-header">
+                <div class="insumo-detalle-nombre">
+                    <h2>${insumo.nombre}</h2>
+                    <span class="insumo-detalle-codigo">${insumo.codigo}</span>
+                </div>
+                <div class="insumo-detalle-stock ${stockClass}">
+                    <span class="stock-valor">${insumo.stockActual} ${insumo.unidad}</span>
+                    <span class="stock-estado">${stockText}</span>
+                </div>
+            </div>
+            
+            <div class="insumo-detalle-info">
+                <div class="info-section">
+                    <h3>Información general</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Categoría</span>
+                            <span class="info-value">${insumo.categoria}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Ubicación</span>
+                            <span class="info-value">${insumo.ubicacion || 'Sin ubicación'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Proveedor</span>
+                            <span class="info-value">${insumo.proveedor || 'Sin proveedor'}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Unidad de medida</span>
+                            <span class="info-value">${insumo.unidad}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="info-section">
+                    <h3>Niveles de stock</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Stock actual</span>
+                            <span class="info-value stock-${stockClass}">${insumo.stockActual} ${insumo.unidad}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Stock mínimo</span>
+                            <span class="info-value">${insumo.stockMinimo} ${insumo.unidad}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Stock óptimo</span>
+                            <span class="info-value">${insumo.stockOptimo} ${insumo.unidad}</span>
+                        </div>
+                    </div>
+                    
+                    <div class="stock-progress-container">
+                        <div class="stock-progress-bar">
+                            <div class="stock-progress" style="width: ${Math.min(100, (insumo.stockActual / insumo.stockOptimo) * 100)}%"></div>
+                        </div>
+                        <div class="stock-limits">
+                            <span class="stock-min" style="left: ${(insumo.stockMinimo / insumo.stockOptimo) * 100}%"></span>
+                        </div>
+                    </div>
+                </div>
+                
+                ${insumo.descripcion ? `
+                <div class="info-section">
+                    <h3>Descripción</h3>
+                    <p class="insumo-descripcion">${insumo.descripcion}</p>
+                </div>
+                ` : ''}
+                
+                <div class="info-section">
+                    <h3>Datos adicionales</h3>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <span class="info-label">Fecha de creación</span>
+                            <span class="info-value">${fechaCreacion}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Última actualización</span>
+                            <span class="info-value">${fechaActualizacion}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                ${movimientosHTML}
+            </div>
+            
+            <div class="insumo-detalle-actions">
+                <button class="btn-primary" id="registrar-movimiento-btn">
+                    <i class="mdi mdi-swap-horizontal"></i>
+                    Registrar movimiento
+                </button>
+                <button class="btn-secondary" id="editar-insumo-btn">
+                    <i class="mdi mdi-pencil-outline"></i>
+                    Editar insumo
+                </button>
+            </div>
+        </div>
+    `;
+    
+    // Abrir modal
+    const modal = openModal(content, {
+        title: 'Detalles del insumo',
+        size: 'large'
+    });
+    
+    // Configurar eventos
+    const registrarMovimientoBtn = modal.querySelector('#registrar-movimiento-btn');
+    if (registrarMovimientoBtn) {
+        registrarMovimientoBtn.addEventListener('click', () => {
+            closeModal(modal);
+            registrarMovimiento(insumo.id);
+        });
+    }
+    
+    const editarInsumoBtn = modal.querySelector('#editar-insumo-btn');
+    if (editarInsumoBtn) {
+        editarInsumoBtn.addEventListener('click', () => {
+            closeModal(modal);
+            editarInsumo(insumo.id);
+        });
+    }
+}
+
+// Editar insumo
+function editarInsumo(insumoId) {
+    toggleLoader(true, 'Cargando datos...');
+    
+    // Obtener categorías para el formulario
+    db.collection('categorias')
+        .where('tipo', '==', 'insumo')
+        .orderBy('nombre')
+        .get()
+        .then(categoriasSnapshot => {
+            const categorias = [];
+            categoriasSnapshot.forEach(doc => {
+                categorias.push({
+                    id: doc.id,
+                    nombre: doc.data().nombre
+                });
+            });
+            
+            // Obtener datos del insumo
+            db.collection('insumos').doc(insumoId).get()
+                .then(doc => {
+                    if (!doc.exists) {
+                        showNotification('Error', 'No se encontró el insumo', 'error');
+                        toggleLoader(false);
+                        return;
+                    }
+                    
+                    const insumo = {
+                        id: doc.id,
+                        ...doc.data()
+                    };
+                    
+                    // Obtener proveedores para el formulario
+                    db.collection('proveedores')
+                        .orderBy('nombre')
+                        .get()
+                        .then(proveedoresSnapshot => {
+                            const proveedores = [];
+                            proveedoresSnapshot.forEach(doc => {
+                                proveedores.push({
+                                    id: doc.id,
+                                    nombre: doc.data().nombre
+                                });
+                            });
+                            
+                            // Mostrar formulario
+                            mostrarFormularioInsumo(insumo, categorias, proveedores);
+                            toggleLoader(false);
+                        })
+                        .catch(error => {
+                            console.error("Error al cargar proveedores:", error);
+                            mostrarFormularioInsumo(insumo, categorias, []);
+                            toggleLoader(false);
+                        });
+                })
+                .catch(error => {
+                    console.error("Error al cargar insumo:", error);
+                    showNotification('Error', 'No se pudo cargar el insumo', 'error');
+                    toggleLoader(false);
+                });
+        })
+        .catch(error => {
+            console.error("Error al cargar categorías:", error);
+            showNotification('Error', 'No se pudieron cargar las categorías', 'error');
+            toggleLoader(false);
+        });
+}
+
+// Mostrar formulario de edición de insumo
+function mostrarFormularioInsumo(insumo, categorias, proveedores) {
+    // Opciones para categorías
+    let categoriasOptions = '';
+    categorias.forEach(cat => {
+        const selected = cat.nombre === insumo.categoria ? 'selected' : '';
+        categoriasOptions += `<option value="${cat.nombre}" ${selected}>${cat.nombre}</option>`;
+    });
+    
+    // Opciones para proveedores
+    let proveedoresOptions = '<option value="">Seleccionar proveedor</option>';
+    proveedores.forEach(prov => {
+        const selected = prov.nombre === insumo.proveedor ? 'selected' : '';
+        proveedoresOptions += `<option value="${prov.nombre}" ${selected}>${prov.nombre}</option>`;
+    });
+    
+    // Crear contenido del formulario
+    const content = `
+        <form id="insumo-form" class="form-grid">
+            <div class="form-group span-2">
+                <label for="nombre">Nombre</label>
+                <input type="text" id="nombre" name="nombre" value="${insumo.nombre || ''}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="codigo">Código</label>
+                <input type="text" id="codigo" name="codigo" value="${insumo.codigo || ''}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="categoria">Categoría</label>
+                <select id="categoria" name="categoria" required>
+                    ${categoriasOptions}
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="unidad">Unidad de medida</label>
+                <input type="text" id="unidad" name="unidad" value="${insumo.unidad || ''}" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="ubicacion">Ubicación</label>
+                <input type="text" id="ubicacion" name="ubicacion" value="${insumo.ubicacion || ''}">
+            </div>
+            
+            <div class="form-group">
+                <label for="stockActual">Stock actual</label>
+                <input type="number" id="stockActual" name="stockActual" value="${insumo.stockActual || 0}" min="0" step="0.01" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="stockMinimo">Stock mínimo</label>
+                <input type="number" id="stockMinimo" name="stockMinimo" value="${insumo.stockMinimo || 0}" min="0" step="0.01" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="stockOptimo">Stock óptimo</label>
+                <input type="number" id="stockOptimo" name="stockOptimo" value="${insumo.stockOptimo || 0}" min="0" step="0.01" required>
+            </div>
+            
+            <div class="form-group span-2">
+                <label for="proveedor">Proveedor</label>
+                <select id="proveedor" name="proveedor">
+                    ${proveedoresOptions}
+                </select>
+            </div>
+            
+            <div class="form-group span-2">
+                <label for="descripcion">Descripción</label>
+                <textarea id="descripcion" name="descripcion" rows="3">${insumo.descripcion || ''}</textarea>
+            </div>
+        </form>
+    `;
+    
+    // Abrir modal
+    const modal = openModal(content, {
+        title: insumo.id ? 'Editar insumo' : 'Nuevo insumo',
+        size: 'medium',
+        onClose: null
+    });
+    
+    // Agregar botones de acción
+    const modalFooter = document.createElement('div');
+    modalFooter.className = 'modal-footer';
+    modalFooter.innerHTML = `
+        <button class="btn-secondary" id="cancel-btn">Cancelar</button>
+        <button class="btn-primary" id="save-btn">Guardar</button>
+    `;
+    
+    modal.querySelector('.modal-container').appendChild(modalFooter);
+    
+    // Configurar eventos
+    const cancelBtn = modal.querySelector('#cancel-btn');
+    const saveBtn = modal.querySelector('#save-btn');
+    const form = modal.querySelector('#insumo-form');
+    
+    cancelBtn.addEventListener('click', () => {
+        closeModal(modal);
+    });
+    
+    saveBtn.addEventListener('click', () => {
+        guardarInsumo(form, insumo.id, modal);
+    });
+    
+    // Validación del formulario
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        guardarInsumo(form, insumo.id, modal);
+    });
+}
+
+// Guardar insumo
+function guardarInsumo(form, insumoId, modal) {
+    // Validar formulario
+    const validation = validateForm('insumo-form', {
+        nombre: { required: true },
+        codigo: { required: true },
+        categoria: { required: true },
+        unidad: { required: true },
+        stockActual: { required: true, number: true, min: 0 },
+        stockMinimo: { required: true, number: true, min: 0 },
+        stockOptimo: { required: true, number: true, min: 0 }
+    });
+    
+    if (!validation.isValid) {
+        return;
+    }
+    
+    // Obtener datos del formulario
+    const formData = {
+        nombre: form.nombre.value.trim(),
+        codigo: form.codigo.value.trim(),
+        categoria: form.categoria.value,
+        unidad: form.unidad.value.trim(),
+        ubicacion: form.ubicacion.value.trim(),
+        stockActual: parseFloat(form.stockActual.value),
+        stockMinimo: parseFloat(form.stockMinimo.value),
+        stockOptimo: parseFloat(form.stockOptimo.value),
+        proveedor: form.proveedor.value.trim(),
+        descripcion: form.descripcion.value.trim(),
+        fechaActualizacion: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    
+    toggleLoader(true, insumoId ? 'Actualizando insumo...' : 'Creando insumo...');
+    
+    if (insumoId) {
+        // Actualizar insumo existente
+        db.collection('insumos').doc(insumoId).update(formData)
+            .then(() => {
+                toggleLoader(false);
+                closeModal(modal);
+                showNotification('Éxito', 'Insumo actualizado correctamente', 'success');
+                
+                // Recargar datos
+                const insumosContainer = document.getElementById('insumos-container');
+                if (insumosContainer) {
+                    loadInsumos(insumosContainer);
+                }
+            })
+            .catch(error => {
+                console.error("Error al actualizar insumo:", error);
+                toggleLoader(false);
+                showNotification('Error', 'No se pudo actualizar el insumo', 'error');
+            });
+    } else {
+        // Crear nuevo insumo
+        formData.fechaCreacion = firebase.firestore.FieldValue.serverTimestamp();
+        
+        db.collection('insumos').add(formData)
+            .then(() => {
+                toggleLoader(false);
+                closeModal(modal);
+                showNotification('Éxito', 'Insumo creado correctamente', 'success');
+                
+                // Recargar datos
+                const insumosContainer = document.getElementById('insumos-container');
+                if (insumosContainer) {
+                    loadInsumos(insumosContainer);
+                }
+            })
+            .catch(error => {
+                console.error("Error al crear insumo:", error);
+                toggleLoader(false);
+                showNotification('Error', 'No se pudo crear el insumo', 'error');
+            });
+    }
+}
+
+// Registrar movimiento de insumo
+function registrarMovimiento(insumoId) {
+    toggleLoader(true, 'Cargando datos...');
+    
+    db.collection('insumos').doc(insumoId).get()
+        .then(doc => {
+            if (!doc.exists) {
+                showNotification('Error', 'No se encontró el insumo', 'error');
+                toggleLoader(false);
+                return;
+            }
+            
+            const insumo = {
+                id: doc.id,
+                ...doc.data()
+            };
+            
+            // Mostrar formulario de movimiento
+            mostrarFormularioMovimiento(insumo);
+            toggleLoader(false);
+        })
+        .catch(error => {
+            console.error("Error al cargar insumo:", error);
+            showNotification('Error', 'No se pudo cargar el insumo', 'error');
+            toggleLoader(false);
+        });
+}
+
+// Mostrar formulario de movimiento
+function mostrarFormularioMovimiento(insumo) {
+    const content = `
+        <form id="movimiento-form" class="form-grid">
+            <div class="form-group span-2">
+                <label>Insumo</label>
+                <div class="input-readonly">
+                    <span>${insumo.nombre}</span>
+                    <small>${insumo.codigo}</small>
+                </div>
+            </div>
+            
+            <div class="form-group span-2">
+                <label>Stock actual</label>
+                <div class="input-readonly">
+                    <span>${insumo.stockActual} ${insumo.unidad}</span>
+                </div>
+            </div>
+            
+            <div class="form-group span-2">
+                <label for="tipo">Tipo de movimiento</label>
+                <div class="radio-group">
+                    <label class="radio-container">
+                        <input type="radio" name="tipo" value="entrada" checked>
+                        <span class="radio-label">Entrada</span>
+                    </label>
+                    <label class="radio-container">
+                        <input type="radio" name="tipo" value="salida">
+                        <span class="radio-label">Salida</span>
+                    </label>
+                </div>
+            </div>
+            
+            <div class="form-group span-2">
+                <label for="cantidad">Cantidad</label>
+                <div class="input-group">
+                    <input type="number" id="cantidad" name="cantidad" min="0.01" step="0.01" required>
+                    <span class="input-addon">${insumo.unidad}</span>
+                </div>
+            </div>
+            
+            <div class="form-group span-2">
+                <label for="motivo">Motivo</label>
+                <select id="motivo" name="motivo" required>
+                    <option value="">Seleccionar motivo</option>
+                    <option value="Compra">Compra</option>
+                    <option value="Donación">Donación</option>
+                    <option value="Devolución">Devolución</option>
+                    <option value="Uso en laboratorio">Uso en laboratorio</option>
+                    <option value="Préstamo">Préstamo</option>
+                    <option value="Vencimiento">Vencimiento</option>
+                    <option value="Daño">Daño</option>
+                    <option value="Ajuste de inventario">Ajuste de inventario</option>
+                    <option value="Otro">Otro</option>
+                </select>
+            </div>
+            
+            <div class="form-group span-2" id="otro-motivo-container" style="display: none;">
+                <label for="otroMotivo">Especificar motivo</label>
+                <input type="text" id="otroMotivo" name="otroMotivo">
+            </div>
+            
+            <div class="form-group span-2">
+                <label for="observaciones">Observaciones</label>
+                <textarea id="observaciones" name="observaciones" rows="3"></textarea>
+            </div>
+        </form>
+    `;
+    
+    // Abrir modal
+    const modal = openModal(content, {
+        title: 'Registrar movimiento',
+        size: 'medium',
+        onClose: null
+    });
+    
+    // Agregar botones de acción
+    const modalFooter = document.createElement('div');
+    modalFooter.className = 'modal-footer';
+    modalFooter.innerHTML = `
+        <button class="btn-secondary" id="cancel-btn">Cancelar</button>
+        <button class="btn-primary" id="save-btn">Registrar</button>
+    `;
+    
+    modal.querySelector('.modal-container').appendChild(modalFooter);
+    
+    // Configurar eventos
+    const cancelBtn = modal.querySelector('#cancel-btn');
+    const saveBtn = modal.querySelector('#save-btn');
+    const form = modal.querySelector('#movimiento-form');
+    const motivoSelect = modal.querySelector('#motivo');
+    const otroMotivoContainer = modal.querySelector('#otro-motivo-container');
+    
+    // Mostrar/ocultar campo "otro motivo"
+    motivoSelect.addEventListener('change', () => {
+        otroMotivoContainer.style.display = motivoSelect.value === 'Otro' ? 'block' : 'none';
+    });
+    
+    cancelBtn.addEventListener('click', () => {
+        closeModal(modal);
+    });
+    
+    saveBtn.addEventListener('click', () => {
+        guardarMovimiento(form, insumo, modal);
+    });
+    
+    // Validación del formulario
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        guardarMovimiento(form, insumo, modal);
+    });
+}
+
+// Guardar movimiento
+function guardarMovimiento(form, insumo, modal) {
+    // Validar formulario
+    const validation = validateForm('movimiento-form', {
+        cantidad: { 
+            required: true, 
+            number: true, 
+            min: 0.01,
+            validate: (value) => {
+                const cantidad = parseFloat(value);
+                const tipo = form.querySelector('input[name="tipo"]:checked').value;
+                
+                if (tipo === 'salida' && cantidad > insumo.stockActual) {
+                    return `No puede retirar más de ${insumo.stockActual} ${insumo.unidad}`;
+                }
+                
+                return null;
+            }
+        },
+        motivo: { required: true },
+        otroMotivo: { 
+            validate: (value, form) => {
+                const motivo = form.motivo.value;
+                if (motivo === 'Otro' && !value.trim()) {
+                    return 'Debe especificar el motivo';
+                }
+                return null;
+            }
+        }
+    });
+    
+    if (!validation.isValid) {
+        return;
+    }
+    
+    // Obtener datos del formulario
+    const tipo = form.querySelector('input[name="tipo"]:checked').value;
+    const cantidad = parseFloat(form.cantidad.value);
+    let motivo = form.motivo.value;
+    
+    if (motivo === 'Otro') {
+        motivo = form.otroMotivo.value.trim();
+    }
+    
+    // Calcular nuevo stock
+    const nuevoStock = tipo === 'entrada' 
+        ? insumo.stockActual + cantidad 
+        : insumo.stockActual - cantidad;
+    
+    // Datos del movimiento
+    const movimientoData = {
+        insumoId: insumo.id,
+        insumoNombre: insumo.nombre,
+        insumoCodigo: insumo.codigo,
+        tipo: tipo,
+        cantidad: cantidad,
+        stockAnterior: insumo.stockActual,
+        stockNuevo: nuevoStock,
+        motivo: motivo,
+        observaciones: form.observaciones.value.trim(),
+        fecha: firebase.firestore.FieldValue.serverTimestamp(),
+        usuarioId: currentUser.uid,
+        usuarioNombre: currentUser.displayName || 'Usuario'
+    };
+    
+    toggleLoader(true, 'Registrando movimiento...');
+    
+    // Usar una transacción para garantizar consistencia
+    db.runTransaction(transaction => {
+        const insumoRef = db.collection('insumos').doc(insumo.id);
+        
+        return transaction.get(insumoRef).then(doc => {
+            if (!doc.exists) {
+                throw new Error('El insumo no existe');
+            }
+            
+            // Verificar stock actual (podría haber cambiado desde que se cargó el formulario)
+            const stockActual = doc.data().stockActual;
+            
+            if (tipo === 'salida' && cantidad > stockActual) {
+                throw new Error(`No puede retirar más de ${stockActual} ${insumo.unidad}`);
+            }
+            
+            // Actualizar stock
+            const nuevoStockActual = tipo === 'entrada' 
+                ? stockActual + cantidad 
+                : stockActual - cantidad;
+            
+            // Actualizar el movimiento con los datos actualizados
+            movimientoData.stockAnterior = stockActual;
+            movimientoData.stockNuevo = nuevoStockActual;
+            
+            // Actualizar insumo
+            transaction.update(insumoRef, { 
+                stockActual: nuevoStockActual,
+                fechaActualizacion: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            // Crear movimiento
+            const movimientoRef = db.collection('movimientos').doc();
+            transaction.set(movimientoRef, movimientoData);
+        });
+    })
+    .then(() => {
+        toggleLoader(false);
+        closeModal(modal);
+        showNotification('Éxito', 'Movimiento registrado correctamente', 'success');
+        
+        // Recargar datos
+        const insumosContainer = document.getElementById('insumos-container');
+        if (insumosContainer) {
+            loadInsumos(insumosContainer);
+        }
+    })
+    .catch(error => {
+        console.error("Error al registrar movimiento:", error);
+        toggleLoader(false);
+        showNotification('Error', error.message || 'No se pudo registrar el movimiento', 'error');
+    });
 }
