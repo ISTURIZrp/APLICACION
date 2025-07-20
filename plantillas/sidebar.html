@@ -1,261 +1,97 @@
-<style>
-    /* Estilos del Sidebar (ahora dentro del mismo archivo) */
-    nav#sidebar {
-        width: var(--sidebar-width-collapsed);
-        background: var(--glass-bg);
-        display: flex;
-        flex-direction: column;
-        transition: width 0.3s ease;
-        position: fixed;
-        height: 100vh;
-        z-index: 1000;
-        border-right: 1px solid var(--glass-border);
-        backdrop-filter: blur(10px);
-        box-shadow: var(--glass-shadow);
-    }
-
-    nav#sidebar:hover {
-        width: var(--sidebar-width-expanded);
-    }
-
-    nav#sidebar header {
-        padding: 1.4rem 1rem;
-        font-weight: 800;
-        text-align: center;
-        border-bottom: 1px solid var(--glass-border);
-        white-space: nowrap;
-        overflow: hidden;
-        font-size: 0;
-        background: linear-gradient(45deg, var(--accent-primary), var(--accent-secondary));
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-    }
-
-    nav#sidebar:hover header {
-        font-size: 1.4rem;
-    }
-
-    #user-info {
-        padding: 1rem 1.2rem;
-        border-top: 1px solid var(--glass-border);
-        text-align: center;
-        opacity: 0;
-        height: 0;
-        overflow: hidden;
-        transition: opacity 0.3s ease, height 0.3s ease;
-        margin-top: auto;
-    }
-
-    nav#sidebar:hover #user-info {
-        opacity: 1;
-        height: auto;
-        padding: 1rem;
-    }
-
-    #user-logout-btn-sidebar {
-        background: transparent;
-        border: 1px solid var(--border-color);
-        padding: 8px 15px;
-        border-radius: 8px;
-        cursor: pointer;
-        margin-top: 12px;
-        font-weight: 600;
-        color: var(--text-primary);
-        transition: all 0.3s ease;
-    }
-
-    #user-logout-btn-sidebar:hover {
-        background: rgba(239, 68, 68, 0.1);
-        border-color: var(--action-error);
-        color: var(--action-error);
-    }
-
-    nav#sidebar ul {
-        list-style: none;
-        padding: 0;
-    }
-
-    nav#sidebar > ul {
-        flex-grow: 1;
-    }
-
-    nav#sidebar ul li a {
-        display: flex;
-        align-items: center;
-        color: var(--text-primary);
-        text-decoration: none;
-        padding: 1rem 1.4rem;
-        white-space: nowrap;
-        overflow: hidden;
-        transition: all 0.3s ease;
-        border-left: 3px solid transparent;
-    }
-
-    nav#sidebar ul li a:hover,
-    nav#sidebar ul li a.active {
-        background: rgba(56, 189, 248, 0.1);
-        border-left: 3px solid var(--accent-primary);
-    }
-
-    nav#sidebar ul li a .material-symbols-outlined {
-        font-size: 1.7rem;
-        transition: margin-right 0.3s ease;
-        min-width: 30px;
-    }
-
-    nav#sidebar:hover ul li a .material-symbols-outlined {
-        margin-right: 1rem;
-    }
-
-    nav#sidebar ul li a span.text {
-        display: none;
-        opacity: 0;
-        font-weight: 500;
-    }
-
-    nav#sidebar:hover ul li a span.text {
-        display: inline;
-        opacity: 1;
-    }
-
-    .menu-section-header {
-        display: flex;
-        align-items: center;
-        padding: 1rem 1.4rem;
-        cursor: pointer;
-        color: var(--text-primary);
-        white-space: nowrap;
-        overflow: hidden;
-        transition: background 0.3s ease;
-    }
-
-    .menu-section-header:hover {
-        background: rgba(56, 189, 248, 0.1);
-    }
-
-    .menu-section .text {
-        flex-grow: 1;
-    }
-
-    .menu-section .dropdown-arrow {
-        font-size: 1.5rem;
-        transition: transform 0.3s ease;
-        display: none;
-    }
-
-    nav#sidebar:hover .menu-section .dropdown-arrow {
-        display: inline-block;
-    }
-
-    .submenu {
-        background-color: rgba(0, 0, 0, 0.05);
-        display: none;
-    }
-
-    .submenu li a {
-        padding-left: 2rem !important;
-    }
-
-    nav#sidebar:hover .submenu li a {
-        padding-left: 4.1rem !important;
-    }
-
-    main#content {
-        flex-grow: 1;
-        margin-left: var(--sidebar-width-collapsed);
-        padding: 2rem 3rem;
-        transition: margin-left 0.3s ease;
-    }
-
-    nav#sidebar:hover + main#content {
-        margin-left: var(--sidebar-width-expanded);
-    }
-</style>
-
-<nav id="sidebar">
-    <header>LabFlow</header>
-    <ul>
-        <li><a href="home.html"><span class="material-symbols-outlined">home</span> <span class="text">Inicio</span></a></li>
-    </ul>
-
+<nav class="sidebar-menu">
     <div class="menu-section">
-        <div class="menu-section-header">
-            <span class="material-symbols-outlined">inventory_2</span>
-            <span class="text">Gestión de Insumos</span>
-            <span class="material-symbols-outlined dropdown-arrow">expand_more</span>
-        </div>
-        <ul class="submenu">
-            <li><a href="insumos.html"><span class="material-symbols-outlined">bubble_chart</span> <span class="text">Insumos</span></a></li>
-            <li><a href="movimientos.html"><span class="material-symbols-outlined">swap_horiz</span> <span class="text">Movimientos</span></a></li>
-            <li><a href="pedidos.html"><span class="material-symbols-outlined">receipt_long</span> <span class="text">Pedidos</span></a></li>
-            <li><a href="registro-pedidos.html"><span class="material-symbols-outlined">format_list_numbered</span> <span class="text">Registro Pedidos</span></a></li>
+        <div class="menu-section-title">Principal</div>
+        <ul class="menu-items">
+            <li class="sidebar-menu-item">
+                <a href="home.html" class="sidebar-menu-link">
+                    <i class="sidebar-menu-icon mdi mdi-view-dashboard"></i>
+                    <span class="sidebar-menu-text">Dashboard</span>
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="reportes.html" class="sidebar-menu-link">
+                    <i class="sidebar-menu-icon mdi mdi-chart-bar"></i>
+                    <span class="sidebar-menu-text">Reportes</span>
+                </a>
+            </li>
         </ul>
     </div>
-
+    
     <div class="menu-section">
-        <div class="menu-section-header">
-            <span class="material-symbols-outlined">category</span>
-            <span class="text">Gestión de Productos</span>
-            <span class="material-symbols-outlined dropdown-arrow">expand_more</span>
-        </div>
-        <ul class="submenu">
-            <li><a href="productos.html"><span class="material-symbols-outlined">manufacturing</span> <span class="text">Productos</span></a></li>
-            <li><a href="envios.html"><span class="material-symbols-outlined">local_shipping</span> <span class="text">Envíos</span></a></li>
+        <div class="menu-section-title">Inventario</div>
+        <ul class="menu-items">
+            <li class="sidebar-menu-item">
+                <a href="insumos.html" class="sidebar-menu-link">
+                    <i class="sidebar-menu-icon mdi mdi-flask"></i>
+                    <span class="sidebar-menu-text">Insumos</span>
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="movimientos.html" class="sidebar-menu-link">
+                    <i class="sidebar-menu-icon mdi mdi-transfer"></i>
+                    <span class="sidebar-menu-text">Movimientos</span>
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="pedidos.html" class="sidebar-menu-link">
+                    <i class="sidebar-menu-icon mdi mdi-cart"></i>
+                    <span class="sidebar-menu-text">Pedidos</span>
+                </a>
+            </li>
         </ul>
     </div>
-
+    
     <div class="menu-section">
-        <div class="menu-section-header">
-            <span class="material-symbols-outlined">precision_manufacturing</span>
-            <span class="text">Gestión de Equipos</span>
-            <span class="material-symbols-outlined dropdown-arrow">expand_more</span>
-        </div>
-        <ul class="submenu">
-            <li><a href="equipos.html"><span class="material-symbols-outlined">handyman</span> <span class="text">Equipos</span></a></li>
-            <li><a href="historial-equipos.html"><span class="material-symbols-outlined">history</span> <span class="text">Historial Equipos</span></a></li>
+        <div class="menu-section-title">Equipos</div>
+        <ul class="menu-items">
+            <li class="sidebar-menu-item">
+                <a href="equipos.html" class="sidebar-menu-link">
+                    <i class="sidebar-menu-icon mdi mdi-microscope"></i>
+                    <span class="sidebar-menu-text">Equipos</span>
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="historical-equipos.html" class="sidebar-menu-link">
+                    <i class="sidebar-menu-icon mdi mdi-history"></i>
+                    <span class="sidebar-menu-text">Historial</span>
+                </a>
+            </li>
         </ul>
     </div>
-
+    
     <div class="menu-section">
-        <div class="menu-section-header">
-            <span class="material-symbols-outlined">bar_chart</span>
-            <span class="text">Reportes y Datos</span>
-            <span class="material-symbols-outlined dropdown-arrow">expand_more</span>
-        </div>
-        <ul class="submenu">
-            <li><a href="reportes.html"><span class="material-symbols-outlined">analytics</span> <span class="text">Reportes</span></a></li>
-            <li><a href="client.html"><span class="material-symbols-outlined">group</span> <span class="text">Clientes</span></a></li>
+        <div class="menu-section-title">Comercial</div>
+        <ul class="menu-items">
+            <li class="sidebar-menu-item">
+                <a href="productos.html" class="sidebar-menu-link">
+                    <i class="sidebar-menu-icon mdi mdi-package-variant"></i>
+                    <span class="sidebar-menu-text">Productos</span>
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="envios.html" class="sidebar-menu-link">
+                    <i class="sidebar-menu-icon mdi mdi-truck"></i>
+                    <span class="sidebar-menu-text">Envíos</span>
+                </a>
+            </li>
         </ul>
     </div>
-
+    
     <div class="menu-section">
-        <div class="menu-section-header">
-            <span class="material-symbols-outlined">settings</span>
-            <span class="text">Configuración y Perfil</span>
-            <span class="material-symbols-outlined dropdown-arrow">expand_more</span>
-        </div>
-        <ul class="submenu">
-            <li><a href="ajustes.html"><span class="material-symbols-outlined">settings_suggest</span> <span class="text">Ajustes</span></a></li>
-            <li><a href="configuracion.html"><span class="material-symbols-outlined">tune</span> <span class="text">Configuración Global</span></a></li>
-            <li><a href="perfil.html"><span class="material-symbols-outlined">person</span> <span class="text">Mi Perfil</span></a></li>
+        <div class="menu-section-title">Administración</div>
+        <ul class="menu-items">
+            <li class="sidebar-menu-item">
+                <a href="usuarios.html" class="sidebar-menu-link">
+                    <i class="sidebar-menu-icon mdi mdi-account-group"></i>
+                    <span class="sidebar-menu-text">Usuarios</span>
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="configuration.html" class="sidebar-menu-link">
+                    <i class="sidebar-menu-icon mdi mdi-cog"></i>
+                    <span class="sidebar-menu-text">Configuración</span>
+                </a>
+            </li>
         </ul>
-    </div>
-
-    <div class="menu-section">
-        <div class="menu-section-header">
-            <span class="material-symbols-outlined">gavel</span>
-            <span class="text">Información Legal</span>
-            <span class="material-symbols-outlined dropdown-arrow">expand_more</span>
-        </div>
-        <ul class="submenu">
-            <li><a href="privacidad.html"><span class="material-symbols-outlined">lock</span> <span class="text">Política Privacidad</span></a></li>
-            <li><a href="terminos.html"><span class="material-symbols-outlined">description</span> <span class="text">Términos de Servicio</span></a></li>
-        </ul>
-    </div>
-
-    <div id="user-info">
-        <div id="user-email-display-sidebar">...</div>
-        <button id="user-logout-btn-sidebar">Cerrar Sesión</button>
     </div>
 </nav>
