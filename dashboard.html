@@ -1,164 +1,148 @@
-Para usar una plantilla de sidebar almacenada en una carpeta de plantillas, podemos cargar el contenido dinámicamente en tu página principal. Esto te permitirá mantener el código modular y fácil de mantener.
-
-### Paso a Paso para Integrar la Plantilla de Sidebar
-
-#### 1. Estructura de Archivos
-
-Supongamos que tienes la siguiente estructura de archivos:
-
-```
-/project-root
-    /plantillas
-        sidebar.html
-    /js
-        main.js
-    /css
-        style.css
-    index.html
-```
-
-#### 2. Contenido de `sidebar.html`
-
-Asegúrate de que tu `sidebar.html` tenga la estructura del menú que deseas incluir. Aquí hay un ejemplo simple:
-
-**plantillas/sidebar.html**:
-
-```html
-<ul>
-    <li>
-        <a href="#" onclick="loadModule('insumos')">
-            <i class="mdi mdi-flask-empty-outline"></i> <span class="menu-text">Insumos</span>
-        </a>
-    </li>
-    <!-- Agrega más elementos del menú según sea necesario -->
-</ul>
-```
-
-#### 3. Cargar la Plantilla Dinámicamente
-
-En tu archivo `index.html`, asegúrate de que tienes un contenedor para el sidebar donde se cargará el contenido:
-
-**index.html**:
-
-```html
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>LabFlow Manager - Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet">
 </head>
-<body class="light-mode">
+<body>
+    <div id="sidebar-container"></div>
 
-    <header class="top-bar">
-        <div class="app-brand">
-            <i class="mdi mdi-beaker-outline logo-icon"></i>
-            <h1>LabFlow Manager</h1>
-        </div>
-        <button id="theme-toggle" class="theme-toggle">
-            <i class="mdi mdi-theme-light-dark"></i>
-        </button>
-    </header>
-
-    <div class="container">
-        <nav class="sidebar collapsed" id="sidebar">
-            <!-- El contenido se cargará aquí dinámicamente -->
-        </nav>
-
-        <main class="page-container" id="page-container">
-            <div class="header-dashboard">
-                <h1>Panel de Control</h1>
-                <p>Gestiona tus operaciones de laboratorio con eficiencia desde un solo lugar</p>
+    <main id="content">
+        <div class="table-header">
+            <h1>Dashboard</h1>
+            <div class="action-buttons">
+                <button id="refreshStatsBtn" class="btn btn-secondary">
+                    <i class="mdi mdi-refresh"></i> Actualizar
+                </button>
             </div>
+        </div>
+        
+        <div class="content-wrapper">
+            <div class="dashboard-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="mdi mdi-flask-outline"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Total de Insumos</h3>
+                        <div class="stat-value" id="totalInsumos">--</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon warning">
+                        <i class="mdi mdi-alert-outline"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Stock Bajo</h3>
+                        <div class="stat-value" id="stockBajo">--</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon danger">
+                        <i class="mdi mdi-package-variant-closed-remove"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Próximos a Vencer</h3>
+                        <div class="stat-value" id="proximosVencer">--</div>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon success">
+                        <i class="mdi mdi-swap-horizontal"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>Movimientos Recientes</h3>
+                        <div class="stat-value" id="movimientosRecientes">--</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-charts">
+                <div class="chart-container">
+                    <h2>Insumos por Categoría</h2>
+                    <div id="categoriasChart" class="chart-placeholder">
+                        <i class="mdi mdi-chart-pie"></i>
+                        <p>Cargando gráfico...</p>
+                    </div>
+                </div>
+                
+                <div class="chart-container">
+                    <h2>Movimientos Recientes</h2>
+                    <div id="movimientosChart" class="chart-placeholder">
+                        <i class="mdi mdi-chart-line"></i>
+                        <p>Cargando gráfico...</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="dashboard-tables">
+                <div class="table-container">
+                    <h2>Insumos con Stock Bajo</h2>
+                    <div id="stockBajoTable" class="table-responsive">
+                        <!-- Tabla generada dinámicamente -->
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <h2>Lotes Próximos a Vencer</h2>
+                    <div id="proximosVencerTable" class="table-responsive">
+                        <!-- Tabla generada dinámicamente -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 
-            <div id="module-content"></div> <!-- Contenido dinámico -->
-
-            <footer class="dashboard-footer">
-                &copy; 2023 LabFlow Manager | <a href="#">Términos de uso</a> | <a href="#">Política de privacidad</a>
-            </footer>
-        </main>
+    <!-- Modal para confirmar acciones -->
+    <div class="modal-backdrop" id="confirmModal">
+        <div class="modal-content" style="max-width: 450px;">
+            <h2 id="confirmModalTitle">Confirmar Acción</h2>
+            <p id="confirmModalMessage" style="margin-top: 15px; margin-bottom: 25px;"></p>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="confirmCancelBtn">Cancelar</button>
+                <button type="button" class="btn-danger" id="confirmOkBtn">Aceptar</button>
+            </div>
+        </div>
     </div>
 
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <!-- Loader -->
+    <div id="app-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p class="loader-message">Cargando...</p>
+        </div>
+    </div>
+    
+    <!-- Notificación -->
+    <div id="app-notification">
+        <i class="mdi mdi-information-outline" id="notification-icon"></i>
+        <div id="notification-content">
+            <div id="notification-title">Notificación</div>
+            <div id="notification-message">Mensaje de notificación</div>
+        </div>
+    </div>
+
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    
+    <!-- Scripts de la aplicación -->
+    <script src="js/firebase.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
     <script src="js/main.js"></script>
 </body>
 </html>
-```
-
-#### 4. Lógica de JavaScript para Cargar la Plantilla
-
-Utiliza JavaScript para cargar el contenido de `sidebar.html` en el contenedor del sidebar:
-
-**main.js**:
-
-```javascript
-// Inicialización de Firebase
-const firebaseConfig = {
-    apiKey: "Tu-API-Key",
-    authDomain: "tu-proyecto.firebaseapp.com",
-    projectId: "tu-proyecto",
-    storageBucket: "tu-proyecto.appspot.com",
-    messagingSenderId: "tu-messagingSenderId",
-    appId: "tu-appId"
-};
-
-// Inicializa Firebase
-if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
-}
-const db = firebase.firestore();
-
-// Función para cargar la plantilla del sidebar
-function loadSidebar() {
-    fetch('plantillas/sidebar.html')
-        .then(response => response.text())
-        .then(data => {
-            document.getElementById('sidebar').innerHTML = data;
-        })
-        .catch(error => console.error("Error al cargar la plantilla del sidebar:", error));
-}
-
-// Llamar a la función para cargar el sidebar
-document.addEventListener('DOMContentLoaded', loadSidebar);
-
-// Alternar entre modo oscuro y claro
-const themeToggle = document.getElementById('theme-toggle');
-themeToggle.addEventListener('click', () => {
-    document.body.classList.toggle('dark-mode');
-    document.body.classList.toggle('light-mode');
-});
-
-// Función para cargar módulos dinámicamente (ejemplo de insumos)
-function loadModule(module) {
-    const moduleContent = document.getElementById('module-content');
-    
-    switch (module) {
-        case 'insumos':
-            fetch('modules/insumos.html')
-                .then(response => response.text())
-                .then(data => {
-                    moduleContent.innerHTML = data;
-                    loadInsumos(); // Llamar a la función para cargar los insumos
-                })
-                .catch(error => console.error("Error al cargar el módulo de insumos:", error));
-            break;
-        // Más casos para otros módulos
-        default:
-            moduleContent.innerHTML = '<h2>Selecciona un módulo</h2>';
-    }
-}
-```
-
-### Resumen
-
-1. **Plantilla de Sidebar**: Guarda la estructura del sidebar en un archivo separado (`sidebar.html`) dentro de la carpeta de plantillas.
-
-2. **Carga Dinámica**: Usa JavaScript para cargar el contenido del sidebar en la página principal cuando se cargue el documento.
-
-3. **Modularidad**: Mantener el código modular facilita el mantenimiento y la actualización de la interfaz.
-
-Siguiendo estos pasos, deberías poder cargar el sidebar desde una plantilla externa. Si tienes alguna pregunta adicional o necesitas más ayuda, ¡estaré encantado de asistirte!
