@@ -3,146 +3,86 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Insumos - LabFlow Manager</title>
+    <title>LabFlow Manager - Insumos y Lotes</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="css/style.css">
+    <link href="css/styles.css" rel="stylesheet">
 </head>
-<body class="light-mode">
-    <div class="app-container">
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <div class="app-brand">
-                    <i class="mdi mdi-flask-outline logo-icon"></i>
-                    <h1>LabFlow</h1>
-                </div>
-                <button id="collapse-sidebar" class="collapse-sidebar">
-                    <i class="mdi mdi-menu"></i>
+<body>
+    <div id="sidebar-container"></div>
+
+    <main id="content">
+        <div class="table-header">
+            <h1>Gestión de Insumos y Lotes</h1>
+            <div class="dropdown-container" id="csvActionsContainer">
+                <button id="btnCSVActions" class="btn btn-secondary">
+                    <i class="mdi mdi-file-document-outline"></i> Acciones CSV
                 </button>
-            </div>
-            <div class="sidebar-content">
-                <!-- El contenido del sidebar se cargará aquí desde la plantilla -->
-            </div>
-            <div class="sidebar-footer">
-                <div class="user-info">
-                    <div class="user-avatar">
-                        <span>JD</span>
-                    </div>
-                    <div class="user-details">
-                        <p class="user-name">John Doe</p>
-                        <p class="user-role">Administrador</p>
-                    </div>
+                <div id="csvDropdownMenu" class="dropdown-menu">
+                    <a href="#" id="btnExportCSV">
+                        <i class="mdi mdi-download"></i> Exportar Todo
+                    </a>
+                    <a href="#" id="btnImportInsumosCSV">
+                        <i class="mdi mdi-upload"></i> Importar Insumos
+                    </a>
+                    <a href="#" id="btnImportLotesCSV">
+                        <i class="mdi mdi-package-variant-plus"></i> Importar Lotes
+                    </a>
                 </div>
-                <button id="logout-btn" class="logout-btn" title="Cerrar Sesión">
-                    <i class="mdi mdi-logout"></i>
-                </button>
+                <input type="file" id="csvFileInput" accept=".csv" style="display: none;">
             </div>
-        </aside>
-
-        <main class="main-content">
-            <header class="top-bar">
-                <div class="page-title">
-                    <h1 id="current-module-title">Insumos</h1>
-                </div>
-                <div class="top-bar-actions">
-                    <div class="search-container">
-                        <i class="mdi mdi-magnify search-icon"></i>
-                        <input type="text" placeholder="Buscar..." class="search-input">
-                    </div>
-                    <button id="notifications-btn" class="icon-btn" title="Notificaciones">
-                        <i class="mdi mdi-bell-outline"></i>
-                        <span class="notification-badge">3</span>
-                    </button>
-                    <button id="theme-toggle" class="icon-btn" title="Cambiar tema">
-                        <i class="mdi mdi-theme-light-dark"></i>
-                    </button>
-                </div>
-            </header>
-
-            <div class="page-container" id="page-container">
-                <div id="module-content">
-                    <div class="module-header">
-                        <div class="module-title">
-                            <h2>Gestión de Insumos</h2>
-                            <p class="module-subtitle">Administra el inventario de insumos, reactivos y materiales del laboratorio</p>
-                        </div>
-                        <div class="module-actions">
-                            <button id="add-insumo-btn" class="btn-primary">
-                                <i class="mdi mdi-plus"></i> Agregar Insumo
-                            </button>
-                        </div>
-                    </div>
-
-                    <div class="filters-bar">
-                        <div class="filters-container">
-                            <div class="filter-group">
-                                <label for="search-insumos">Buscar:</label>
-                                <div class="search-input-container">
-                                    <i class="mdi mdi-magnify"></i>
-                                    <input type="text" id="search-insumos" placeholder="Buscar por nombre, código...">
-                                </div>
-                            </div>
-                            <div class="filter-group">
-                                <label for="filter-categoria">Categoría:</label>
-                                <select id="filter-categoria">
-                                    <option value="">Todas</option>
-                                    <option value="Reactivos">Reactivos</option>
-                                    <option value="Material de vidrio">Material de vidrio</option>
-                                    <option value="Material plástico">Material plástico</option>
-                                    <option value="Consumibles">Consumibles</option>
-                                    <option value="Equipos pequeños">Equipos pequeños</option>
-                                    <option value="Otro">Otro</option>
-                                </select>
-                            </div>
-                            <div class="filter-group">
-                                <label for="filter-stock">Stock:</label>
-                                <select id="filter-stock">
-                                    <option value="">Todos</option>
-                                    <option value="normal">Normal</option>
-                                    <option value="bajo">Bajo</option>
-                                    <option value="critico">Crítico</option>
-                                    <option value="agotado">Agotado</option>
-                                </select>
-                            </div>
-                            <button id="clear-filters" class="btn-text">
-                                <i class="mdi mdi-filter-remove"></i> Limpiar filtros
-                            </button>
-                        </div>
-                        <div class="results-count">
-                            <span id="insumos-count">0</span> insumos encontrados
-                        </div>
-                    </div>
-
-                    <div class="data-table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>Código</th>
-                                    <th>Nombre</th>
-                                    <th>Categoría</th>
-                                    <th>Stock</th>
-                                    <th>Ubicación</th>
-                                    <th>Último Movimiento</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="insumos-list">
-                                <!-- Los datos se cargarán dinámicamente -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
+        </div>
+        
+        <div class="content-wrapper">
+            <div id="insumos-container">
+                <!-- Aquí se cargarán los insumos dinámicamente -->
             </div>
-        </main>
+        </div>
+    </main>
+
+    <!-- Modal para confirmar acciones -->
+    <div class="modal-backdrop" id="confirmModal">
+        <div class="modal-content" style="max-width: 450px;">
+            <h2 id="confirmModalTitle">Confirmar Acción</h2>
+            <p id="confirmModalMessage" style="margin-top: 15px; margin-bottom: 25px;"></p>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" id="confirmCancelBtn">Cancelar</button>
+                <button type="button" class="btn-danger" id="confirmOkBtn">Aceptar</button>
+            </div>
+        </div>
     </div>
 
-    <div id="notification-container" class="notification-container"></div>
+    <!-- Loader -->
+    <div id="app-loader">
+        <div class="loader-content">
+            <div class="loader-spinner"></div>
+            <p class="loader-message">Cargando...</p>
+        </div>
+    </div>
+    
+    <!-- Notificación -->
+    <div id="app-notification">
+        <i class="mdi mdi-information-outline" id="notification-icon"></i>
+        <div id="notification-content">
+            <div id="notification-title">Notificación</div>
+            <div id="notification-message">Mensaje de notificación</div>
+        </div>
+    </div>
 
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <!-- Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+    
+    <!-- Scripts de la aplicación -->
     <script src="js/firebase.js"></script>
-    <script src="js/main.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/auth.js"></script>
     <script src="js/insumos.js"></script>
+    <script src="js/main.js"></script>
 </body>
 </html>
