@@ -1,185 +1,536 @@
+/* Variables CSS para colores y estilos */
 :root {
-    /* Colores para el modo claro */
-    --background-body-light: #ffffff;
-    --text-primary-light: #0a0a0a;
+    /* Colores principales */
+    --primary-color: #667eea;
+    --primary-dark: #5a6fd8;
+    --secondary-color: #764ba2;
+    --accent-color: #f093fb;
+    --success-color: #10b981;
+    --error-color: #ef4444;
+    --warning-color: #f59e0b;
     
-    /* Colores para el modo oscuro */
-    --background-body-dark: #0a192f;
-    --text-primary-dark: #e6f1ff;
-
-    /* Estilos generales */
-    --background-container: rgba(255, 255, 255, 0.1);
-    --border-color: rgba(100, 255, 218, 0.3);
-    --accent-primary: #00c4e6;
-    --accent-secondary: #00a896;
-    --font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+    /* Colores neutros */
+    --bg-primary: #0f172a;
+    --bg-secondary: #1e293b;
+    --bg-card: rgba(30, 41, 59, 0.8);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    
+    /* Bordes y sombras */
+    --border-color: rgba(148, 163, 184, 0.1);
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+    
+    /* Tipografía */
+    --font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-size-xs: 0.75rem;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.125rem;
+    --font-size-xl: 1.25rem;
+    --font-size-2xl: 1.5rem;
+    --font-size-3xl: 1.875rem;
+    
+    /* Espaciado */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 2rem;
+    --spacing-2xl: 3rem;
+    
+    /* Border radius */
+    --radius-sm: 0.375rem;
+    --radius-md: 0.5rem;
+    --radius-lg: 0.75rem;
+    --radius-xl: 1rem;
+    --radius-2xl: 1.5rem;
+    
+    /* Transiciones */
+    --transition-fast: 0.15s ease-out;
+    --transition-normal: 0.3s ease-out;
+    --transition-slow: 0.5s ease-out;
 }
 
-/* Estilos del cuerpo */
+/* Reset y estilos base */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    font-size: 16px;
+    scroll-behavior: smooth;
+}
+
 body {
     font-family: var(--font-family);
+    font-size: var(--font-size-base);
+    line-height: 1.6;
+    color: var(--text-primary);
+    background: var(--bg-primary);
+    overflow-x: hidden;
+    min-height: 100vh;
+}
+
+/* Fondo animado */
+.login-background {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+    position: relative;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    
+    /* Patrón de fondo animado */
+    background-image: 
+        radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+    background-size: 100px 100px;
+    animation: backgroundMove 20s ease-in-out infinite;
+}
+
+@keyframes backgroundMove {
+    0%, 100% { background-position: 0% 0%, 100% 100%; }
+    50% { background-position: 100% 100%, 0% 0%; }
+}
+
+/* Container de partículas */
+.particles-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    animation: float 15s infinite linear;
+    opacity: 0;
+}
+
+.particle:nth-child(1) { width: 6px; height: 6px; }
+.particle:nth-child(2) { width: 3px; height: 3px; }
+.particle:nth-child(3) { width: 5px; height: 5px; }
+
+@keyframes float {
+    0% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-100px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Tarjeta de login */
+.login-card {
+    position: relative;
+    z-index: 2;
+    width: 100%;
+    max-width: 420px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-2xl);
+    padding: var(--spacing-2xl);
+    box-shadow: var(--shadow-xl);
+    animation: slideUp 0.8s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Header del login */
+.login-header {
+    text-align: center;
+    margin-bottom: var(--spacing-2xl);
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--spacing-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.logo-icon {
+    font-size: var(--font-size-3xl);
+    color: var(--primary-color);
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+.app-title {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    color: var(--bg-primary);
+    margin: 0;
+}
+
+.login-subtitle {
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    font-weight: 400;
+    margin: 0;
+}
+
+/* Formulario */
+.login-form {
     display: flex;
     flex-direction: column;
-    min-height: 100vh;
-    padding: 20px;
-    transition: background-color 0.3s ease, color 0.3s ease;
+    gap: var(--spacing-lg);
 }
 
-body.light-mode {
-    background-color: var(--background-body-light);
-    color: var(--text-primary-light);
+.form-group {
+    position: relative;
 }
 
-body.dark-mode {
-    background-color: var(--background-body-dark);
-    color: var(--text-primary-dark);
+.input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
 }
 
-/* Estilos del encabezado */
-.top-bar {
+.input-icon {
+    position: absolute;
+    left: var(--spacing-md);
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    z-index: 2;
+    transition: color var(--transition-normal);
+}
+
+.form-input {
+    width: 100%;
+    padding: var(--spacing-lg) var(--spacing-lg) var(--spacing-lg) 3rem;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-base);
+    font-family: inherit;
+    background: rgba(255, 255, 255, 0.8);
+    color: var(--bg-primary);
+    transition: all var(--transition-normal);
+    outline: none;
+}
+
+.form-input:focus {
+    border-color: var(--primary-color);
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    transform: translateY(-2px);
+}
+
+.form-input:focus + .input-icon,
+.input-container.focused .input-icon {
+    color: var(--primary-color);
+}
+
+.password-toggle {
+    position: absolute;
+    right: var(--spacing-md);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: var(--spacing-xs);
+    border-radius: var(--radius-sm);
+    transition: color var(--transition-normal);
+    z-index: 2;
+}
+
+.password-toggle:hover {
+    color: var(--primary-color);
+}
+
+/* Opciones del formulario */
+.form-options {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px 20px;
-    background: var(--accent-primary);
+    gap: var(--spacing-md);
+    margin: var(--spacing-sm) 0;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+    cursor: pointer;
+    user-select: none;
+}
+
+.checkbox-container input[type="checkbox"] {
+    display: none;
+}
+
+.checkmark {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    position: relative;
+    transition: all var(--transition-normal);
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark {
+    background: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.checkbox-container input[type="checkbox"]:checked + .checkmark::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     color: white;
-    border-radius: 8px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    font-size: var(--font-size-xs);
+    font-weight: bold;
 }
 
-.app-brand {
-    display: flex;
-    align-items: center;
+.checkbox-text {
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
 }
 
-.app-brand h1 {
-    margin-left: 10px;
-    font-size: 1.5rem;
-    font-weight: 600;
-}
-
-/* Estilos del contenedor principal */
-.page-container {
-    width: 100%;
-    max-width: 1200px;
-    padding: 20px;
-    margin: auto;
-    background: var(--background-container);
-    border-radius: 12px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
-
-/* Estilos del encabezado del panel */
-.header-dashboard {
-    text-align: center;
-    margin-bottom: 40px;
-}
-
-.header-dashboard h1 {
-    font-size: 2.5rem;
-    margin: 0;
-    color: var(--accent-primary);
-}
-
-.header-dashboard p {
-    font-size: 1.2rem;
-    color: var(--text-primary-light);
-}
-
-/* Estilos de los módulos */
-.modules-container {
-    display: flex;
-    flex-direction: column;
-    gap: 20px; /* Espaciado entre módulos */
-}
-
-.module {
-    background: var(--background-container);
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-}
-
-.module:hover {
-    transform: translateY(-5px);
-}
-
-/* Estilos de la cabecera del módulo */
-.module-header {
-    display: flex;
-    align-items: center;
-}
-
-.module-header h2 {
-    margin-left: 10px;
-    font-size: 1.8rem;
-    color: var(--accent-primary);
-}
-
-/* Estilos del contenido del módulo */
-.module-content {
-    display: flex;
-    flex-direction: column;
-    margin-top: 10px;
-}
-
-/* Estilos de los ítems del módulo */
-.module-item {
-    padding: 15px;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    margin: 5px 0;
+.forgot-password {
+    color: var(--primary-color);
     text-decoration: none;
-    color: var(--text-primary-light);
-    transition: background 0.3s ease, transform 0.3s ease;
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    transition: color var(--transition-normal);
 }
 
-.module-item:hover {
-    background: rgba(14, 196, 230, 0.1);
-    transform: scale(1.02);
+.forgot-password:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
 }
 
-/* Estilos del pie de página */
-.dashboard-footer {
-    margin-top: 20px;
-    text-align: center;
-    font-size: 0.9rem;
+/* Botón de login */
+.login-button {
+    width: 100%;
+    padding: var(--spacing-lg);
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+    color: white;
+    border: none;
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-base);
+    font-weight: 600;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all var(--transition-normal);
+    box-shadow: var(--shadow-md);
 }
 
-/* Estilos de las notificaciones */
-#app-notification {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    background: rgba(255, 255, 255, 0.9);
-    border: 1px solid var(--border-color);
-    padding: 15px;
-    border-radius: 8px;
-    display: none; /* Oculto por defecto */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    transition: opacity 0.3s ease;
+.login-button:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
 }
 
-/* Estilos para mostrar notificaciones */
-#app-notification.show {
+.login-button:active {
+    transform: translateY(0);
+}
+
+.login-button.loading {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.loading-spinner {
     display: flex;
     align-items: center;
-    opacity: 1;
+    justify-content: center;
 }
 
-/* Estilos para el icono de la notificación */
-#app-notification i {
-    margin-right: 10px;
+.loading-spinner i {
+    font-size: var(--font-size-lg);
 }
 
-/* Media queries para responsividad */
-@media (max-width: 768px) {
-    .header-dashboard h1 {
-        font-size: 2rem;
+/* Footer del login */
+.login-footer {
+    text-align: center;
+    margin-top: var(--spacing-xl);
+    padding-top: var(--spacing-lg);
+    border-top: 1px solid var(--border-color);
+}
+
+.login-footer p {
+    color: var(--text-muted);
+    font-size: var(--font-size-sm);
+    margin: 0;
+}
+
+.signup-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--transition-normal);
+}
+
+.signup-link:hover {
+    color: var(--primary-dark);
+    text-decoration: underline;
+}
+
+/* Notificaciones */
+.notification {
+    position: fixed;
+    top: var(--spacing-lg);
+    right: var(--spacing-lg);
+    padding: var(--spacing-md) var(--spacing-lg);
+    border-radius: var(--radius-lg);
+    font-size: var(--font-size-sm);
+    font-weight: 500;
+    box-shadow: var(--shadow-lg);
+    transform: translateX(100%);
+    transition: transform var(--transition-normal);
+    z-index: 1000;
+    max-width: 300px;
+}
+
+.notification.show {
+    transform: translateX(0);
+}
+
+.notification.error {
+    background: var(--error-color);
+    color: white;
+}
+
+.notification.success {
+    background: var(--success-color);
+    color: white;
+}
+
+.notification.warning {
+    background: var(--warning-color);
+    color: white;
+}
+
+/* Responsive design */
+@media (max-width: 480px) {
+    .login-background {
+        padding: var(--spacing-md);
     }
-    .modules-container {
-        gap: 15px;
+    
+    .login-card {
+        padding: var(--spacing-xl);
     }
+    
+    .app-title {
+        font-size: var(--font-size-xl);
+    }
+    
+    .form-options {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: var(--spacing-sm);
+    }
+    
+    .notification {
+        right: var(--spacing-md);
+        left: var(--spacing-md);
+        max-width: none;
+    }
+}
+
+@media (max-width: 380px) {
+    .logo-container {
+        flex-direction: column;
+        gap: var(--spacing-xs);
+    }
+    
+    .form-input {
+        padding-left: 2.5rem;
+    }
+}
+
+/* Animaciones adicionales */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes slideInRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Estilos para estados de carga */
+.loading-state {
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/* Mejoras de accesibilidad */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+    
+    .particles-container {
+        display: none;
+    }
+}
+
+/* Focus visible para navegación por teclado */
+.form-input:focus-visible,
+.login-button:focus-visible,
+.forgot-password:focus-visible,
+.signup-link:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
 }
