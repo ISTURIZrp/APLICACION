@@ -1,9 +1,13 @@
 :root {
+    /* Colores para el modo claro */
     --background-body-light: #ffffff;
     --text-primary-light: #000000;
+    
+    /* Colores para el modo oscuro */
     --background-body-dark: #0a192f;
     --text-primary-dark: #e6f1ff;
-    
+
+    /* Estilos generales */
     --background-container: rgba(255, 255, 255, 0.05);
     --border-color: rgba(100, 255, 218, 0.2);
     --accent-primary: #00c4e6;
@@ -11,6 +15,7 @@
     --font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
 }
 
+/* Estilos del cuerpo */
 body {
     font-family: var(--font-family);
     display: flex;
@@ -18,6 +23,7 @@ body {
     justify-content: center;
     align-items: center;
     padding: 20px;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 body.light-mode {
@@ -30,14 +36,121 @@ body.dark-mode {
     color: var(--text-primary-dark);
 }
 
-/* Otros estilos que ya tienes pueden ir aquí */
+/* Estilos del encabezado */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background: var(--accent-primary);
+    color: white;
+}
 
-.login-container {
-    background: var(--background-container);
-    border-radius: 20px;
-    padding: 40px 35px;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
-    max-width: 450px;
+/* Estilos del contenedor principal */
+.page-container {
     width: 100%;
+    max-width: 1200px;
+    padding: 20px;
+}
+
+/* Estilos del encabezado del panel */
+.header-dashboard {
     text-align: center;
+    margin-bottom: 40px;
+}
+
+.header-dashboard h1 {
+    font-size: 2.5rem;
+    margin: 0;
+}
+
+.header-dashboard p {
+    font-size: 1.2rem;
+}
+
+/* Estilos de los módulos */
+.modules-container {
+    display: flex;
+    flex-direction: column;
+    gap: 20px; /* Espaciado entre módulos */
+}
+
+.module {
+    background: var(--background-container);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilos de la cabecera del módulo */
+.module-header {
+    display: flex;
+    align-items: center;
+}
+
+.module-header h2 {
+    margin-left: 10px;
+}
+
+/* Estilos del contenido del módulo */
+.module-content {
+    display: flex;
+    flex-direction: column;
+    margin-top: 10px;
+}
+
+/* Estilos de los ítems del módulo */
+.module-item {
+    padding: 10px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    margin: 5px 0;
+    text-decoration: none;
+    color: var(--text-primary-light);
+    transition: background 0.3s ease;
+}
+
+.module-item:hover {
+    background: rgba(14, 196, 230, 0.1);
+}
+
+/* Estilos del pie de página */
+.dashboard-footer {
+    margin-top: 20px;
+    text-align: center;
+}
+
+/* Estilos de las notificaciones */
+#app-notification {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.9);
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    border-radius: 8px;
+    display: none; /* Oculto por defecto */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+/* Estilos para mostrar notificaciones */
+#app-notification.show {
+    display: flex;
+    align-items: center;
+}
+
+/* Estilos para el icono de la notificación */
+#app-notification i {
+    margin-right: 10px;
+}
+
+/* Media queries para responsividad */
+@media (max-width: 768px) {
+    .header-dashboard h1 {
+        font-size: 2rem;
+    }
+    .modules-container {
+        gap: 15px;
+    }
 }
