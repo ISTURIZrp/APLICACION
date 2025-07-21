@@ -1,4 +1,6 @@
 // js/firebase.js
+console.log('Firebase.js script loaded');
+console.log('Firebase object:', typeof firebase);
 
 // Configuración de Firebase (usa tu propia configuración)
 const firebaseConfig = {
@@ -11,9 +13,18 @@ const firebaseConfig = {
 };
 
 // Inicializar Firebase
-try {
-    firebase.initializeApp(firebaseConfig);
-    console.log('Firebase initialized successfully');
-} catch (error) {
-    console.error('Error initializing Firebase:', error);
+if (typeof firebase === 'undefined') {
+    console.error('Firebase SDK not loaded');
+} else {
+    try {
+        if (firebase.apps.length === 0) {
+            firebase.initializeApp(firebaseConfig);
+            console.log('Firebase initialized successfully');
+            console.log('Firebase apps:', firebase.apps.length);
+        } else {
+            console.log('Firebase already initialized');
+        }
+    } catch (error) {
+        console.error('Error initializing Firebase:', error);
+    }
 }
