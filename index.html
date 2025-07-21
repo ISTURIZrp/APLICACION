@@ -24,6 +24,11 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <script src="js/firebase.js"></script> <!-- Archivo de configuración de Firebase -->
     <script>
+        // Esperar a que Firebase esté listo
+        window.addEventListener('load', function() {
+            console.log('Page loaded, Firebase apps:', firebase.apps?.length || 0);
+        });
+
         const loginForm = document.getElementById('login-form');
         const notificationDiv = document.getElementById('notification');
 
