@@ -6,9 +6,10 @@ const firebaseConfig = {
     apiKey: "AIzaSyCxJOpBEXZUo7WrAqDTrlJV_2kJBsL8Ym0",
     authDomain: "labflow-manager.firebaseapp.com",
     projectId: "labflow-manager",
-    storageBucket: "labflow-manager.appspot.com",
+    storageBucket: "labflow-manager.firebasestorage.app",
     messagingSenderId: "742212306654",
-    appId: "1:742212306654:web:a53bf890fc63cd5d05e44f"
+    appId: "1:742212306654:web:a53bf890fc63cd5d05e44f",
+    measurementId: "G-YVZDBCJR3B"
 };
 
 // Variable global para el estado de Firebase
