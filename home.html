@@ -10,7 +10,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css"> <!-- Archivo CSS -->
 </head>
-<body>
+<body class="light-mode"> <!-- Cambiar entre light-mode y dark-mode según la preferencia del usuario -->
 
     <header class="top-bar">
         <div class="app-brand">
@@ -38,6 +38,9 @@
                 </a>
             </div>
         </div>
+        <button id="toggle-mode" class="toggle-mode">
+            <i class="mdi mdi-theme-light-dark"></i>
+        </button>
     </header>
 
     <main class="page-container" id="page-container">
@@ -47,7 +50,6 @@
         </div>
 
         <div class="modules-container">
-            <!-- Módulos (puedes agregar más módulos según sea necesario) -->
             <div class="module active" id="insumos-module">
                 <div class="module-header">
                     <i class="mdi mdi-clipboard-list-outline"></i>
@@ -84,8 +86,6 @@
                     </a>
                 </div>
             </div>
-
-            <!-- Puedes agregar más módulos aquí -->
         </div>
 
         <div class="dashboard-footer">
@@ -107,5 +107,13 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <script src="js/firebase.js"></script> <!-- Archivo de configuración de Firebase -->
     <script src="js/home.js"></script> <!-- Archivo JavaScript para la página principal -->
+    <script>
+        // Lógica para manejar el modo oscuro y claro
+        const toggleButton = document.getElementById('toggle-mode');
+        toggleButton.addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            document.body.classList.toggle('light-mode');
+        });
+    </script>
 </body>
 </html>
