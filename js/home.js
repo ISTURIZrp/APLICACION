@@ -13,7 +13,6 @@ const notificationMessage = document.getElementById('notification-message');
 // Manejar estado de autenticación
 auth.onAuthStateChanged(async (user) => {
     if (user) {
-        // Usuario autenticado
         const userDoc = await db.collection('users').doc(user.uid).get();
         if (userDoc.exists) {
             const userData = userDoc.data();
