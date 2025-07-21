@@ -1,15 +1,15 @@
 :root {
     /* Colores para el modo claro */
     --background-body-light: #ffffff;
-    --text-primary-light: #000000;
+    --text-primary-light: #0a0a0a;
     
     /* Colores para el modo oscuro */
     --background-body-dark: #0a192f;
     --text-primary-dark: #e6f1ff;
 
     /* Estilos generales */
-    --background-container: rgba(255, 255, 255, 0.05);
-    --border-color: rgba(100, 255, 218, 0.2);
+    --background-container: rgba(255, 255, 255, 0.1);
+    --border-color: rgba(100, 255, 218, 0.3);
     --accent-primary: #00c4e6;
     --accent-secondary: #00a896;
     --font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
@@ -19,9 +19,8 @@
 body {
     font-family: var(--font-family);
     display: flex;
+    flex-direction: column;
     min-height: 100vh;
-    justify-content: center;
-    align-items: center;
     padding: 20px;
     transition: background-color 0.3s ease, color 0.3s ease;
 }
@@ -41,9 +40,22 @@ body.dark-mode {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 24px;
+    padding: 10px 20px;
     background: var(--accent-primary);
     color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.app-brand {
+    display: flex;
+    align-items: center;
+}
+
+.app-brand h1 {
+    margin-left: 10px;
+    font-size: 1.5rem;
+    font-weight: 600;
 }
 
 /* Estilos del contenedor principal */
@@ -51,6 +63,10 @@ body.dark-mode {
     width: 100%;
     max-width: 1200px;
     padding: 20px;
+    margin: auto;
+    background: var(--background-container);
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 /* Estilos del encabezado del panel */
@@ -62,10 +78,12 @@ body.dark-mode {
 .header-dashboard h1 {
     font-size: 2.5rem;
     margin: 0;
+    color: var(--accent-primary);
 }
 
 .header-dashboard p {
     font-size: 1.2rem;
+    color: var(--text-primary-light);
 }
 
 /* Estilos de los módulos */
@@ -80,6 +98,11 @@ body.dark-mode {
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.module:hover {
+    transform: translateY(-5px);
 }
 
 /* Estilos de la cabecera del módulo */
@@ -90,6 +113,8 @@ body.dark-mode {
 
 .module-header h2 {
     margin-left: 10px;
+    font-size: 1.8rem;
+    color: var(--accent-primary);
 }
 
 /* Estilos del contenido del módulo */
@@ -101,23 +126,25 @@ body.dark-mode {
 
 /* Estilos de los ítems del módulo */
 .module-item {
-    padding: 10px;
+    padding: 15px;
     border: 1px solid var(--border-color);
     border-radius: 8px;
     margin: 5px 0;
     text-decoration: none;
     color: var(--text-primary-light);
-    transition: background 0.3s ease;
+    transition: background 0.3s ease, transform 0.3s ease;
 }
 
 .module-item:hover {
     background: rgba(14, 196, 230, 0.1);
+    transform: scale(1.02);
 }
 
 /* Estilos del pie de página */
 .dashboard-footer {
     margin-top: 20px;
     text-align: center;
+    font-size: 0.9rem;
 }
 
 /* Estilos de las notificaciones */
@@ -127,17 +154,19 @@ body.dark-mode {
     right: 20px;
     background: rgba(255, 255, 255, 0.9);
     border: 1px solid var(--border-color);
-    padding: 10px;
+    padding: 15px;
     border-radius: 8px;
     display: none; /* Oculto por defecto */
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
     z-index: 1000;
+    transition: opacity 0.3s ease;
 }
 
 /* Estilos para mostrar notificaciones */
 #app-notification.show {
     display: flex;
     align-items: center;
+    opacity: 1;
 }
 
 /* Estilos para el icono de la notificación */
