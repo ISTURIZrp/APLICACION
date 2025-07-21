@@ -87,8 +87,67 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
     <script src="js/firebase.js"></script>
-    
+
     <script>
+        // Configuración de Firebase integrada
+        const firebaseConfig = {
+            apiKey: "AIzaSyCxJOpBEXZUo7WrAqDTrlJV_2kJBsL8Ym0",
+            authDomain: "labflow-manager.firebaseapp.com",
+            projectId: "labflow-manager",
+            storageBucket: "labflow-manager.firebasestorage.app",
+            messagingSenderId: "742212306654",
+            appId: "1:742212306654:web:a53bf890fc63cd5d05e44f",
+            measurementId: "G-YVZDBCJR3B"
+        };
+
+        // Variable para el estado de Firebase
+        let firebaseReady = false;
+        let firebaseApp = null;
+
+        // Función para inicializar Firebase
+        async function initializeFirebase() {
+            if (typeof firebase === 'undefined') {
+                throw new Error('Firebase SDK not loaded');
+            }
+
+            try {
+                if (firebase.apps.length === 0) {
+                    firebaseApp = firebase.initializeApp(firebaseConfig);
+                    console.log('Firebase initialized successfully');
+                } else {
+                    firebaseApp = firebase.apps[0];
+                    console.log('Firebase already initialized');
+                }
+
+                firebaseReady = true;
+                console.log('Firebase apps count:', firebase.apps.length);
+                return firebaseApp;
+            } catch (error) {
+                console.error('Error initializing Firebase:', error);
+                throw error;
+            }
+        }
+
+        // Función para verificar que Firebase esté listo
+        async function waitForFirebase() {
+            if (firebaseReady && firebase.apps.length > 0) {
+                return true;
+            }
+
+            // Intentar inicializar si no está listo
+            await initializeFirebase();
+            return true;
+        }
+
+        // Inicializar Firebase inmediatamente
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await initializeFirebase();
+            } catch (error) {
+                console.error('Error en inicialización inicial:', error);
+            }
+        });
+
         // Elementos del DOM
         const loginForm = document.getElementById('login-form');
         const emailInput = document.getElementById('email');
