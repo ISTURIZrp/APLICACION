@@ -34,6 +34,11 @@
             const password = document.getElementById('password').value;
 
             try {
+                // Verificar que Firebase esté inicializado
+                if (!firebase.apps.length) {
+                    throw new Error('Firebase no está inicializado');
+                }
+
                 // Iniciar sesión con email y contraseña
                 await firebase.auth().signInWithEmailAndPassword(email, password);
                 window.location.href = 'home.html'; // Redirigir a home después de iniciar sesión
