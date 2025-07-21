@@ -1,55 +1,58 @@
-import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-import { doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
-import { auth, db } from './firebase-config.js';
+// js/home.js
 
+import { auth, db } from './firebase.js'; // Importar auth y db
+
+// Elementos DOM
 const pageContainer = document.getElementById('page-container');
-const loginSection = document.getElementById('login-section');
 const userInfoBox = document.getElementById('user-info-box');
 const userDropdown = document.getElementById('user-dropdown');
 const userNameDisplay = document.getElementById('user-name-display');
 const userRoleDisplay = document.getElementById('user-role-display');
 const logoutBtn = document.getElementById('logout-btn');
+const notificationDiv = document.getElementById('app-notification');
+const notificationTitle = document.getElementById('notification-title');
+const notificationMessage = document.getElementById('notification-message');
 
-onAuthStateChanged(auth, async (user) => {
+// Manejar estado de autenticación
+auth.onAuthStateChanged(async (user) => {
     if (user) {
         // Usuario autenticado
-        pageContainer.style.display = 'block';
-        loginSection.style.display = 'none';
-
         try {
-            const userDoc = await getDoc(doc(db, 'users', user.uid));
-            if (userDoc.exists()) {
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            if (userDoc.exists) {
                 const userData = userDoc.data();
                 userNameDisplay.textContent = userData.displayName || user.email;
                 userRoleDisplay.textContent = userData.role || 'Usuario';
-            } else {
-                userNameDisplay.textContent = user.email;
-                userRoleDisplay.textContent = 'Usuario';
+                pageContainer.style.display = 'flex';
+                showNotification('Bienvenido', `Hola ${userData.displayName || user.email}`, 'success');
             }
         } catch (error) {
             console.error("Error al obtener datos del usuario:", error);
-            userNameDisplay.textContent = user.email;
+            showNotification('Error', 'No se pudieron cargar los datos del usuario', 'error');
         }
     } else {
-        // No autenticado
-        pageContainer.style.display = 'none';
-        loginSection.style.display = 'block';
+        // No autenticado, redirigir a la página de inicio de sesión
+        window.location.href = 'index.html';
     }
 });
 
-logoutBtn.addEventListener('click', () => signOut(auth));
-
-userInfoBox.addEventListener('click', (e) => {
-    e.stopPropagation();
-    userDropdown.classList.toggle('show');
-});
-
-document.addEventListener('click', () => {
-    userDropdown.classList.remove('show');
-});
-
-document.querySelectorAll('.module-header').forEach(header => {
-    header.addEventListener('click', () => {
-        header.closest('.module').classList.toggle('active');
+// Manejar cierre de sesión
+logoutBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    auth.signOut().then(() => {
+        showNotification('Sesión cerrada', 'Has cerrado sesión correctamente', 'info');
+        window.location.href = 'index.html'; // Redirigir a la página de inicio de sesión
+    }).catch((error) => {
+        showNotification('Error', 'No se pudo cerrar la sesión', 'error');
     });
 });
+
+// Mostrar notificación
+function showNotification(title, message, type = 'info') {
+    notificationTitle.textContent = title;
+    notificationMessage.textContent = message;
+    notificationDiv.className = 'show ' + type;
+    setTimeout(() => { 
+        notificationDiv.className = ''; 
+    }, 3000);
+}
