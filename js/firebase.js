@@ -1,8 +1,7 @@
 // js/firebase.js
 console.log('Firebase.js script loaded');
-console.log('Firebase object:', typeof firebase);
 
-// Configuración de Firebase (usa tu propia configuración)
+// Configuración de Firebase
 const firebaseConfig = {
     apiKey: "AIzaSyCxJOpBEXZUo7WrAqDTrlJV_2kJBsL8Ym0",
     authDomain: "labflow-manager.firebaseapp.com",
@@ -12,19 +11,56 @@ const firebaseConfig = {
     appId: "1:742212306654:web:a53bf890fc63cd5d05e44f"
 };
 
-// Inicializar Firebase
-if (typeof firebase === 'undefined') {
-    console.error('Firebase SDK not loaded');
-} else {
-    try {
-        if (firebase.apps.length === 0) {
-            firebase.initializeApp(firebaseConfig);
-            console.log('Firebase initialized successfully');
-            console.log('Firebase apps:', firebase.apps.length);
-        } else {
-            console.log('Firebase already initialized');
+// Variable global para el estado de Firebase
+window.firebaseReady = false;
+window.firebaseApp = null;
+
+// Función para inicializar Firebase
+function initializeFirebase() {
+    return new Promise((resolve, reject) => {
+        if (typeof firebase === 'undefined') {
+            console.error('Firebase SDK not loaded');
+            reject(new Error('Firebase SDK not loaded'));
+            return;
         }
-    } catch (error) {
-        console.error('Error initializing Firebase:', error);
-    }
+
+        try {
+            if (firebase.apps.length === 0) {
+                window.firebaseApp = firebase.initializeApp(firebaseConfig);
+                console.log('Firebase initialized successfully');
+            } else {
+                window.firebaseApp = firebase.apps[0];
+                console.log('Firebase already initialized');
+            }
+
+            window.firebaseReady = true;
+            console.log('Firebase apps count:', firebase.apps.length);
+            resolve(window.firebaseApp);
+        } catch (error) {
+            console.error('Error initializing Firebase:', error);
+            reject(error);
+        }
+    });
+}
+
+// Función para verificar que Firebase esté listo
+function waitForFirebase() {
+    return new Promise((resolve, reject) => {
+        if (window.firebaseReady && firebase.apps.length > 0) {
+            resolve(true);
+            return;
+        }
+
+        // Intentar inicializar si no está listo
+        initializeFirebase()
+            .then(() => resolve(true))
+            .catch(reject);
+    });
+}
+
+// Inicializar Firebase inmediatamente
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initializeFirebase);
+} else {
+    initializeFirebase();
 }
