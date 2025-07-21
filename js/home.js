@@ -5,11 +5,12 @@ import { auth, db } from './firebase.js'; // Importar auth y db
 // Elementos DOM
 const userNameDisplay = document.getElementById('user-name-display');
 const userRoleDisplay = document.getElementById('user-role-display');
+const logoutBtn = document.getElementById('logout-btn');
 const notificationDiv = document.getElementById('app-notification');
 const notificationTitle = document.getElementById('notification-title');
 const notificationMessage = document.getElementById('notification-message');
 
-// Manejar estado de autenticación
+// Manejar el estado de autenticación
 auth.onAuthStateChanged(async (user) => {
     if (user) {
         // Usuario autenticado
@@ -30,6 +31,18 @@ auth.onAuthStateChanged(async (user) => {
     } else {
         // No autenticado, redirigir a la página de inicio de sesión
         window.location.href = 'index.html';
+    }
+});
+
+// Manejar cierre de sesión
+logoutBtn.addEventListener('click', async (e) => {
+    e.preventDefault(); // Evitar la acción predeterminada del enlace
+    try {
+        await auth.signOut(); // Cerrar sesión
+        showNotification('Sesión cerrada', 'Has cerrado sesión correctamente', 'info');
+        window.location.href = 'index.html'; // Redirigir a la página de inicio de sesión
+    } catch (error) {
+        showNotification('Error', 'No se pudo cerrar la sesión', 'error');
     }
 });
 
