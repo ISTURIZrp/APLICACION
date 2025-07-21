@@ -16,4 +16,4 @@ firebase.initializeApp(firebaseConfig);
 // Exportar las instancias de Firebase
 const auth = firebase.auth();
 const db = firebase.firestore();
-export { auth, db };
+export { auth, db }; 
