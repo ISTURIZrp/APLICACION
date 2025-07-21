@@ -16,8 +16,8 @@ const firebaseConfig = {
 window.firebaseReady = false;
 window.firebaseApp = null;
 
-// Función para inicializar Firebase
-function initializeFirebase() {
+// Función para inicializar Firebase (global)
+window.initializeFirebase = function() {
     return new Promise((resolve, reject) => {
         if (typeof firebase === 'undefined') {
             console.error('Firebase SDK not loaded');
@@ -44,8 +44,8 @@ function initializeFirebase() {
     });
 }
 
-// Función para verificar que Firebase esté listo
-function waitForFirebase() {
+// Función para verificar que Firebase esté listo (global)
+window.waitForFirebase = function() {
     return new Promise((resolve, reject) => {
         if (window.firebaseReady && firebase.apps.length > 0) {
             resolve(true);
@@ -53,7 +53,7 @@ function waitForFirebase() {
         }
 
         // Intentar inicializar si no está listo
-        initializeFirebase()
+        window.initializeFirebase()
             .then(() => resolve(true))
             .catch(reject);
     });
