@@ -3,19 +3,41 @@
     --text-primary-light: #000000;
     --background-body-dark: #0a192f;
     --text-primary-dark: #e6f1ff;
-    /* Otras variables que necesites */
+    
+    --background-container: rgba(255, 255, 255, 0.05);
+    --border-color: rgba(100, 255, 218, 0.2);
+    --accent-primary: #00c4e6;
+    --accent-secondary: #00a896;
+    --font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
 }
 
-/* Estilos para el modo claro */
+body {
+    font-family: var(--font-family);
+    display: flex;
+    min-height: 100vh;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
 body.light-mode {
     background-color: var(--background-body-light);
     color: var(--text-primary-light);
 }
 
-/* Estilos para el modo oscuro */
 body.dark-mode {
     background-color: var(--background-body-dark);
     color: var(--text-primary-dark);
 }
 
 /* Otros estilos que ya tienes pueden ir aquí */
+
+.login-container {
+    background: var(--background-container);
+    border-radius: 20px;
+    padding: 40px 35px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    max-width: 450px;
+    width: 100%;
+    text-align: center;
+}
