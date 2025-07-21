@@ -55,4 +55,4 @@ function showNotification(title, message, type = 'info') {
     setTimeout(() => { 
         notificationDiv.className = ''; 
     }, 3000);
-}
+} 
