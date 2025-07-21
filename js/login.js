@@ -1,60 +1,49 @@
-import { signInWithEmailAndPassword, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-import { collection, query, where, getDocs } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-import { auth, db } from './firebase-config.js';
+// js/login.js
 
-const loginForm = document.getElementById('loginForm');
-const emailOrUsernameField = document.getElementById('email-username-field');
-const passwordField = document.getElementById('password-field');
-const errorMessageDiv = document.getElementById('error-message');
-const loginBtn = document.getElementById('login-btn');
+import { auth, db } from './firebase.js'; // Importar auth y db
 
-// Si el usuario ya está autenticado, lo redirige al home.
-onAuthStateChanged(auth, (user) => {
-    if (user) {
-        window.location.href = 'home.html';
-    }
-});
+// Elementos DOM
+const loginForm = document.getElementById('login-form');
+const loginEmail = document.getElementById('login-email');
+const loginPassword = document.getElementById('login-password');
+const notificationDiv = document.getElementById('app-notification');
+const notificationTitle = document.getElementById('notification-title');
+const notificationMessage = document.getElementById('notification-message');
 
-// Maneja el evento de envío del formulario.
+// Mostrar notificación
+function showNotification(title, message, type = 'info') {
+    notificationTitle.textContent = title;
+    notificationMessage.textContent = message;
+    notificationDiv.className = 'show ' + type;
+    setTimeout(() => { 
+        notificationDiv.className = ''; 
+    }, 3000);
+}
+
+// Manejar inicio de sesión
 loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
-    loginBtn.disabled = true;
-    errorMessageDiv.textContent = '';
-    let emailToSignIn = emailOrUsernameField.value.trim();
-    const password = passwordField.value;
+    const email = loginEmail.value;
+    const password = loginPassword.value;
 
-    if (!emailToSignIn || !password) {
-        errorMessageDiv.textContent = 'Ambos campos son obligatorios.';
-        loginBtn.disabled = false;
-        return;
-    }
-
-    // Si no es un email, búscalo como nombre de usuario en Firestore
-    if (!emailToSignIn.includes('@')) {
-        try {
-            const q = query(collection(db, 'users'), where('username', '==', emailToSignIn));
-            const querySnapshot = await getDocs(q);
-            if (!querySnapshot.empty) {
-                emailToSignIn = querySnapshot.docs[0].data().email;
-            } else {
-                errorMessageDiv.textContent = 'Usuario o contraseña incorrectos.';
-                loginBtn.disabled = false;
-                return;
-            }
-        } catch (error) {
-            errorMessageDiv.textContent = 'Error al verificar usuario.';
-            loginBtn.disabled = false;
-            return;
-        }
-    }
-    
-    // Intenta iniciar sesión con el email
     try {
-        await signInWithEmailAndPassword(auth, emailToSignIn, password);
-        // La redirección la maneja onAuthStateChanged
+        await auth.signInWithEmailAndPassword(email, password);
+        window.location.href = 'home.html'; // Redirigir a home.html al iniciar sesión
     } catch (error) {
-        errorMessageDiv.textContent = 'Usuario o contraseña incorrectos.';
-    } finally {
-        loginBtn.disabled = false;
+        let errorMessage = 'Error al iniciar sesión';
+        switch (error.code) {
+            case 'auth/user-not-found':
+                errorMessage = 'Usuario no registrado';
+                break;
+            case 'auth/wrong-password':
+                errorMessage = 'Contraseña incorrecta';
+                break;
+            case 'auth/invalid-email':
+                errorMessage = 'Email no válido';
+                break;
+            default:
+                errorMessage = error.message;
+        }
+        showNotification('Error', errorMessage, 'error');
     }
 });
