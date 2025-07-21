@@ -1,173 +1,111 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LabFlow Manager - Dashboard</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LabFlow Manager - Panel de Control</title>
+    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/@mdi/font/css/materialdesignicons.min.css" rel="stylesheet">
-    <link href="css/styles.css" rel="stylesheet">
-    <style>
-        /* Estilos básicos en caso de que no cargue el CSS externo */
-        body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            padding: 20px;
-            margin: 0;
-        }
-        .dashboard-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-        .logout-btn {
-            padding: 10px 16px;
-            background-color: #ef4444;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        #app-loader {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
-        }
-        #app-loader.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        .loader-content {
-            background: #fff;
-            padding: 25px 40px;
-            border-radius: 15px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .loader-spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(0, 0, 0, 0.1);
-            border-radius: 50%;
-            border-top-color: #0ea5e9;
-            animation: spin 1s linear infinite;
-            margin-bottom: 15px;
-        }
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-    </style>
+    <link rel="stylesheet" href="css/style.css"> <!-- Archivo CSS -->
 </head>
 <body>
-    <div class="dashboard-container">
-        <div class="header">
-            <h1>Dashboard</h1>
-            <button id="logout-btn" class="logout-btn">
-                <i class="mdi mdi-logout"></i> Cerrar Sesión
-            </button>
+
+    <header class="top-bar">
+        <div class="app-brand">
+            <i class="mdi mdi-beaker-outline logo-icon"></i>
+            <h1>LabFlow Manager</h1>
         </div>
-        
-        <div class="dashboard-content">
-            <p>¡Bienvenido al sistema LabFlow Manager!</p>
-            <p>Has iniciado sesión correctamente.</p>
-            <p>Correo del usuario: <span id="user-email">Cargando...</span></p>
+        <div class="user-info-box" id="user-info-box">
+            <div class="user-details">
+                <div id="user-name-display">Iniciar sesión</div>
+                <small id="user-role-display">No autenticado</small>
+            </div>
+            <i class="mdi mdi-account-circle-outline"></i>
+            <div class="user-dropdown" id="user-dropdown">
+                <a href="perfil.html">
+                    <i class="mdi mdi-account-outline"></i>
+                    <span>Mi perfil</span>
+                </a>
+                <a href="configuracion.html">
+                    <i class="mdi mdi-cog-outline"></i>
+                    <span>Configuración</span>
+                </a>
+                <a href="#" id="logout-btn">
+                    <i class="mdi mdi-logout-variant"></i>
+                    <span>Cerrar sesión</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="page-container" id="page-container">
+        <div class="header-dashboard">
+            <h1>Panel de Control</h1>
+            <p>Gestiona tus operaciones de laboratorio con eficiencia desde un solo lugar</p>
+        </div>
+
+        <div class="modules-container">
+            <!-- Módulos (puedes agregar más módulos según sea necesario) -->
+            <div class="module active" id="insumos-module">
+                <div class="module-header">
+                    <i class="mdi mdi-clipboard-list-outline"></i>
+                    <h2>Insumos</h2>
+                </div>
+                <div class="module-content">
+                    <a href="insumos.html" class="module-item">
+                        <i class="mdi mdi-flask-empty-outline"></i>
+                        <div class="item-info">
+                            <h3>Insumos</h3>
+                            <p>Gestiona inventario de reactivos y materiales</p>
+                        </div>
+                    </a>
+                    <a href="movimientos.html" class="module-item">
+                        <i class="mdi mdi-swap-horizontal"></i>
+                        <div class="item-info">
+                            <h3>Entradas/Salidas</h3>
+                            <p>Registra movimientos de inventario</p>
+                        </div>
+                    </a>
+                    <a href="pedidos.html" class="module-item">
+                        <i class="mdi mdi-cart-outline"></i>
+                        <div class="item-info">
+                            <h3>Pedidos de insumos</h3>
+                            <p>Solicita nuevos materiales y reactivos</p>
+                        </div>
+                    </a>
+                    <a href="registro-pedidos.html" class="module-item">
+                        <i class="mdi mdi-clipboard-check-outline"></i>
+                        <div class="item-info">
+                            <h3>Registro de pedido</h3>
+                            <p>Administra pedidos realizados</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Puedes agregar más módulos aquí -->
+        </div>
+
+        <div class="dashboard-footer">
+            &copy; 2023 LabFlow Manager | <a href="#">Términos de uso</a> | <a href="#">Política de privacidad</a>
+        </div>
+    </main>
+
+    <div id="app-notification">
+        <i class="mdi mdi-information-outline"></i>
+        <div id="notification-content">
+            <div id="notification-title">Sistema</div>
+            <div id="notification-message">Bienvenido al Panel de Control</div>
         </div>
     </div>
-    
-    <!-- Loader -->
-    <div id="app-loader">
-        <div class="loader-content">
-            <div class="loader-spinner"></div>
-            <p class="loader-message">Cargando...</p>
-        </div>
-    </div>
 
-    <!-- Firebase -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-    
-    <script>
-        // Configuración de Firebase directamente en el archivo
-        const firebaseConfig = {
-            apiKey: "AIzaSyCxJOpBEXZUo7WrAqDTrlJV_2kJBsL8Ym0",
-            authDomain: "labflow-manager.firebaseapp.com",
-            projectId: "labflow-manager",
-            storageBucket: "labflow-manager.appspot.com",
-            messagingSenderId: "742212306654",
-            appId: "1:742212306654:web:a53bf890fc63cd5d05e44f",
-            measurementId: "G-YVZDBCJR3B"
-        };
-
-        // Inicializar Firebase
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-
-        function toggleLoader(show, message = 'Cargando...') {
-            const loader = document.getElementById('app-loader');
-            const loaderMessage = loader.querySelector('.loader-message');
-            
-            if (show) {
-                loaderMessage.textContent = message;
-                loader.classList.add('active');
-            } else {
-                loader.classList.remove('active');
-            }
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            toggleLoader(true, 'Verificando sesión...');
-            
-            // Verificar autenticación
-            auth.onAuthStateChanged(user => {
-                if (user) {
-                    // Usuario autenticado, mostrar información
-                    console.log("Usuario autenticado:", user.email);
-                    document.getElementById('user-email').textContent = user.email;
-                    toggleLoader(false);
-                } else {
-                    // No hay usuario autenticado, redirigir al login
-                    console.log("No hay usuario autenticado, redirigiendo...");
-                    window.location.href = 'index.html';
-                }
-            });
-            
-            // Configurar botón de logout
-            document.getElementById('logout-btn').addEventListener('click', function() {
-                toggleLoader(true, 'Cerrando sesión...');
-                
-                auth.signOut()
-                    .then(() => {
-                        window.location.href = 'index.html';
-                    })
-                    .catch(error => {
-                        console.error("Error al cerrar sesión:", error);
-                        toggleLoader(false);
-                        alert('Error al cerrar sesión');
-                    });
-            });
-        });
-    </script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase.js"></script> <!-- Archivo de configuración de Firebase -->
+    <script src="js/home.js"></script> <!-- Archivo JavaScript para la página principal -->
 </body>
 </html>
