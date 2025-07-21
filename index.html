@@ -137,7 +137,7 @@
         // Event listener para el formulario
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            
+
             const email = emailInput.value.trim();
             const password = passwordInput.value;
 
@@ -149,26 +149,26 @@
             setLoading(true);
 
             try {
-                // Verificar que Firebase esté inicializado
-                if (!firebase.apps.length) {
-                    throw new Error('Firebase no está inicializado');
-                }
-                
+                // Esperar a que Firebase esté listo
+                await waitForFirebase();
+
+                console.log('Firebase listo para autenticación');
+
                 // Iniciar sesión
                 await firebase.auth().signInWithEmailAndPassword(email, password);
-                
+
                 showNotification('¡Inicio de sesión exitoso!', 'success');
-                
+
                 // Redirigir después de un breve delay
                 setTimeout(() => {
                     window.location.href = 'home.html';
                 }, 1500);
-                
+
             } catch (error) {
                 console.error("Error al iniciar sesión:", error);
-                
+
                 let errorMessage = 'Error al iniciar sesión';
-                
+
                 // Personalizar mensajes de error
                 switch (error.code) {
                     case 'auth/user-not-found':
@@ -183,10 +183,13 @@
                     case 'auth/too-many-requests':
                         errorMessage = 'Demasiados intentos. Intenta más tarde';
                         break;
+                    case 'auth/network-request-failed':
+                        errorMessage = 'Error de conexión. Verifica tu internet';
+                        break;
                     default:
-                        errorMessage = error.message;
+                        errorMessage = error.message || 'Error desconocido';
                 }
-                
+
                 showNotification(errorMessage);
             } finally {
                 setLoading(false);
