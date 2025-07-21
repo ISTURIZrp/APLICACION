@@ -3,9 +3,6 @@
 import { auth, db } from './firebase.js'; // Importar auth y db
 
 // Elementos DOM
-const pageContainer = document.getElementById('page-container');
-const userInfoBox = document.getElementById('user-info-box');
-const userDropdown = document.getElementById('user-dropdown');
 const userNameDisplay = document.getElementById('user-name-display');
 const userRoleDisplay = document.getElementById('user-role-display');
 const logoutBtn = document.getElementById('logout-btn');
@@ -17,18 +14,11 @@ const notificationMessage = document.getElementById('notification-message');
 auth.onAuthStateChanged(async (user) => {
     if (user) {
         // Usuario autenticado
-        try {
-            const userDoc = await db.collection('users').doc(user.uid).get();
-            if (userDoc.exists) {
-                const userData = userDoc.data();
-                userNameDisplay.textContent = userData.displayName || user.email;
-                userRoleDisplay.textContent = userData.role || 'Usuario';
-                pageContainer.style.display = 'flex';
-                showNotification('Bienvenido', `Hola ${userData.displayName || user.email}`, 'success');
-            }
-        } catch (error) {
-            console.error("Error al obtener datos del usuario:", error);
-            showNotification('Error', 'No se pudieron cargar los datos del usuario', 'error');
+        const userDoc = await db.collection('users').doc(user.uid).get();
+        if (userDoc.exists) {
+            const userData = userDoc.data();
+            userNameDisplay.textContent = userData.displayName || user.email;
+            userRoleDisplay.textContent = userData.role || 'Usuario';
         }
     } else {
         // No autenticado, redirigir a la página de inicio de sesión
@@ -37,14 +27,15 @@ auth.onAuthStateChanged(async (user) => {
 });
 
 // Manejar cierre de sesión
-logoutBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    auth.signOut().then(() => {
+logoutBtn.addEventListener('click', async (e) => {
+    e.preventDefault(); // Evitar la acción predeterminada del enlace
+    try {
+        await auth.signOut(); // Cerrar sesión
         showNotification('Sesión cerrada', 'Has cerrado sesión correctamente', 'info');
         window.location.href = 'index.html'; // Redirigir a la página de inicio de sesión
-    }).catch((error) => {
+    } catch (error) {
         showNotification('Error', 'No se pudo cerrar la sesión', 'error');
-    });
+    }
 });
 
 // Mostrar notificación
@@ -55,4 +46,4 @@ function showNotification(title, message, type = 'info') {
     setTimeout(() => { 
         notificationDiv.className = ''; 
     }, 3000);
-} 
+}
