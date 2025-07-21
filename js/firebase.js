@@ -61,7 +61,7 @@ window.waitForFirebase = function() {
 
 // Inicializar Firebase inmediatamente
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initializeFirebase);
+    document.addEventListener('DOMContentLoaded', window.initializeFirebase);
 } else {
-    initializeFirebase();
+    window.initializeFirebase();
 }
