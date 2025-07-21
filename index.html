@@ -225,9 +225,18 @@
         }
 
         // Esperar a que la página cargue
-        window.addEventListener('load', function() {
-            console.log('Página cargada, Firebase apps:', firebase.apps?.length || 0);
+        window.addEventListener('load', async function() {
+            console.log('Página cargada');
             createParticles();
+
+            // Verificar que Firebase esté listo
+            try {
+                await waitForFirebase();
+                console.log('Firebase listo - Apps:', firebase.apps?.length || 0);
+            } catch (error) {
+                console.error('Error inicializando Firebase:', error);
+                showNotification('Error de configuración. Contacta al administrador.', 'error');
+            }
         });
     </script>
 </body>
